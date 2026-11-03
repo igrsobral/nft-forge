@@ -16,12 +16,12 @@ export function CatalogFilters({
   onChange: (patch: FilterPatch) => void
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4">
       <label className="grid gap-1 text-sm" htmlFor={`${idPrefix}-category`}>
         <span className="text-muted-foreground">Category</span>
         <select
           id={`${idPrefix}-category`}
-          className="h-10 rounded-lg border border-input bg-background px-3"
+          className="type-b-14 h-11 w-full rounded-[10px] border border-line bg-surface-card px-3 text-foreground"
           value={search.category ?? ''}
           onChange={(event) => {
             const value = event.target.value
@@ -40,7 +40,7 @@ export function CatalogFilters({
         <span className="text-muted-foreground">Collection</span>
         <select
           id={`${idPrefix}-collection`}
-          className="h-10 rounded-lg border border-input bg-background px-3"
+          className="type-b-14 h-11 w-full rounded-[10px] border border-line bg-surface-card px-3 text-foreground"
           value={search.collection ?? ''}
           onChange={(event) => onChange({ collection: event.target.value || undefined })}
         >
@@ -56,7 +56,7 @@ export function CatalogFilters({
         <span className="text-muted-foreground">Sort</span>
         <select
           id={`${idPrefix}-sort`}
-          className="h-10 rounded-lg border border-input bg-background px-3"
+          className="type-b-14 h-11 w-full rounded-[10px] border border-line bg-surface-card px-3 text-foreground"
           value={search.sort}
           onChange={(event) => {
             const value = sorts.find((sort) => sort === event.target.value)
@@ -76,7 +76,7 @@ export function CatalogFilters({
           inputMode="decimal"
           defaultValue={search.minPrice ?? ''}
           key={`min-${search.minPrice ?? ''}`}
-          className="h-10 rounded-lg border border-input bg-background px-3"
+          className="type-b-14 h-11 w-full rounded-[10px] border border-line bg-surface-card px-3 text-foreground"
           onBlur={(event) => commitPrice(event.target.value, (minPrice) => onChange({ minPrice }))}
         />
       </label>
@@ -87,7 +87,7 @@ export function CatalogFilters({
           inputMode="decimal"
           defaultValue={search.maxPrice ?? ''}
           key={`max-${search.maxPrice ?? ''}`}
-          className="h-10 rounded-lg border border-input bg-background px-3"
+          className="type-b-14 h-11 w-full rounded-[10px] border border-line bg-surface-card px-3 text-foreground"
           onBlur={(event) => commitPrice(event.target.value, (maxPrice) => onChange({ maxPrice }))}
         />
       </label>

@@ -1,33 +1,32 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/geist';
+@import '@fontsource/roboto-mono/400.css';
+@import '@fontsource/roboto-mono/500.css';
+@import '@fontsource/roboto-mono/700.css';
 
 @custom-variant dark (&:is(.dark *));
 
-/*
-  Neutral dark marketplace palette. These are stand-ins until the Figma file
-  is available — swap the values below, the component classes read the variables.
-*/
+/* Figma tokens for this challenge: warm ink ground, copper accent, Roboto Mono. */
 :root {
-  --background: oklch(0.16 0.014 270);
-  --foreground: oklch(0.97 0.005 270);
-  --card: oklch(0.21 0.016 270);
-  --card-foreground: oklch(0.97 0.005 270);
-  --popover: oklch(0.22 0.016 270);
-  --popover-foreground: oklch(0.97 0.005 270);
-  --primary: oklch(0.86 0.12 84);
-  --primary-foreground: oklch(0.22 0.03 84);
-  --secondary: oklch(0.28 0.016 270);
-  --secondary-foreground: oklch(0.97 0.005 270);
-  --muted: oklch(0.28 0.014 270);
-  --muted-foreground: oklch(0.78 0.02 270);
-  --accent: oklch(0.32 0.03 270);
-  --accent-foreground: oklch(0.97 0.005 270);
-  --destructive: oklch(0.7 0.17 22);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.86 0.12 84);
+  --background: #140d0a;
+  --foreground: #f5f1eb;
+  --card: #241612;
+  --card-foreground: #f5f1eb;
+  --popover: #241612;
+  --popover-foreground: #f5f1eb;
+  --primary: #d28a4c;
+  --primary-foreground: #140d0a;
+  --secondary: #b39463;
+  --secondary-foreground: #f5f1eb;
+  --muted: #2f1d15;
+  --muted-foreground: #b39463;
+  --accent: #e89b55;
+  --accent-foreground: #140d0a;
+  --destructive: #f0805f;
+  --border: #3f2319;
+  --input: #3f2319;
+  --ring: #e89b55;
   --radius: 0.625rem;
   color-scheme: dark;
   --chart-1: oklch(0.87 0 0);
@@ -46,7 +45,12 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Roboto Mono', ui-monospace, 'Courier New', monospace;
+  --color-ink: #140d0a;
+  --color-surface-card: #241612;
+  --color-surface-raised: #2f1d15;
+  --color-text-secondary: #cfb28c;
+  --color-line: #3f2319;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -98,7 +102,7 @@
   }
 
   body {
-    @apply m-0 min-h-svh font-sans bg-background text-foreground;
+    @apply m-0 min-h-svh overflow-x-clip bg-background font-sans text-foreground;
   }
 
   :focus-visible {
@@ -115,14 +119,70 @@
   }
 }
 
+@utility bg-gradient-tile {
+  background-image: linear-gradient(139.5deg, #241612 12%, #2f1d15 106.6%);
+}
+@utility bg-gradient-cta {
+  background-image: linear-gradient(108.9deg, #d28a4c 4%, rgba(210, 138, 76, 0.8) 122%);
+}
+@utility bg-gradient-filter-btn {
+  background-image: linear-gradient(137deg, rgba(210, 138, 76, 0.45) 24.6%, #d28a4c 100%);
+}
+@utility type-wordmark {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.4px;
+}
+@utility type-display-43 {
+  font-size: 43px;
+  font-weight: 700;
+  line-height: 70px;
+}
+@utility type-t-18-bold {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 29px;
+}
+@utility type-b-16-bold {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 16px;
+}
+@utility type-b-16 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 16px;
+}
+@utility type-b-15 {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: normal;
+}
+@utility type-b-14-bold {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+}
+@utility type-b-14 {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+}
+@utility type-c-13 {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 16px;
+}
+@utility type-c-12 {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
 .skeleton-shimmer {
-  background-color: var(--muted);
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    oklch(1 0 0 / 10%) 50%,
-    transparent 100%
-  );
+  background-color: #2f1d15;
+  background-image: linear-gradient(90deg, transparent, rgba(245, 241, 235, 0.08), transparent);
   background-size: 200% 100%;
   background-repeat: no-repeat;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -136,24 +196,24 @@
 }
 
 .dark {
-  --background: oklch(0.16 0.014 270);
-  --foreground: oklch(0.97 0.005 270);
-  --card: oklch(0.21 0.016 270);
-  --card-foreground: oklch(0.97 0.005 270);
-  --popover: oklch(0.22 0.016 270);
-  --popover-foreground: oklch(0.97 0.005 270);
-  --primary: oklch(0.86 0.12 84);
-  --primary-foreground: oklch(0.22 0.03 84);
-  --secondary: oklch(0.28 0.016 270);
-  --secondary-foreground: oklch(0.97 0.005 270);
-  --muted: oklch(0.28 0.014 270);
-  --muted-foreground: oklch(0.78 0.02 270);
-  --accent: oklch(0.32 0.03 270);
-  --accent-foreground: oklch(0.97 0.005 270);
-  --destructive: oklch(0.7 0.17 22);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.86 0.12 84);
+  --background: #140d0a;
+  --foreground: #f5f1eb;
+  --card: #241612;
+  --card-foreground: #f5f1eb;
+  --popover: #241612;
+  --popover-foreground: #f5f1eb;
+  --primary: #d28a4c;
+  --primary-foreground: #140d0a;
+  --secondary: #b39463;
+  --secondary-foreground: #f5f1eb;
+  --muted: #2f1d15;
+  --muted-foreground: #b39463;
+  --accent: #e89b55;
+  --accent-foreground: #140d0a;
+  --destructive: #f0805f;
+  --border: #3f2319;
+  --input: #3f2319;
+  --ring: #e89b55;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);

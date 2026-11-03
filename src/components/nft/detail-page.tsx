@@ -43,28 +43,33 @@ export function NftDetailPage() {
 
   const nft = query.data
   return (
-    <main className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+    <main className="mx-auto grid w-full max-w-[1440px] gap-6 px-4 py-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-12 lg:px-10 lg:py-8">
       <img
         src={nft.imageUrl}
         alt={`${nft.name} by ${nft.creator}`}
         width={800}
         height={800}
-        className="aspect-square w-full rounded-2xl border border-border object-cover"
+        className="aspect-square w-full rounded-[20px] object-cover lg:rounded-[24px]"
       />
-      <div className="flex flex-col gap-4">
-        <Link to="/" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+      <div className="flex min-w-0 flex-col gap-4">
+        <Link
+          to="/"
+          className="type-b-14 text-text-secondary underline-offset-4 hover:text-accent hover:underline"
+        >
           Back to catalog
         </Link>
-        <p className="text-sm tracking-wide text-primary uppercase">{nft.collectionName}</p>
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{nft.name}</h1>
-        <p className="text-muted-foreground">{nft.description}</p>
-        <p className="text-sm text-muted-foreground">
+        <p className="type-c-12 tracking-[1.4px] text-accent uppercase">{nft.collectionName}</p>
+        <h1 className="type-t-18-bold break-words text-foreground lg:text-[32px] lg:leading-tight">
+          {nft.name}
+        </h1>
+        <p className="type-b-14 leading-6 text-text-secondary">{nft.description}</p>
+        <p className="type-c-13 text-text-secondary">
           {nft.category} · {nft.creator}
         </p>
-        <p data-testid="nft-price" className="text-2xl font-semibold">
+        <p data-testid="nft-price" className="type-b-16-bold text-2xl text-accent">
           {formatEth(nft.priceEth)}
         </p>
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p className="type-c-13 text-text-secondary" aria-live="polite">
           Version {nft.version}.{' '}
           {nft.available
             ? 'At least one edition is still available.'
@@ -92,17 +97,17 @@ export function NftDetailPage() {
             </DialogContent>
           </Dialog>
         </div>
-        <ul className="mt-2 divide-y divide-border rounded-xl border border-border">
+        <ul className="mt-2 divide-y divide-line rounded-[14px] border border-line bg-surface-card">
           {nft.editions.map((edition) => (
             <li key={edition.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div>
-                <p className="font-medium">{edition.name}</p>
-                <p className="text-sm text-muted-foreground">
+              <div className="min-w-0">
+                <p className="type-b-14-bold truncate">{edition.name}</p>
+                <p className="type-c-12 text-text-secondary">
                   {edition.remaining} of {edition.supply} remaining
                   {edition.remaining === 0 ? ' · Sold out' : ''}
                 </p>
               </div>
-              <p className="font-medium">{formatEth(edition.priceEth)}</p>
+              <p className="type-b-14-bold shrink-0 text-accent">{formatEth(edition.priceEth)}</p>
             </li>
           ))}
         </ul>
@@ -113,9 +118,12 @@ export function NftDetailPage() {
 
 export function DetailSkeleton() {
   return (
-    <main aria-busy="true" className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 lg:grid-cols-2">
+    <main
+      aria-busy="true"
+      className="mx-auto grid w-full max-w-[1440px] gap-6 px-4 py-4 lg:grid-cols-2 lg:px-10"
+    >
       <span className="sr-only">Loading edition</span>
-      <Skeleton className="aspect-square w-full rounded-2xl" />
+      <Skeleton className="aspect-square w-full rounded-[20px]" />
       <div className="flex flex-col gap-3">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-10 w-2/3" />

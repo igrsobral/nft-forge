@@ -2,7 +2,7 @@
 
 Foundation for the NFT marketplace take-home: a Vite + React + TypeScript app with typed REST contracts, an MSW mock API, and a Socket.IO price feed. The catalog and edition detail are the working slice. Sign-in, cart, checkout, profile, and wallets are implemented in the mock API and not yet as screens.
 
-The Figma file was not readable from this environment, so the UI uses a neutral dark theme. Colors and type live in CSS variables in `src/index.css` and can be swapped for the Figma tokens later.
+The Figma file still needs a desktop sign-in, so frames were not opened directly. The UI uses this challenge’s tokens (ink, copper, Roboto Mono) from `src/index.css`.
 
 ## Setup
 

@@ -54,7 +54,7 @@ One module-level database is shared by every handler, persisted at `nft-market:d
 
 ## Known limitations
 
-- Figma was inaccessible. The palette, Geist, and spacing are placeholders in `src/index.css`.
+- The Figma file still needs a desktop sign-in, so frames were not opened directly. The catalog, cards, header, and detail use this challenge’s published tokens: ink `#140d0a`, copper `#d28a4c`, Roboto Mono, 20px mobile tiles, a 2-column staggered grid under 768px, and a 45px search bar. Screens beyond this slice are still unstyled.
 - TypeScript is 6.0.3 with `strict` and `noUncheckedIndexedAccess`. The Vite template's TypeScript 7 is not used because typescript-eslint does not parse it yet.
 - Auth, cart, checkout, profile, and wallet screens are not built. The sign-in control explains that and does not submit a login.
 - Optimistic updates are not wired yet. The socket patch is a cache write from a verified event, not a mutation rollback.
