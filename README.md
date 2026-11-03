@@ -1,6 +1,6 @@
 # Atelier Market
 
-Foundation for the NFT marketplace take-home: a Vite + React + TypeScript app with typed REST contracts, an MSW mock API, and a Socket.IO price feed. The catalog and edition detail are the working slice. Sign-in, cart, checkout, profile, and wallets are implemented in the mock API and not yet as screens.
+NFT marketplace take-home: React, TypeScript, TanStack Router and Query, Axios, and a Socket.IO feed mocked with MSW. The app includes the catalog, edition detail, cart, checkout, order receipt, sign-in, sign-up, profile, and wallets.
 
 The Figma file still needs a desktop sign-in, so frames were not opened directly. The UI uses this challenge’s tokens (ink, copper, Roboto Mono) from `src/index.css`.
 
@@ -34,6 +34,8 @@ Passwords are PBKDF2-SHA256 hashes in the seed, not clear text.
 | Leo Okonkwo | `leo@collector.dev` | `marble-gallery` |
 
 Coupons: `WELCOME10` (10%), `ARCHIVE5` (5%), `SPRING24` (expired). Network fee is `0.0015` ETH.
+
+Sign in from the header. An edition can be saved (optimistic, and only after sign-in) or added to the cart. Checkout connects a wallet and requires a fresh confirmation of the quoted total. The order page keeps the same id until the socket reports confirmed or declined. Profile and wallets are available after sign-in.
 
 ## Scenarios and reset
 
