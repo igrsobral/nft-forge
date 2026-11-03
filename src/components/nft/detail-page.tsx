@@ -5,6 +5,7 @@ import { ApiError } from '@/lib/api/errors'
 import { formatEth } from '@/lib/money'
 import { nftDetailQuery } from '@/lib/queries'
 import { getStoredUserId } from '@/lib/storage'
+import { PurchasePanel } from '@/components/nft/purchase-panel'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -75,6 +76,7 @@ export function NftDetailPage() {
             ? 'At least one edition is still available.'
             : 'Every edition is sold out.'}
         </p>
+        <PurchasePanel nft={nft} />
         <div className="flex flex-wrap gap-2">
           <Button type="button" onClick={() => tick.mutate()} disabled={tick.isPending}>
             {tick.isPending ? 'Sending market move…' : 'Simulate market move'}

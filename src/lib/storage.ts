@@ -38,14 +38,33 @@ export function getStoredUserId(): string | null {
   return readStorage(storageKeys.userId)
 }
 
+let sessionEpoch = 0
+const sessionListeners = new Set<() => void>()
+
+function bumpSession(): void {
+  sessionEpoch += 1
+  for (const listener of sessionListeners) listener()
+}
+
+export function subscribeSession(listener: () => void): () => void {
+  sessionListeners.add(listener)
+  return () => sessionListeners.delete(listener)
+}
+
+export function getSessionEpoch(): number {
+  return sessionEpoch
+}
+
 export function setStoredSession(token: string, userId: string): void {
   writeStorage(storageKeys.token, token)
   writeStorage(storageKeys.userId, userId)
+  bumpSession()
 }
 
 export function clearStoredSession(): void {
   removeStorage(storageKeys.token)
   removeStorage(storageKeys.userId)
+  bumpSession()
 }
 
 export function getGuestId(): string {

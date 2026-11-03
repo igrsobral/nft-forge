@@ -10,6 +10,7 @@ import {
   sessionResponseSchema,
   signupBodySchema,
   walletListSchema,
+  walletConnectionSchema,
   walletSchema,
   walletWriteSchema,
 } from '@/contracts/account'
@@ -983,6 +984,33 @@ export const httpHandlers = [
     result.db.wallets.push(wallet)
     persist(result.db)
     return HttpResponse.json(presentWallet(wallet), { status: 201 })
+  }),
+
+  http.post('/api/wallets/:walletId/connection', async ({ request, params }) => {
+    const result = await gate(request, 'required')
+    const user = requireUser(result)
+    if (user instanceof Response) return user
+    if (!result.ok) return result.response
+    const parsed = walletConnectionSchema.safeParse(await readJson(request))
+    if (!parsed.success) {
+      return apiError(422, 'validation', 'Choose a connection action.', zodDetails(parsed.error))
+    }
+    const wallet = result.db.wallets.find(
+      (item) => item.id === String(params.walletId) && item.userId === user.id,
+    )
+    if (!wallet) return apiError(404, 'not_found', 'That wallet could not be found.')
+    if (parsed.data.action === 'decline') {
+      wallet.connected = false
+      wallet.updatedAt = new Date().toISOString()
+      persist(result.db)
+      return apiError(422, 'validation', 'The wallet refused the connection.', [
+        { path: 'action', message: 'Connection was declined.' },
+      ])
+    }
+    wallet.connected = parsed.data.action === 'connect'
+    wallet.updatedAt = new Date().toISOString()
+    persist(result.db)
+    return HttpResponse.json(presentWallet(wallet))
   }),
 
   http.patch('/api/wallets/:walletId', async ({ request, params }) => {

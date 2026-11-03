@@ -1,11 +1,12 @@
 import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { useSyncExternalStore } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { Header } from '@/components/layout/header'
 import { NotFoundPage, RouteError } from '@/components/route-error'
 import { Toaster } from '@/components/ui/sonner'
 import { sessionQuery } from '@/lib/queries'
-import { getStoredUserId } from '@/lib/storage'
+import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
 import { RealtimeBridge } from '@/realtime/bridge'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -15,6 +16,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 })
 
 function RootLayout() {
+  useSyncExternalStore(subscribeSession, getSessionEpoch, () => 0)
   useQuery(sessionQuery(getStoredUserId()))
 
   return (

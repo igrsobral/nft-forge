@@ -54,7 +54,9 @@ One module-level database is shared by every handler, persisted at `nft-market:d
 
 ## Known limitations
 
-- The Figma file still needs a desktop sign-in, so frames were not opened directly. The catalog, cards, header, and detail use this challenge’s published tokens: ink `#140d0a`, copper `#d28a4c`, Roboto Mono, 20px mobile tiles, a 2-column staggered grid under 768px, and a 45px search bar. Screens beyond this slice are still unstyled.
+- The Figma file still needs a desktop sign-in, so frames were not opened directly. Catalog, cart, checkout, profile, and wallets share the published tokens: ink `#140d0a`, copper `#d28a4c`, Roboto Mono, and a stacked layout under 768px.
+- Playwright covers the catalog slice and a signed-in purchase through a confirmed receipt on desktop and mobile. The rest of the spec’s matrix (visual baselines, session-expiry during checkout, idempotent timeout) is not automated yet.
+- Lighthouse is configured but the three-run mobile and desktop audit has not been collected in this environment.
 - TypeScript is 6.0.3 with `strict` and `noUncheckedIndexedAccess`. The Vite template's TypeScript 7 is not used because typescript-eslint does not parse it yet.
 - Auth, cart, checkout, profile, and wallet screens are not built. The sign-in control explains that and does not submit a login.
 - Optimistic updates are not wired yet. The socket patch is a cache write from a verified event, not a mutation rollback.

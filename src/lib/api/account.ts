@@ -8,6 +8,7 @@ import {
   sessionResponseSchema,
   signupBodySchema,
   walletListSchema,
+  walletConnectionSchema,
   walletSchema,
   walletWriteSchema,
   type AuthResponse,
@@ -20,7 +21,7 @@ import {
   type Wallet,
   type WalletWrite,
 } from '@/contracts/account'
-import { setStoredSession } from '@/lib/storage'
+import { clearStoredSession, setStoredSession } from '@/lib/storage'
 import { api } from './client'
 
 export async function getSession(signal?: AbortSignal): Promise<SessionResponse> {
@@ -43,7 +44,11 @@ export async function login(body: LoginBody): Promise<AuthResponse> {
 }
 
 export async function logout(): Promise<void> {
-  await api.post('/auth/logout')
+  try {
+    await api.post('/auth/logout')
+  } finally {
+    clearStoredSession()
+  }
 }
 
 export async function updateProfile(body: ProfileUpdate): Promise<PublicUser> {
@@ -67,6 +72,17 @@ export async function listWallets(signal?: AbortSignal): Promise<Wallet[]> {
 
 export async function createWallet(body: WalletWrite): Promise<Wallet> {
   const response = await api.post('/wallets', walletWriteSchema.parse(body))
+  return walletSchema.parse(response.data)
+}
+
+export async function setWalletConnection(
+  walletId: string,
+  action: 'connect' | 'disconnect' | 'decline',
+): Promise<Wallet> {
+  const response = await api.post(
+    `/wallets/${encodeURIComponent(walletId)}/connection`,
+    walletConnectionSchema.parse({ action }),
+  )
   return walletSchema.parse(response.data)
 }
 

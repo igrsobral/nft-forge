@@ -63,6 +63,10 @@ export const walletSchema = z.object({
   updatedAt: z.string(),
 })
 
+export const walletConnectionSchema = z.object({
+  action: z.enum(['connect', 'disconnect', 'decline']),
+})
+
 export const walletWriteSchema = z.object({
   label: z.string().trim().min(2).max(40),
   address: walletAddressSchema,
