@@ -150,7 +150,6 @@ function AuthPanel({
       {mode === 'login' ? (
         <button
           type="button"
-          aria-label="Criar conta"
           className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
           onClick={() => onMode('signup')}
         >
@@ -160,7 +159,6 @@ function AuthPanel({
       {mode === 'signup' ? (
         <button
           type="button"
-          aria-label="Entrar"
           className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
           onClick={() => onMode('login')}
         >

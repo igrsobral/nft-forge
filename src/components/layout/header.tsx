@@ -121,7 +121,7 @@ export function Header() {
           </Dialog>
           <Link
             to="/cart"
-            aria-label={count > 0 ? `Carrinho, ${count} itens` : 'Carrinho'}
+            aria-label={`Carrinho, ${count} ${count === 1 ? 'item' : 'itens'}`}
             className="relative text-foreground hover:text-accent"
           >
             <ShoppingCart className="size-5" />
@@ -173,7 +173,7 @@ export function Header() {
           </TabLink>
           <Link
             to="/cart"
-            aria-label={count > 0 ? `Carrinho, ${count} itens` : 'Carrinho'}
+            aria-label={`Carrinho, ${count} ${count === 1 ? 'item' : 'itens'}`}
             className="-mt-5 flex size-14 items-center justify-center justify-self-center rounded-full bg-primary text-primary-foreground shadow-lg"
           >
             <ScanLine className="size-6" />

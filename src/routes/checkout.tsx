@@ -13,6 +13,7 @@ import { ApiError } from '@/lib/api/errors'
 import { requireSession } from '@/lib/auth'
 import { pickAuth } from '@/lib/auth-search'
 import { formatEth } from '@/lib/money'
+import { pickWallet } from '@/lib/wallet'
 import { cartOwnerKey } from '@/lib/owner'
 import { cartQuery, quoteQuery, sessionQuery, walletsQuery } from '@/lib/queries'
 import { getStoredUserId } from '@/lib/storage'
@@ -49,7 +50,7 @@ function CheckoutPage() {
   const cart = useQuery(cartQuery(owner))
   const quote = useQuery(quoteQuery(owner, search.coupon ? { couponCode: search.coupon } : {}))
   const [walletId, setWalletId] = useState('')
-  const selected = wallets.data?.find((wallet) => wallet.id === walletId) ?? wallets.data?.[0]
+  const selected = pickWallet(wallets.data, walletId)
   const [acceptedTotal, setAcceptedTotal] = useState<string | null>(null)
   const [provider, setProvider] = useState('WalletConnect')
   const activeWalletId = selected?.id ?? ''

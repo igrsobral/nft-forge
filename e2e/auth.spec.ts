@@ -30,10 +30,10 @@ test('switches modes, validates signup, rejects a duplicate, and creates an acco
   const dialog = page.getByRole('dialog')
   await expect(dialog.getByLabel('Nome de usuário')).toBeVisible()
 
-  await dialog.getByRole('button', { name: 'Entrar' }).click()
+  await dialog.getByRole('button', { name: /entrar|já tem uma conta/i }).click()
   await expect(page).toHaveURL(/auth=login/)
   await expect(dialog.getByRole('button', { name: 'Esqueceu a senha?' })).toBeVisible()
-  await dialog.getByRole('button', { name: 'Criar conta' }).click()
+  await dialog.getByRole('button', { name: /criar conta|crie uma conta/i }).click()
   await expect(page).toHaveURL(/auth=signup/)
 
   await dialog.getByLabel('Nome de usuário').fill('Nova')

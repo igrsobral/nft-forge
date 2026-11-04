@@ -23,6 +23,8 @@ test('changes quantity, validates coupons, opens checkout, and removes the item'
 
   await item.getByRole('button', { name: 'Aumentar quantidade' }).click()
   await expect(item.getByTestId('cart-quantity')).toHaveText('2')
+  await page.reload()
+  await expect(page.getByTestId('cart-quantity')).toHaveText('2')
   await item.getByRole('button', { name: 'Diminuir quantidade' }).click()
   await expect(item.getByTestId('cart-quantity')).toHaveText('1')
 

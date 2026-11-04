@@ -3,6 +3,7 @@ import type { NftListQuery, NftListResponse } from '@/contracts/catalog'
 import type { CatalogNetwork, Category } from '@/contracts/common'
 import { categories, catalogNetworks } from '@/contracts/common'
 import { toEth } from '@/lib/money'
+import { stepByKey } from '@/lib/price-step'
 
 type FilterPatch = Partial<NftListQuery>
 
@@ -17,19 +18,6 @@ function stepEth(step: number): string {
 function commaFixed(value: string): string {
   const [whole, fraction = ''] = toEth(value).split('.')
   return `${whole ?? '0'},${(fraction + '00').slice(0, 2)}`
-}
-
-function stepByKey(current: number, key: string, min: number, max: number): number | null {
-  if (key === 'Home') return min
-  if (key === 'End') return max
-  const jump = key === 'PageUp' || key === 'PageDown' ? 10 : 1
-  if (key === 'ArrowRight' || key === 'ArrowUp' || key === 'PageUp') {
-    return Math.min(max, current + jump)
-  }
-  if (key === 'ArrowLeft' || key === 'ArrowDown' || key === 'PageDown') {
-    return Math.max(min, current - jump)
-  }
-  return null
 }
 
 export function CatalogFilters({

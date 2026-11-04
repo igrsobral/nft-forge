@@ -15,6 +15,7 @@ dist-ssr
 
 # Tests and audits
 playwright-report
+coverage
 test-results
 blob-report
 .lighthouseci

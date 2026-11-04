@@ -10,6 +10,7 @@ import { ApiError } from '@/lib/api/errors'
 import { addFavorite, addCartItem, removeFavorite } from '@/lib/api/commerce'
 import { favoritesQuery } from '@/lib/queries'
 import { queryKeys } from '@/lib/query-keys'
+import { CART_QUANTITY_CAP } from '@/lib/cart'
 import { formatEth } from '@/lib/money'
 import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
 import { useSyncExternalStore } from 'react'
@@ -30,7 +31,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
     setEditionId(nft.editions[0]?.id ?? '')
   }
   const edition = nft.editions.find((item) => item.id === editionId) ?? nft.editions[0]
-  const maxQuantity = Math.min(20, edition?.remaining ?? 0)
+  const maxQuantity = Math.min(CART_QUANTITY_CAP, edition?.remaining ?? 0)
   const [quantity, setQuantity] = useState(1)
   const saved = favorites.data?.includes(nft.id) ?? false
   const nextQuantity = Math.min(Math.max(1, quantity), Math.max(1, maxQuantity))

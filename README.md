@@ -46,17 +46,19 @@ pnpm dev
 
 O servidor de desenvolvimento sobe em [http://127.0.0.1:4471](http://127.0.0.1:4471), com os mocks ligados. Não é preciso criar `.env`: os padrões estão em [`src/lib/env.ts`](src/lib/env.ts). O modelo está em [`.env.example`](.env.example).
 
-| Comando             | O que faz                                                                        | Verificado                                                                                                                        |
-| ------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm typecheck`    | `tsc -b` em app, config do Vite e e2e                                            | Sim                                                                                                                               |
-| `pnpm lint`         | ESLint                                                                           | Sim                                                                                                                               |
-| `pnpm build`        | Typecheck e build de produção, com o worker do MSW                               | Sim                                                                                                                               |
-| `pnpm preview`      | Serve `dist` em [http://127.0.0.1:4472](http://127.0.0.1:4472)                   | Sim, responde 200                                                                                                                 |
-| `pnpm test:e2e`     | Instala o Chromium do Playwright, se faltar, e roda os testes                    | Sim, 4 testes, desktop e mobile                                                                                                   |
-| `pnpm lighthouse`   | `pnpm build` e depois três coletas mobile e três desktop de `/` e `/nfts/nft_01` | Sim, saiu com código 0. Medianas em [docs/testes.md](docs/testes.md). Os HTML/JSON ficam em `.lighthouseci/` e não vão para o git |
-| `pnpm format:check` | Prettier em modo verificação                                                     | O binário existe; não faz parte do fluxo mínimo                                                                                   |
+| Comando              | O que faz                                                                        | Verificado                                                                                                                        |
+| -------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck`     | `tsc -b` em app, config do Vite e e2e                                            | Sim                                                                                                                               |
+| `pnpm lint`          | ESLint                                                                           | Sim                                                                                                                               |
+| `pnpm build`         | Typecheck e build de produção, com o worker do MSW                               | Sim                                                                                                                               |
+| `pnpm preview`       | Serve `dist` em [http://127.0.0.1:4472](http://127.0.0.1:4472)                   | Sim, responde 200                                                                                                                 |
+| `pnpm test:unit`     | Vitest da lógica (dinheiro, contratos, carrinho, sessão, tempo real)             | Sim, ver [docs/testes.md](docs/testes.md)                                                                                         |
+| `pnpm test:coverage` | A mesma suíte com cobertura v8 e limiares                                        | Sim                                                                                                                               |
+| `pnpm test:e2e`      | Instala o Chromium do Playwright, se faltar, e roda desktop e mobile             | Sim, ver [docs/testes.md](docs/testes.md)                                                                                         |
+| `pnpm lighthouse`    | `pnpm build` e depois três coletas mobile e três desktop de `/` e `/nfts/nft_01` | Sim, saiu com código 0. Medianas em [docs/testes.md](docs/testes.md). Os HTML/JSON ficam em `.lighthouseci/` e não vão para o git |
+| `pnpm format:check`  | Prettier em modo verificação                                                     | O binário existe; não faz parte do fluxo mínimo                                                                                   |
 
-Não há suíte de teste unitário nem script `pnpm test`.
+`pnpm test:unit` roda o Vitest. `pnpm test:coverage` exige os limiares de `vitest.config.ts`. O Playwright continua em `pnpm test:e2e`.
 
 ## Contas e cupons
 

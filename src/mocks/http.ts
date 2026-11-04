@@ -35,6 +35,7 @@ import {
 } from '@/contracts/commerce'
 import type { ErrorCode, FieldError } from '@/contracts/common'
 import { catalogNetworks, categories } from '@/contracts/common'
+import { mergedLineQuantity, nextLineQuantity } from '@/lib/cart'
 import { addEth, cmpEth, mulEth } from '@/lib/money'
 import { HttpResponse, http } from 'msw'
 import type { z } from 'zod'
@@ -308,7 +309,11 @@ function mergeGuestCart(db: Database, userId: string, request: Request) {
     const existing = cart.items.find(
       (entry) => entry.nftId === item.nftId && entry.editionId === item.editionId,
     )
-    const nextQuantity = Math.min(edition.remaining, (existing?.quantity ?? 0) + item.quantity)
+    const nextQuantity = mergedLineQuantity(
+      existing?.quantity ?? 0,
+      item.quantity,
+      edition.remaining,
+    )
     if (nextQuantity <= 0) continue
     if (existing) existing.quantity = nextQuantity
     else cart.items.push({ ...item, id: crypto.randomUUID(), quantity: nextQuantity })
@@ -409,6 +414,20 @@ function confirmOrder(db: Database, order: OrderRecord): boolean {
     cart.updatedAt = now
   }
   return true
+}
+
+function settleTimedOutOrder(db: Database, order: OrderRecord) {
+  if (confirmOrder(db, order)) {
+    order.status = 'confirmed'
+    order.txRef = txRefFor(order.id)
+    order.explorerUrl = `https://etherscan.io/tx/${order.txRef}`
+  } else {
+    order.status = 'declined'
+  }
+  order.version += 1
+  order.updatedAt = new Date().toISOString()
+  persist(db)
+  publishOrder(order)
 }
 
 function scheduleResolution(orderId: string, scenario: Scenario) {
@@ -787,19 +806,28 @@ export const httpHandlers = [
     const existing = cart.items.find(
       (item) => item.nftId === nft.id && item.editionId === edition.id,
     )
-    const nextQuantity = (existing?.quantity ?? 0) + parsed.data.quantity
-    if (edition.remaining < nextQuantity) {
-      return apiError(409, 'availability_conflict', 'Not enough editions remain.', [
-        { path: 'quantity', message: `${edition.remaining} remaining.` },
-      ])
+    const decision = nextLineQuantity(
+      existing?.quantity ?? 0,
+      parsed.data.quantity,
+      edition.remaining,
+    )
+    if (!decision.ok) {
+      return decision.reason === 'cap'
+        ? apiError(422, 'validation', 'A line can hold at most 20 editions.', [
+            { path: 'quantity', message: 'Quantity cannot exceed 20.' },
+          ])
+        : apiError(409, 'availability_conflict', 'Not enough editions remain.', [
+            { path: 'quantity', message: `${edition.remaining} remaining.` },
+          ])
     }
+    const nextQuantity = decision.quantity
     if (existing) existing.quantity = nextQuantity
     else {
       cart.items.push({
         id: crypto.randomUUID(),
         nftId: nft.id,
         editionId: edition.id,
-        quantity: parsed.data.quantity,
+        quantity: nextQuantity,
         addedAt: new Date().toISOString(),
       })
     }
@@ -822,12 +850,17 @@ export const httpHandlers = [
     const nft = findNft(result.db.nfts, item.nftId)
     const edition = nft ? findEdition(nft, item.editionId) : undefined
     if (!nft || !edition) return apiError(404, 'not_found', 'That edition could not be found.')
-    if (edition.remaining < parsed.data.quantity) {
-      return apiError(409, 'availability_conflict', 'Not enough editions remain.', [
-        { path: 'quantity', message: `${edition.remaining} remaining.` },
-      ])
+    const decision = nextLineQuantity(0, parsed.data.quantity, edition.remaining)
+    if (!decision.ok) {
+      return decision.reason === 'cap'
+        ? apiError(422, 'validation', 'A line can hold at most 20 editions.', [
+            { path: 'quantity', message: 'Quantity cannot exceed 20.' },
+          ])
+        : apiError(409, 'availability_conflict', 'Not enough editions remain.', [
+            { path: 'quantity', message: `${edition.remaining} remaining.` },
+          ])
     }
-    item.quantity = parsed.data.quantity
+    item.quantity = decision.quantity
     cart.updatedAt = new Date().toISOString()
     persist(result.db)
     return HttpResponse.json(presentCart(result.db, cart))
@@ -892,6 +925,9 @@ export const httpHandlers = [
           'conflict',
           'This idempotency key was already used for a different order.',
         )
+      }
+      if (result.scenario === 'order_timeout' && existing.status === 'pending') {
+        settleTimedOutOrder(result.db, existing)
       }
       return HttpResponse.json(presentOrder(existing))
     }
@@ -1009,7 +1045,7 @@ export const httpHandlers = [
         const nft = findNft(result.db.nfts, line.nftId)
         if (nft) publishNft(nft)
       }
-    } else {
+    } else if (result.scenario !== 'order_timeout') {
       scheduleResolution(order.id, result.scenario)
     }
     if (result.scenario === 'order_timeout') await delay(60_000, request.signal)

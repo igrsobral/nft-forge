@@ -12,6 +12,7 @@ export default tseslint.config(
       'node_modules/**',
       'src/routeTree.gen.ts',
       'playwright-report/**',
+      'coverage/**',
       'test-results/**',
       'lighthouse-reports/**',
       '.lighthouseci/**',

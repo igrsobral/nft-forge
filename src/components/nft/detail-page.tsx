@@ -92,7 +92,7 @@ export function NftDetailPage() {
         <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
           <div
             className="relative hidden gap-2 lg:flex lg:flex-col"
-            role="list"
+            role="group"
             aria-label="Miniaturas"
           >
             {gallery.map((src, index) => (
@@ -161,7 +161,7 @@ export function NftDetailPage() {
               {formatEth(nft.priceEth)}
             </p>
             <p className="flex items-center gap-2 text-[#c9a27a]">
-              <span className="inline-flex" aria-label={`${nft.rating} de 5`}>
+              <span className="inline-flex" role="img" aria-label={`${nft.rating} de 5`}>
                 {Array.from({ length: 5 }, (_, index) => (
                   <Star
                     key={index}
@@ -183,11 +183,11 @@ export function NftDetailPage() {
             </p>
           </div>
           <PurchasePanel nft={nft} />
-          <dl className="type-c-13 grid gap-1 text-[#c9a27a]">
-            <div>ID do token: {nft.tokenId}</div>
-            <div>Coleção: {nft.collectionName}</div>
-            <div>Atributos: {nft.attributes.join(', ')}</div>
-          </dl>
+          <ul className="type-c-13 grid gap-1 text-[#c9a27a]">
+            <li>ID do token: {nft.tokenId}</li>
+            <li>Coleção: {nft.collectionName}</li>
+            <li>Atributos: {nft.attributes.join(', ')}</li>
+          </ul>
           <p className="type-c-13 flex flex-wrap items-center gap-3 text-[#c9a27a]">
             <span>Compartilhar este NFT:</span>
             <a

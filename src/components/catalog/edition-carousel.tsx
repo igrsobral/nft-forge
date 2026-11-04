@@ -62,6 +62,7 @@ export function EditionCarousel({
             <button
               key={index}
               type="button"
+              role="tab"
               aria-label={`Página ${index + 1} de ${title}`}
               aria-selected={index === current}
               onClick={() => setPage(index)}

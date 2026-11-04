@@ -10,6 +10,7 @@ import type { CartItem } from '@/contracts/commerce'
 import { removeCartItem, updateCartItem } from '@/lib/api/commerce'
 import { ApiError } from '@/lib/api/errors'
 import { toListQuery } from '@/lib/catalog-search'
+import { CART_QUANTITY_CAP } from '@/lib/cart'
 import { formatEth } from '@/lib/money'
 import { cartOwnerKey } from '@/lib/owner'
 import { cartQuery, nftListQuery, quoteQuery, sessionQuery } from '@/lib/queries'
@@ -267,7 +268,7 @@ function CartRow({
   onQuantity: (quantity: number) => void
   onRemove: () => void
 }) {
-  const max = Math.min(20, item.remaining)
+  const max = Math.min(CART_QUANTITY_CAP, item.remaining)
   return (
     <li
       data-testid="cart-item"

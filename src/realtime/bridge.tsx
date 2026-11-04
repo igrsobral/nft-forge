@@ -5,19 +5,8 @@ import { nftUpdatedEventSchema, orderUpdatedEventSchema } from '@/contracts/even
 import { formatEth } from '@/lib/money'
 import { onSessionExpired } from '@/lib/storage'
 import { applyNftUpdated, applyOrderUpdated, nftName } from './apply-events'
+import { eventMemory } from './dedupe'
 import { getSocket } from './socket'
-
-const seenEventIds = new Set<string>()
-
-function remember(eventId: string): boolean {
-  if (seenEventIds.has(eventId)) return false
-  seenEventIds.add(eventId)
-  if (seenEventIds.size > 200) {
-    const oldest = seenEventIds.values().next().value
-    if (oldest) seenEventIds.delete(oldest)
-  }
-  return true
-}
 
 export function RealtimeBridge() {
   const queryClient = useQueryClient()
@@ -59,7 +48,7 @@ export function RealtimeBridge() {
 
       const onNft = (payload: unknown) => {
         const parsed = nftUpdatedEventSchema.safeParse(payload)
-        if (!parsed.success || !remember(parsed.data.eventId)) return
+        if (!parsed.success || !eventMemory.remember(parsed.data.eventId)) return
         const name = nftName(queryClient, parsed.data.nftId)
         const priceChanged = applyNftUpdated(queryClient, parsed.data)
         if (priceChanged) {
@@ -69,7 +58,7 @@ export function RealtimeBridge() {
 
       const onOrder = (payload: unknown) => {
         const parsed = orderUpdatedEventSchema.safeParse(payload)
-        if (!parsed.success || !remember(parsed.data.eventId)) return
+        if (!parsed.success || !eventMemory.remember(parsed.data.eventId)) return
         const applied = applyOrderUpdated(queryClient, parsed.data)
         if (!applied) return
         if (parsed.data.status === 'confirmed') toast.success('Payment confirmed.')

@@ -1,71 +1,55 @@
-# Testes, limitações e deploy
+# Testes
 
-## O que a suíte cobre
+Os testes de lógica rodam no Vitest. Os fluxos de ponta a ponta rodam no Playwright, em desktop 1440×900 e no Pixel 5. Cada teste E2E começa em `/?reset=1`, que zera o banco, o token e o id do usuário daquele contexto. Os dois projetos não compartilham `localStorage`.
 
-Não há testes unitários. A verificação automatizada é o Playwright em [`e2e`](../e2e), com relatório HTML em `playwright-report/` e trace, screenshot e vídeo quando um teste falha. [`playwright.config.ts`](../playwright.config.ts) define dois projetos Chromium: desktop 1440×900 e Pixel 5.
+## Como rodar
 
-| Arquivo                                           | O que observa                                                                                           |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [`e2e/catalog.spec.ts`](../e2e/catalog.spec.ts)   | Lista, filtro de categoria na URL, detalhe, `nft.updated` mudando o preço no detalhe e de volta no card |
-| [`e2e/purchase.spec.ts`](../e2e/purchase.spec.ts) | Login da Ada, item no carrinho, checkout e status `confirmed` com referência de transação               |
+| Comando              | O que faz                                                      |
+| -------------------- | -------------------------------------------------------------- |
+| `pnpm test:unit`     | Vitest, sem cobertura                                          |
+| `pnpm test:coverage` | Vitest com c8/v8. O relatório sai no terminal e em `coverage/` |
+| `pnpm test:e2e`      | Instala o Chromium, se faltar, e roda os dois projetos         |
+| `pnpm typecheck`     | `tsc -b`                                                       |
+| `pnpm lint`          | ESLint                                                         |
 
-`pnpm test:e2e` foi executado nesta máquina: 4 testes passaram (os dois arquivos nos dois projetos). O comando instala o Chromium do Playwright antes de rodar.
+A cobertura exige, nos módulos de lógica listados em [`vitest.config.ts`](../vitest.config.ts), pelo menos 85% de statements, 75% de branches, 85% de functions e 85% de lines. Entram `src/lib` (dinheiro, carrinho, carteira, busca, sessão, Axios), `src/contracts`, `src/realtime/apply-events.ts`, `src/realtime/dedupe.ts` e `src/mocks/pricing.ts`. Ficam de fora componentes visuais, rotas e o restante do mock HTTP.
 
-Cada teste começa em `/?reset=1`, que zera o banco local daquele contexto. Os dois projetos não compartilham `localStorage`.
+O login repetido dos testes E2E está em [`e2e/support.ts`](../e2e/support.ts). Não há `waitForTimeout`. As esperas usam asserções web-first.
+
+## Matriz de comportamento
+
+| Comportamento                                                                         | Onde está coberto                                                         |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Strings decimais de ETH, soma, desconto e formatação                                  | `src/lib/money.test.ts`                                                   |
+| Cupom WELCOME10, ARCHIVE5, SPRING24 expirado, código inválido, taxa de rede e estoque | `src/mocks/pricing.test.ts`                                               |
+| Quantidade do carrinho: soma, teto de 20, estoque e merge de visitante                | `src/lib/cart.test.ts` e `e2e/cart.spec.ts` (quantidade, reload, remoção) |
+| Busca, ordenação, paginação, faixa de preço e URL                                     | `src/lib/catalog-search.test.ts`, `e2e/catalog.spec.ts`                   |
+| Setas do slider e Aplicar                                                             | `src/components/catalog/catalog-filters.test.tsx`, `e2e/catalog.spec.ts`  |
+| Seleção de edição, favorito e avaliações                                              | `e2e/detail.spec.ts`                                                      |
+| Login, senha errada, cadastro, e-mail duplicado, esqueci a senha, Escape              | `e2e/auth.spec.ts`                                                        |
+| Contratos Zod de conta, senha, endereço e pedido                                      | `src/contracts/contracts.test.ts`                                         |
+| Redirect seguro, rota protegida e expiração de sessão                                 | `src/lib/auth.test.ts`, `e2e/resilience.spec.ts`                          |
+| Interceptor Axios: token, 401 limpando a sessão, abort sem logout                     | `src/lib/api/client.test.ts`, `src/lib/api/errors.test.ts`                |
+| Evento de preço novo, versão antiga ignorada, pedido de outro usuário                 | `src/realtime/apply-events.test.ts`                                       |
+| Evento duplicado descartado                                                           | `src/realtime/dedupe.test.ts`                                             |
+| Preço ao vivo no card depois do detalhe                                               | `e2e/catalog.spec.ts`                                                     |
+| Checkout confirmado e recibo (hash, token, taxa, Etherscan)                           | `e2e/purchase.spec.ts`, `src/lib/receipt.test.ts`                         |
+| Pagamento recusado, carrinho mantido, timeout e retry com a mesma chave               | `e2e/resilience.spec.ts`                                                  |
+| Carteira escolhida ou a primeira da lista                                             | `src/lib/wallet.test.ts`                                                  |
+| Perfil, senha, avatar, carteira e suporte                                             | `e2e/profile.spec.ts`                                                     |
+| API offline e 503                                                                     | `e2e/resilience.spec.ts`                                                  |
+| Página 404                                                                            | `e2e/resilience.spec.ts`                                                  |
+| Viewport mobile nos fluxos acima                                                      | projeto `chromium-mobile`                                                 |
+| Axe sem violação serious ou critical em início, detalhe, carrinho e login             | `e2e/a11y.spec.ts`                                                        |
+
+## O que ainda não entra na suíte
+
+- Regressão visual com baseline.
+- Projeto Playwright em 768 px.
+- Lighthouse no mesmo comando dos testes. O histórico de uma coleta continua abaixo.
+- O worker do Socket.IO em si. A suíte cobre a função que aplica o evento no cache e a que descarta duplicata, e o preço ao vivo pela UI.
+- Cada ramo do `src/mocks/http.ts`. O arquivo é o servidor simulado; os fluxos críticos passam pelo Playwright e as regras de quantidade, cupom e timeout estão extraídas ou exercitadas por ele.
 
 ## Lighthouse
 
-`pnpm lighthouse` faz o build e roda `@lhci/cli` `0.16.0` (Lighthouse `13.6.0`) duas vezes:
-
-- [`lighthouserc.mobile.cjs`](../lighthouserc.mobile.cjs): 3 coletas, form factor mobile, viewport 390×844, throttling simulado
-- [`lighthouserc.desktop.cjs`](../lighthouserc.desktop.cjs): 3 coletas com preset desktop
-
-URLs: `http://127.0.0.1:4472/` e `http://127.0.0.1:4472/nfts/nft_01`. O preview sobe na porta 4472. Os relatórios foram para `.lighthouseci/mobile` e `.lighthouseci/desktop`. Essa pasta está no `.gitignore`.
-
-Uma execução completa terminou com código 0 nesta máquina (Linux, Chrome achado pelo LHCI, 3 de novembro de 2026, 21:32 em America/Sao_Paulo). Mediana das três coletas, categorias em pontos de 0 a 100:
-
-| Perfil  | URL            | Performance | Acessibilidade | Boas práticas | SEO |     LCP |    CLS |   TBT |
-| ------- | -------------- | ----------: | -------------: | ------------: | --: | ------: | -----: | ----: |
-| Mobile  | `/`            |          94 |            100 |           100 |  92 | 3012 ms | 0,0076 | 89 ms |
-| Mobile  | `/nfts/nft_01` |          94 |            100 |           100 |  92 | 3007 ms | 0,0007 | 71 ms |
-| Desktop | `/`            |          99 |            100 |           100 |  92 |  925 ms | 0,0013 |  0 ms |
-| Desktop | `/nfts/nft_01` |         100 |            100 |           100 |  92 |  260 ms | 0,0003 |  0 ms |
-
-No mobile, as três notas de performance da home foram 90, 94 e 94. O LCP fica perto de 3 s por causa do throttling simulado e do worker do MSW no primeiro carregamento. SEO fica em 92: a página tem título e descrição no `index.html`, sem um histórico de conteúdo indexável além do SPA. Esses números são desta máquina, não um laboratório controlado. Rode `pnpm lighthouse` de novo para repetir.
-
-## O que o enunciado pede e ainda não está automatizado
-
-- Busca combinada, ordenação, paginação e restauração pelo histórico, além do filtro de categoria e do `goBack` do teste de catálogo.
-- NFT inexistente, estoque esgotado na UI e limite de quantidade.
-- Cadastro, conflito, expiração de sessão, logout e troca de usuário.
-- Favorito com falha e rollback.
-- Carrinho: quantidade, remoção, cupom inválido, refresh e preservação do carrinho de visitante no login.
-- Clique repetido, timeout com a mesma chave e pagamento recusado.
-- Perfil, avatar, senha e carteiras, com erro de validação.
-- Preço alterado durante o checkout, evento duplicado ou antigo, queda de conexão com pedido pendente.
-- Teclado, foco de diálogo e skeletons sob latência.
-- Regressão visual de início, detalhe, carrinho e pagamento, com baselines versionadas.
-- Projeto de tablet em 768 px. O layout usa breakpoints do Tailwind, mas o Playwright não tem esse projeto.
-
-O comportamento correspondente, quando existe, está na UI e no mock. Só não há teste cobrindo.
-
-## Limitações de produto
-
-- Os frames do Figma não foram abertos. Tipografia, raios e a grade de dois cartões no mobile seguem os tokens do desafio, não uma medição dos frames.
-- A galeria do detalhe é uma imagem. Não há várias vistas.
-- Não há lista de pedidos anteriores. A tela de pedido abre pelo id criado no checkout.
-- O perfil lê a sessão (`GET /api/auth/session`), não um `GET /api/profile` separado. Salvar, avatar e senha usam os endpoints de perfil.
-- As chaves `orders` e `profile` em [`src/lib/query-keys.ts`](../src/lib/query-keys.ts) existem para o isolamento por usuário. A UI atual não dispara uma query de lista de pedidos nem uma query só de perfil.
-- Páginas editoriais, suporte, atividade e ofertas não fazem parte do enunciado e não foram criadas.
-- Com mais tempo: completar a matriz Playwright, gravar baselines, rodar o Lighthouse três vezes por URL e perfil, e ajustar o layout com os frames do Figma abertos.
-
-## Deploy
-
-O `vercel.json` reescreve `/(.*)` para `/index.html`, para o refresh em `/nfts/nft_01` e nas outras rotas não cair em 404 da plataforma. Arquivos reais, entre eles `mockServiceWorker.js`, continuam sendo servidos antes do rewrite.
-
-Não há URL pública anexada a este repositório. Um deploy estático na Vercel, Netlify ou Cloudflare Pages funciona se o build for `pnpm build` e o publish for `dist`. Não defina `VITE_ENABLE_MOCKS=false` nesse build: sem o worker a interface não tem API.
-
-Variáveis úteis no painel, ambas opcionais:
-
-- `VITE_ENABLE_MOCKS=true`
-- `VITE_MOCK_SCENARIO=success`
+`pnpm lighthouse` faz o build e roda três coletas mobile e três desktop de `/` e `/nfts/nft_01`. Uma execução nesta máquina, em 3 de novembro de 2026, saiu com código 0. As medianas estão no histórico do repositório anterior a esta auditoria: performance mobile 94, desktop 99–100, acessibilidade 100. Rode o comando de novo para repetir. Os HTML ficam em `.lighthouseci/` e não vão para o git.
