@@ -64,7 +64,10 @@ export const orderStatusSchema = z.enum(orderStatuses)
 
 export const walletAddressSchema = z
   .string()
-  .regex(/^0x[a-fA-F0-9]{40}$/, 'Enter a 20-byte hex address')
+  .regex(
+    /^0x[a-fA-F0-9]{40}$/,
+    'Endereço inválido para ethereum, polygon ou base. Use 0x e 40 caracteres hexadecimais.',
+  )
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>
 export type FieldError = z.infer<typeof fieldErrorSchema>

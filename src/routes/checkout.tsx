@@ -142,7 +142,7 @@ function CheckoutPage() {
       ) : (
         <p className="text-text-secondary">
           Add a wallet before paying.{' '}
-          <a className="text-accent" href="/wallets">
+          <a className="text-accent" href="/profile/wallets">
             Wallets
           </a>
         </p>

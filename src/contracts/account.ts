@@ -5,6 +5,9 @@ export const publicUserSchema = z.object({
   id: z.string(),
   email: z.email(),
   displayName: z.string(),
+  username: z.string(),
+  ensName: z.string(),
+  walletNickname: z.string(),
   bio: z.string(),
   avatarUrl: z.string().nullable(),
   createdAt: z.string(),
@@ -62,21 +65,37 @@ export const forgotPasswordResponseSchema = z.object({
 })
 
 export const profileUpdateSchema = z.object({
-  displayName: z.string().trim().min(2).max(40),
-  bio: z.string().trim().max(280),
+  displayName: z.string().trim().min(2, 'Informe o nome de exibição.').max(40),
+  username: z.string().trim().min(2, 'Informe o nome de usuário.').max(40),
+  email: z.email('Informe um e-mail válido.'),
+  ensName: z.string().trim().min(1, 'Informe o nome ENS.').max(40),
+  walletNickname: z.string().trim().min(2, 'Informe o apelido da carteira.').max(40),
+  bio: z.string().trim().max(280).default(''),
 })
 
 export const avatarUpdateSchema = z.object({
   imageDataUrl: z
     .string()
-    .regex(/^data:image\/(?:png|jpeg|webp);base64,/, 'Use a PNG, JPEG, or WebP data URL')
-    .max(400_000),
+    .regex(/^data:image\/(?:png|jpeg|webp);base64,/, 'Use uma imagem PNG, JPEG ou WebP.')
+    .max(400_000)
+    .nullable(),
 })
 
-export const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1).max(72),
-  newPassword: z.string().min(8).max(72),
-})
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Informe a senha atual.').max(72),
+    newPassword: z.string().min(8, 'A nova senha precisa ter pelo menos 8 caracteres.').max(72),
+    confirmPassword: z.string().min(1, 'Confirme a nova senha.'),
+  })
+  .superRefine((value, context) => {
+    if (value.newPassword !== value.confirmPassword) {
+      context.addIssue({
+        code: 'custom',
+        path: ['confirmPassword'],
+        message: 'As senhas não coincidem.',
+      })
+    }
+  })
 
 export const walletSchema = z.object({
   id: z.string(),
@@ -86,6 +105,11 @@ export const walletSchema = z.object({
   role: walletRoleSchema,
   connected: z.boolean(),
   updatedAt: z.string(),
+  displayName: z.string().default(''),
+  profileName: z.string().default(''),
+  ensName: z.string().default(''),
+  referralCode: z.string().default(''),
+  contactEmail: z.string().default(''),
 })
 
 export const walletConnectionSchema = z.object({
@@ -93,10 +117,15 @@ export const walletConnectionSchema = z.object({
 })
 
 export const walletWriteSchema = z.object({
-  label: z.string().trim().min(2).max(40),
+  label: z.string().trim().min(2, 'Informe o apelido da carteira.').max(40),
   address: walletAddressSchema,
   network: networkSchema,
   role: walletRoleSchema,
+  displayName: z.string().trim().min(2, 'Informe o nome de exibição.').max(40),
+  profileName: z.string().trim().min(2, 'Informe o nome do perfil.').max(40),
+  ensName: z.string().trim().min(1, 'Informe o nome ENS.').max(40),
+  referralCode: z.string().trim().min(1, 'Informe o código de indicação.').max(40),
+  contactEmail: z.email('Informe um e-mail válido.'),
 })
 
 export const walletListSchema = z.object({

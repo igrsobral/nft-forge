@@ -180,7 +180,7 @@ export function Header() {
           <Link to="/profile" className="type-c-12 text-text-secondary">
             Perfil
           </Link>
-          <Link to="/wallets" className="type-c-12 text-text-secondary">
+          <Link to="/profile/wallets" className="type-c-12 text-text-secondary">
             Carteiras
           </Link>
         </nav>

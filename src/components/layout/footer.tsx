@@ -27,7 +27,7 @@ const features = [
 const profileLinks = [
   { label: 'Meu perfil', to: '/profile' as const },
   { label: 'Minha coleção', to: '/profile' as const },
-  { label: 'Atividade', to: '/profile' as const },
+  { label: 'Atividade', to: '/profile/activity' as const },
   { label: 'Estúdio do criador', to: '/signup' as const },
   { label: 'Lista de interesse', to: '/' as const },
 ]
@@ -178,7 +178,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/wallets" className="type-c-13 text-[#c9a27a] hover:text-primary">
+                <Link to="/profile/wallets" className="type-c-13 text-[#c9a27a] hover:text-primary">
                   Carteira e segurança
                 </Link>
               </li>

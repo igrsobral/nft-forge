@@ -6,14 +6,18 @@ import {
   favoriteListSchema,
   favoriteWriteSchema,
   newsletterResponseSchema,
+  orderListSchema,
   orderSchema,
   quoteRequestSchema,
+  supportRequestSchema,
+  supportResponseSchema,
   quoteSchema,
   type Cart,
   type CartAdd,
   type CreateOrderBody,
   type Order,
   type Quote,
+  type SupportRequest,
   type QuoteRequest,
 } from '@/contracts/commerce'
 import { api } from './client'
@@ -72,7 +76,17 @@ export async function createOrder(body: CreateOrderBody, idempotencyKey: string)
   return orderSchema.parse(response.data)
 }
 
+export async function listOrders(signal?: AbortSignal): Promise<Order[]> {
+  const response = await api.get('/orders', { signal })
+  return orderListSchema.parse(response.data).items
+}
+
 export async function getOrder(orderId: string, signal?: AbortSignal): Promise<Order> {
   const response = await api.get(`/orders/${encodeURIComponent(orderId)}`, { signal })
   return orderSchema.parse(response.data)
+}
+
+export async function submitSupport(body: SupportRequest): Promise<void> {
+  const response = await api.post('/support', supportRequestSchema.parse(body))
+  supportResponseSchema.parse(response.data)
 }

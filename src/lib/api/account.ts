@@ -2,15 +2,12 @@ import {
   authResponseSchema,
   avatarUpdateSchema,
   forgotPasswordResponseSchema,
-  passwordChangeSchema,
-  profileUpdateSchema,
   publicUserSchema,
   sessionResponseSchema,
   signupBodySchema,
   walletListSchema,
   walletConnectionSchema,
   walletSchema,
-  walletWriteSchema,
   type AuthResponse,
   type LoginBody,
   type PasswordChange,
@@ -65,17 +62,17 @@ export async function logout(): Promise<void> {
 }
 
 export async function updateProfile(body: ProfileUpdate): Promise<PublicUser> {
-  const response = await api.patch('/profile', profileUpdateSchema.parse(body))
+  const response = await api.patch('/profile', body)
   return publicUserSchema.parse(response.data)
 }
 
-export async function updateAvatar(imageDataUrl: string): Promise<PublicUser> {
+export async function updateAvatar(imageDataUrl: string | null): Promise<PublicUser> {
   const response = await api.post('/profile/avatar', avatarUpdateSchema.parse({ imageDataUrl }))
   return publicUserSchema.parse(response.data)
 }
 
 export async function changePassword(body: PasswordChange): Promise<void> {
-  await api.post('/profile/password', passwordChangeSchema.parse(body))
+  await api.post('/profile/password', body)
 }
 
 export async function listWallets(signal?: AbortSignal): Promise<Wallet[]> {
@@ -84,7 +81,7 @@ export async function listWallets(signal?: AbortSignal): Promise<Wallet[]> {
 }
 
 export async function createWallet(body: WalletWrite): Promise<Wallet> {
-  const response = await api.post('/wallets', walletWriteSchema.parse(body))
+  const response = await api.post('/wallets', body)
   return walletSchema.parse(response.data)
 }
 
@@ -100,9 +97,6 @@ export async function setWalletConnection(
 }
 
 export async function updateWallet(walletId: string, body: WalletWrite): Promise<Wallet> {
-  const response = await api.patch(
-    `/wallets/${encodeURIComponent(walletId)}`,
-    walletWriteSchema.parse(body),
-  )
+  const response = await api.patch(`/wallets/${encodeURIComponent(walletId)}`, body)
   return walletSchema.parse(response.data)
 }

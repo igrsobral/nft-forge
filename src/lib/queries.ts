@@ -3,7 +3,7 @@ import type { NftListQuery } from '@/contracts/catalog'
 import type { QuoteRequest } from '@/contracts/commerce'
 import { getSession, listWallets } from '@/lib/api/account'
 import { getNft, listNfts } from '@/lib/api/catalog'
-import { createQuote, getCart, getOrder, listFavorites } from '@/lib/api/commerce'
+import { createQuote, getCart, getOrder, listFavorites, listOrders } from '@/lib/api/commerce'
 import { queryKeys } from '@/lib/query-keys'
 
 export function sessionQuery(userId: string | null) {
@@ -45,6 +45,13 @@ export function quoteQuery(ownerKey: string, params: QuoteRequest) {
   return queryOptions({
     queryKey: queryKeys.quote(ownerKey, params),
     queryFn: ({ signal }) => createQuote(params, signal),
+  })
+}
+
+export function ordersQuery(userId: string | null) {
+  return queryOptions({
+    queryKey: queryKeys.orders(userId),
+    queryFn: ({ signal }) => listOrders(signal),
   })
 }
 

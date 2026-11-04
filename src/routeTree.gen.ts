@@ -19,6 +19,13 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WalletsRouteImport } from './routes/wallets'
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ProfileActivityRouteImport } from './routes/profile.activity'
+import { Route as ProfileDownloadsRouteImport } from './routes/profile.downloads'
+import { Route as ProfileOffersRouteImport } from './routes/profile.offers'
+import { Route as ProfileSupportRouteImport } from './routes/profile.support'
+import { Route as ProfileWalletsRouteImport } from './routes/profile.wallets'
+import { Route as ProfileWatchlistRouteImport } from './routes/profile.watchlist'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +77,41 @@ const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
   path: '/orders/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileActivityRoute = ProfileActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileDownloadsRoute = ProfileDownloadsRouteImport.update({
+  id: '/downloads',
+  path: '/downloads',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileOffersRoute = ProfileOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileSupportRoute = ProfileSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileWalletsRoute = ProfileWalletsRouteImport.update({
+  id: '/wallets',
+  path: '/wallets',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileWatchlistRoute = ProfileWatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => ProfileRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -77,11 +119,18 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/signup': typeof SignupRoute
   '/wallets': typeof WalletsRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/profile/activity': typeof ProfileActivityRoute
+  '/profile/downloads': typeof ProfileDownloadsRoute
+  '/profile/offers': typeof ProfileOffersRoute
+  '/profile/support': typeof ProfileSupportRoute
+  '/profile/wallets': typeof ProfileWalletsRoute
+  '/profile/watchlist': typeof ProfileWatchlistRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -89,11 +138,17 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/wallets': typeof WalletsRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/profile/activity': typeof ProfileActivityRoute
+  '/profile/downloads': typeof ProfileDownloadsRoute
+  '/profile/offers': typeof ProfileOffersRoute
+  '/profile/support': typeof ProfileSupportRoute
+  '/profile/wallets': typeof ProfileWalletsRoute
+  '/profile/watchlist': typeof ProfileWatchlistRoute
+  '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -102,11 +157,18 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/signup': typeof SignupRoute
   '/wallets': typeof WalletsRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/profile/activity': typeof ProfileActivityRoute
+  '/profile/downloads': typeof ProfileDownloadsRoute
+  '/profile/offers': typeof ProfileOffersRoute
+  '/profile/support': typeof ProfileSupportRoute
+  '/profile/wallets': typeof ProfileWalletsRoute
+  '/profile/watchlist': typeof ProfileWatchlistRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +183,13 @@ export interface FileRouteTypes {
     | '/wallets'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/profile/activity'
+    | '/profile/downloads'
+    | '/profile/offers'
+    | '/profile/support'
+    | '/profile/wallets'
+    | '/profile/watchlist'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,11 +197,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/login'
-    | '/profile'
     | '/signup'
     | '/wallets'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/profile/activity'
+    | '/profile/downloads'
+    | '/profile/offers'
+    | '/profile/support'
+    | '/profile/wallets'
+    | '/profile/watchlist'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -145,6 +220,13 @@ export interface FileRouteTypes {
     | '/wallets'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/profile/activity'
+    | '/profile/downloads'
+    | '/profile/offers'
+    | '/profile/support'
+    | '/profile/wallets'
+    | '/profile/watchlist'
+    | '/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,7 +235,7 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
-  ProfileRoute: typeof ProfileRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
   SignupRoute: typeof SignupRoute
   WalletsRoute: typeof WalletsRoute
   NftsNftIdRoute: typeof NftsNftIdRoute
@@ -232,8 +314,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/activity': {
+      id: '/profile/activity'
+      path: '/activity'
+      fullPath: '/profile/activity'
+      preLoaderRoute: typeof ProfileActivityRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/downloads': {
+      id: '/profile/downloads'
+      path: '/downloads'
+      fullPath: '/profile/downloads'
+      preLoaderRoute: typeof ProfileDownloadsRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/offers': {
+      id: '/profile/offers'
+      path: '/offers'
+      fullPath: '/profile/offers'
+      preLoaderRoute: typeof ProfileOffersRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/support': {
+      id: '/profile/support'
+      path: '/support'
+      fullPath: '/profile/support'
+      preLoaderRoute: typeof ProfileSupportRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/wallets': {
+      id: '/profile/wallets'
+      path: '/wallets'
+      fullPath: '/profile/wallets'
+      preLoaderRoute: typeof ProfileWalletsRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/watchlist': {
+      id: '/profile/watchlist'
+      path: '/watchlist'
+      fullPath: '/profile/watchlist'
+      preLoaderRoute: typeof ProfileWatchlistRouteImport
+      parentRoute: typeof ProfileRoute
+    }
   }
 }
+
+interface ProfileRouteChildren {
+  ProfileActivityRoute: typeof ProfileActivityRoute
+  ProfileDownloadsRoute: typeof ProfileDownloadsRoute
+  ProfileOffersRoute: typeof ProfileOffersRoute
+  ProfileSupportRoute: typeof ProfileSupportRoute
+  ProfileWalletsRoute: typeof ProfileWalletsRoute
+  ProfileWatchlistRoute: typeof ProfileWatchlistRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileActivityRoute: ProfileActivityRoute,
+  ProfileDownloadsRoute: ProfileDownloadsRoute,
+  ProfileOffersRoute: ProfileOffersRoute,
+  ProfileSupportRoute: ProfileSupportRoute,
+  ProfileWalletsRoute: ProfileWalletsRoute,
+  ProfileWatchlistRoute: ProfileWatchlistRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -241,7 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
-  ProfileRoute: ProfileRoute,
+  ProfileRoute: ProfileRouteWithChildren,
   SignupRoute: SignupRoute,
   WalletsRoute: WalletsRoute,
   NftsNftIdRoute: NftsNftIdRoute,

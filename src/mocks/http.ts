@@ -26,8 +26,11 @@ import {
   favoriteWriteSchema,
   newsletterResponseSchema,
   newsletterSubscribeSchema,
+  orderListSchema,
   orderSchema,
   quoteRequestSchema,
+  supportRequestSchema,
+  supportResponseSchema,
   quoteSchema,
 } from '@/contracts/commerce'
 import type { ErrorCode, FieldError } from '@/contracts/common'
@@ -145,6 +148,9 @@ function presentUser(user: UserRecord) {
     id: user.id,
     email: user.email,
     displayName: user.displayName,
+    username: user.username || user.email.split('@')[0] || 'colecionador',
+    ensName: user.ensName ?? '',
+    walletNickname: user.walletNickname ?? '',
     bio: user.bio,
     avatarUrl: user.avatarUrl,
     createdAt: user.createdAt,
@@ -199,6 +205,11 @@ function presentWallet(wallet: Database['wallets'][number]) {
     role: wallet.role,
     connected: wallet.connected,
     updatedAt: wallet.updatedAt,
+    displayName: wallet.displayName ?? '',
+    profileName: wallet.profileName ?? '',
+    ensName: wallet.ensName ?? '',
+    referralCode: wallet.referralCode ?? '',
+    contactEmail: wallet.contactEmail ?? '',
   })
 }
 
@@ -996,6 +1007,38 @@ export const httpHandlers = [
     return HttpResponse.json(presentOrder(order))
   }),
 
+  http.get('/api/orders', async ({ request }) => {
+    const result = await gate(request, 'required')
+    const user = requireUser(result)
+    if (user instanceof Response) return user
+    if (!result.ok) return result.response
+    const items = result.db.orders.filter((order) => order.userId === user.id).map(presentOrder)
+    return HttpResponse.json(orderListSchema.parse({ items }))
+  }),
+
+  http.post('/api/support', async ({ request }) => {
+    const result = await gate(request, 'required')
+    const user = requireUser(result)
+    if (user instanceof Response) return user
+    if (!result.ok) return result.response
+    const parsed = supportRequestSchema.safeParse(await readJson(request))
+    if (!parsed.success) {
+      return apiError(422, 'validation', 'Revise a mensagem de suporte.', zodDetails(parsed.error))
+    }
+    const ticket = {
+      id: crypto.randomUUID(),
+      userId: user.id,
+      subject: parsed.data.subject.trim(),
+      message: parsed.data.message.trim(),
+      createdAt: new Date().toISOString(),
+    }
+    result.db.supportTickets = [...(result.db.supportTickets ?? []), ticket]
+    persist(result.db)
+    return HttpResponse.json(supportResponseSchema.parse({ id: ticket.id, ok: true }), {
+      status: 201,
+    })
+  }),
+
   http.get('/api/profile', async ({ request }) => {
     const result = await gate(request, 'required')
     const user = requireUser(result)
@@ -1011,7 +1054,17 @@ export const httpHandlers = [
     const parsed = profileUpdateSchema.safeParse(await readJson(request))
     if (!parsed.success)
       return apiError(422, 'validation', 'Check your profile details.', zodDetails(parsed.error))
+    const email = parsed.data.email.toLowerCase()
+    if (result.db.users.some((item) => item.id !== user.id && item.email.toLowerCase() === email)) {
+      return apiError(409, 'conflict', 'Já existe uma conta com esse e-mail.', [
+        { path: 'email', message: 'Esse e-mail já está cadastrado.' },
+      ])
+    }
     user.displayName = parsed.data.displayName.trim()
+    user.username = parsed.data.username.trim()
+    user.email = email
+    user.ensName = parsed.data.ensName.trim()
+    user.walletNickname = parsed.data.walletNickname.trim()
     user.bio = parsed.data.bio.trim()
     persist(result.db)
     return HttpResponse.json(presentUser(user))
@@ -1042,15 +1095,15 @@ export const httpHandlers = [
     if (!result.ok) return result.response
     const parsed = passwordChangeSchema.safeParse(await readJson(request))
     if (!parsed.success)
-      return apiError(422, 'validation', 'Check the password fields.', zodDetails(parsed.error))
+      return apiError(422, 'validation', 'Revise a senha.', zodDetails(parsed.error))
     const matches = await verifyPassword(
       parsed.data.currentPassword,
       user.passwordSalt,
       user.passwordHash,
     )
     if (!matches) {
-      return apiError(422, 'validation', 'The current password is incorrect.', [
-        { path: 'currentPassword', message: 'That password does not match.' },
+      return apiError(422, 'validation', 'A senha atual está incorreta.', [
+        { path: 'currentPassword', message: 'A senha atual não confere.' },
       ])
     }
     user.passwordSalt = randomSalt()
@@ -1075,7 +1128,7 @@ export const httpHandlers = [
     if (!result.ok) return result.response
     const parsed = walletWriteSchema.safeParse(await readJson(request))
     if (!parsed.success)
-      return apiError(422, 'validation', 'Check the wallet details.', zodDetails(parsed.error))
+      return apiError(422, 'validation', 'Revise os dados da carteira.', zodDetails(parsed.error))
     const mine = result.db.wallets.filter((wallet) => wallet.userId === user.id)
     if (mine.length >= 2) {
       return apiError(
@@ -1098,6 +1151,11 @@ export const httpHandlers = [
       role: parsed.data.role,
       connected: false,
       updatedAt: now,
+      displayName: parsed.data.displayName.trim(),
+      profileName: parsed.data.profileName.trim(),
+      ensName: parsed.data.ensName.trim(),
+      referralCode: parsed.data.referralCode.trim(),
+      contactEmail: parsed.data.contactEmail,
     }
     result.db.wallets.push(wallet)
     persist(result.db)
@@ -1138,7 +1196,7 @@ export const httpHandlers = [
     if (!result.ok) return result.response
     const parsed = walletWriteSchema.safeParse(await readJson(request))
     if (!parsed.success)
-      return apiError(422, 'validation', 'Check the wallet details.', zodDetails(parsed.error))
+      return apiError(422, 'validation', 'Revise os dados da carteira.', zodDetails(parsed.error))
     const wallet = result.db.wallets.find(
       (item) => item.id === String(params.walletId) && item.userId === user.id,
     )
@@ -1153,6 +1211,11 @@ export const httpHandlers = [
     wallet.address = parsed.data.address
     wallet.network = parsed.data.network
     wallet.role = parsed.data.role
+    wallet.displayName = parsed.data.displayName.trim()
+    wallet.profileName = parsed.data.profileName.trim()
+    wallet.ensName = parsed.data.ensName.trim()
+    wallet.referralCode = parsed.data.referralCode.trim()
+    wallet.contactEmail = parsed.data.contactEmail
     wallet.updatedAt = new Date().toISOString()
     persist(result.db)
     return HttpResponse.json(presentWallet(wallet))

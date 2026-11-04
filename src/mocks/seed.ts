@@ -52,6 +52,9 @@ export type UserRecord = {
   id: string
   email: string
   displayName: string
+  username?: string
+  ensName?: string
+  walletNickname?: string
   bio: string
   avatarUrl: string | null
   passwordSalt: string
@@ -94,6 +97,11 @@ export type WalletRecord = {
   role: WalletRole
   connected: boolean
   updatedAt: string
+  displayName?: string
+  profileName?: string
+  ensName?: string
+  referralCode?: string
+  contactEmail?: string
 }
 
 export type ReceiptLineRecord = {
@@ -140,6 +148,13 @@ export type Database = {
   wallets: WalletRecord[]
   orders: OrderRecord[]
   subscribers: { email: string; createdAt: string }[]
+  supportTickets?: {
+    id: string
+    userId: string
+    subject: string
+    message: string
+    createdAt: string
+  }[]
 }
 
 const titles = [
@@ -418,6 +433,9 @@ export function createSeed(): Database {
         id: 'user_ada',
         email: 'ada@collector.dev',
         displayName: 'Ada Marlowe',
+        username: 'ada',
+        ensName: 'ada',
+        walletNickname: 'Studio vault',
         bio: 'Collects photographic editions and night scenes.',
         avatarUrl: null,
         passwordSalt: '0a11ceada0c0ffee01b0a7edc0ffee42',
@@ -428,6 +446,9 @@ export function createSeed(): Database {
         id: 'user_leo',
         email: 'leo@collector.dev',
         displayName: 'Leo Okonkwo',
+        username: 'leo',
+        ensName: 'leo',
+        walletNickname: 'Gallery desk',
         bio: 'Follows generative collections and small artist proofs.',
         avatarUrl: null,
         passwordSalt: '1e00c0ffee0b0a7ed5a17ed4e0c0ffee',
@@ -455,6 +476,11 @@ export function createSeed(): Database {
         role: 'primary',
         connected: true,
         updatedAt: createdAt,
+        displayName: 'Ada Marlowe',
+        profileName: 'ada',
+        ensName: 'ada',
+        referralCode: 'KURIO',
+        contactEmail: 'ada@collector.dev',
       },
       {
         id: 'wal_ada_secondary',
@@ -465,6 +491,11 @@ export function createSeed(): Database {
         role: 'secondary',
         connected: false,
         updatedAt: createdAt,
+        displayName: 'Ada Marlowe',
+        profileName: 'ada',
+        ensName: 'ada',
+        referralCode: 'KURIO',
+        contactEmail: 'ada@collector.dev',
       },
       {
         id: 'wal_leo_primary',
@@ -475,6 +506,11 @@ export function createSeed(): Database {
         role: 'primary',
         connected: true,
         updatedAt: createdAt,
+        displayName: 'Leo Okonkwo',
+        profileName: 'leo',
+        ensName: 'leo',
+        referralCode: 'KURIO',
+        contactEmail: 'leo@collector.dev',
       },
     ],
     orders: [],
