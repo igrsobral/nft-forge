@@ -10,9 +10,18 @@ import {
 export const editionSchema = z.object({
   id: z.string(),
   name: z.string(),
+  label: z.string().min(1),
   supply: z.number().int().nonnegative(),
   remaining: z.number().int().nonnegative(),
   priceEth: ethAmountSchema,
+})
+
+export const reviewSchema = z.object({
+  id: z.string(),
+  author: z.string(),
+  rating: z.number().int().min(1).max(5),
+  body: z.string(),
+  createdAt: z.string(),
 })
 
 export const nftSummarySchema = z.object({
@@ -37,6 +46,16 @@ export const nftDetailSchema = nftSummarySchema.extend({
   editions: z.array(editionSchema).min(1),
   favoritesCount: z.number().int().nonnegative(),
   createdAt: z.string(),
+  tokenId: z.string().min(1),
+  attributes: z.array(z.string()).min(1),
+  rating: z.number().min(0).max(5),
+  reviewCount: z.number().int().nonnegative(),
+  reviews: z.array(reviewSchema),
+  gallery: z.array(z.string().min(1)).min(1),
+  contractAddress: z.string().min(1),
+  networkNote: z.string(),
+  contractNote: z.string(),
+  royaltyNote: z.string(),
 })
 
 const optionalInStock = z
@@ -81,6 +100,7 @@ export const nftListResponseSchema = z.object({
 })
 
 export type Edition = z.infer<typeof editionSchema>
+export type Review = z.infer<typeof reviewSchema>
 export type NftSummary = z.infer<typeof nftSummarySchema>
 export type NftDetail = z.infer<typeof nftDetailSchema>
 export type NftListQuery = z.infer<typeof nftListQuerySchema>

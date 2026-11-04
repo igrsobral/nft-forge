@@ -21,6 +21,8 @@ import {
   createOrderSchema,
   favoriteListSchema,
   favoriteWriteSchema,
+  newsletterResponseSchema,
+  newsletterSubscribeSchema,
   orderSchema,
   quoteRequestSchema,
   quoteSchema,
@@ -37,6 +39,7 @@ import { hashPassword, randomSalt, verifyPassword } from './password'
 import { findEdition, findNft, quoteCart, totalsMatch } from './pricing'
 import { getScenario, isScenario, setScenario, type Scenario } from './scenario'
 import {
+  galleryFor,
   imageFor,
   type CartRecord,
   type Database,
@@ -171,6 +174,16 @@ function presentDetail(nft: NftRecord) {
     editions: nft.editions,
     favoritesCount: nft.favoritesCount,
     createdAt: nft.createdAt,
+    tokenId: nft.tokenId,
+    attributes: nft.attributes,
+    rating: nft.rating,
+    reviewCount: nft.reviews.length,
+    reviews: nft.reviews,
+    gallery: galleryFor(nft),
+    contractAddress: nft.contractAddress,
+    networkNote: nft.networkNote,
+    contractNote: nft.contractNote,
+    royaltyNote: nft.royaltyNote,
   })
 }
 
@@ -422,6 +435,21 @@ function markAvailability(db: Database, cart: CartRecord, scenario: Scenario) {
 }
 
 export const httpHandlers = [
+  http.post('/api/newsletter', async ({ request }) => {
+    const result = await gate(request)
+    if (!result.ok) return result.response
+    const parsed = newsletterSubscribeSchema.safeParse(await readJson(request))
+    if (!parsed.success) {
+      return apiError(422, 'validation', 'Informe um e-mail válido.', zodDetails(parsed.error))
+    }
+    const email = parsed.data.email.toLowerCase()
+    if (!result.db.subscribers.some((item) => item.email === email)) {
+      result.db.subscribers.push({ email, createdAt: new Date().toISOString() })
+      persist(result.db)
+    }
+    return HttpResponse.json(newsletterResponseSchema.parse({ ok: true }))
+  }),
+
   http.post('/api/dev/reset', () => {
     resetDb()
     return HttpResponse.json({ ok: true })

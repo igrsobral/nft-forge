@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { Heart } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import type { NftDetail } from '@/contracts/catalog'
@@ -10,17 +11,27 @@ import { favoritesQuery } from '@/lib/queries'
 import { queryKeys } from '@/lib/query-keys'
 import { getStoredUserId } from '@/lib/storage'
 
+const pillOrder = ['1/1', '1/10', '1/50', 'ABERTA']
+
 export function PurchasePanel({ nft }: { nft: NftDetail }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const userId = getStoredUserId()
   const favorites = useQuery({ ...favoritesQuery(userId), enabled: Boolean(userId) })
   const [editionId, setEditionId] = useState(nft.editions[0]?.id ?? '')
+  const [seenNft, setSeenNft] = useState(nft.id)
+  if (nft.id !== seenNft) {
+    setSeenNft(nft.id)
+    setEditionId(nft.editions[0]?.id ?? '')
+  }
   const edition = nft.editions.find((item) => item.id === editionId) ?? nft.editions[0]
   const maxQuantity = Math.min(20, edition?.remaining ?? 0)
   const [quantity, setQuantity] = useState(1)
   const saved = favorites.data?.includes(nft.id) ?? false
   const nextQuantity = Math.min(Math.max(1, quantity), Math.max(1, maxQuantity))
+  const pills = [...nft.editions].sort(
+    (left, right) => pillOrder.indexOf(left.label) - pillOrder.indexOf(right.label),
+  )
 
   function askSignIn() {
     void navigate({
@@ -50,7 +61,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
       if (userId && context?.previous) {
         queryClient.setQueryData(queryKeys.favorites(userId), context.previous)
       }
-      toast.error(error instanceof ApiError ? error.message : 'The favorite could not be saved.')
+      toast.error(error instanceof ApiError ? error.message : 'Não foi possível salvar o favorito.')
     },
     onSettled: async () => {
       if (userId) await queryClient.invalidateQueries({ queryKey: queryKeys.favorites(userId) })
@@ -59,68 +70,91 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
 
   const add = useMutation({
     mutationFn: () => {
-      if (!edition) throw new Error('Choose an edition')
+      if (!edition) throw new Error('Escolha uma edição')
       return addCartItem({ nftId: nft.id, editionId: edition.id, quantity: nextQuantity })
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['cart'] })
-      toast.success('Added to cart')
+      toast.success('Adicionado ao carrinho')
       void navigate({ to: '/cart' })
     },
     onError: (error) => {
-      toast.error(error instanceof ApiError ? error.message : 'Could not add this edition.')
+      toast.error(
+        error instanceof ApiError ? error.message : 'Não foi possível adicionar esta edição.',
+      )
     },
   })
 
   return (
-    <div className="grid gap-3 rounded-[14px] border border-line bg-surface-card p-4">
-      <label className="grid gap-1">
-        <span className="type-b-14 text-text-secondary">Edition</span>
-        <select
-          className="type-b-14 h-11 rounded-[10px] border border-line bg-background px-3"
-          value={edition?.id ?? ''}
-          onChange={(event) => {
-            setEditionId(event.target.value)
-            setQuantity(1)
-          }}
+    <div className="flex flex-col gap-4">
+      <div>
+        <p className="type-b-14 text-foreground">Edição:</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Edição">
+          {pills.map((item) => {
+            const selected = item.id === edition?.id
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={selected}
+                disabled={item.remaining === 0}
+                onClick={() => {
+                  setEditionId(item.id)
+                  setQuantity(1)
+                }}
+                className={
+                  selected
+                    ? 'type-c-13 rounded-md border border-primary px-2.5 py-1 font-bold text-primary'
+                    : 'type-c-13 rounded-md px-2.5 py-1 text-primary/80 hover:text-primary disabled:opacity-40'
+                }
+              >
+                {item.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          aria-label="Diminuir quantidade"
+          disabled={maxQuantity === 0 || nextQuantity <= 1}
+          onClick={() => setQuantity(nextQuantity - 1)}
+          className="flex size-8 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40"
         >
-          {nft.editions.map((item) => (
-            <option key={item.id} value={item.id} disabled={item.remaining === 0}>
-              {item.name}
-              {item.remaining === 0 ? ' (sold out)' : ` (${item.remaining} left)`}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="grid gap-1">
-        <span className="type-b-14 text-text-secondary">Quantity</span>
-        <input
-          type="number"
-          min={1}
-          max={Math.max(1, maxQuantity)}
-          value={nextQuantity}
-          disabled={maxQuantity === 0}
-          aria-describedby="quantity-hint"
-          onChange={(event) => setQuantity(Number(event.target.value))}
-          className="type-b-14 h-11 rounded-[10px] border border-line bg-background px-3"
-        />
-        <span id="quantity-hint" className="type-c-12 text-text-secondary">
-          {maxQuantity === 0 ? 'This edition is sold out.' : `Maximum ${maxQuantity}.`}
+          −
+        </button>
+        <span data-testid="quantity" className="type-b-16 min-w-4 text-center">
+          {maxQuantity === 0 ? 0 : nextQuantity}
         </span>
-      </label>
-      <div className="flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          aria-label="Aumentar quantidade"
+          disabled={maxQuantity === 0 || nextQuantity >= maxQuantity}
+          onClick={() => setQuantity(nextQuantity + 1)}
+          className="flex size-8 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40"
+        >
+          +
+        </button>
+        <span className="type-c-12 text-[#c9a27a]">
+          {maxQuantity === 0
+            ? 'Edição esgotada.'
+            : `${edition?.remaining ?? 0} de ${edition?.supply ?? 0} disponíveis.`}
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           type="button"
-          className="w-full sm:w-auto"
+          className="h-11 rounded-lg px-8 tracking-wide"
           disabled={!edition || maxQuantity === 0 || add.isPending}
           onClick={() => add.mutate()}
         >
-          {add.isPending ? 'Adding…' : 'Add to cart'}
+          {add.isPending ? 'Enviando…' : 'COMPRAR'}
         </Button>
         <Button
           type="button"
           variant="outline"
-          className="w-full sm:w-auto"
+          className="h-11 gap-2 rounded-lg border-primary/80 px-5 text-foreground"
           aria-pressed={saved}
           onClick={() => {
             if (!userId) {
@@ -130,7 +164,8 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
             favorite.mutate()
           }}
         >
-          {saved ? 'Saved' : 'Save'}
+          <Heart className={saved ? 'size-4 fill-primary text-primary' : 'size-4 text-primary'} />
+          {saved ? 'Favorito' : 'Favoritar'}
         </Button>
       </div>
     </div>

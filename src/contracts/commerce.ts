@@ -9,6 +9,14 @@ export const favoriteWriteSchema = z.object({
   nftId: z.string().min(1),
 })
 
+export const newsletterSubscribeSchema = z.object({
+  email: z.email(),
+})
+
+export const newsletterResponseSchema = z.object({
+  ok: z.literal(true),
+})
+
 export const cartItemSchema = z.object({
   id: z.string(),
   nftId: z.string(),
@@ -109,6 +117,7 @@ export const createOrderSchema = z.object({
   expectedTotalEth: ethAmountSchema,
 })
 
+export type NewsletterSubscribe = z.infer<typeof newsletterSubscribeSchema>
 export type Cart = z.infer<typeof cartSchema>
 export type CartItem = z.infer<typeof cartItemSchema>
 export type CartAdd = z.infer<typeof cartAddSchema>

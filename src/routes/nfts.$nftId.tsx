@@ -18,10 +18,10 @@ export const Route = createFileRoute('/nfts/$nftId')({
       throw error
     }
   },
-  head: ({ params }) => ({
+  head: () => ({
     meta: [
-      { title: `${params.nftId} · Atelier Market` },
-      { name: 'description', content: 'Edition detail, stock, and live price.' },
+      { title: 'Edição · Kurio' },
+      { name: 'description', content: 'Ficha da edição, tiragem, avaliações e preço ao vivo.' },
     ],
   }),
   pendingComponent: DetailSkeleton,

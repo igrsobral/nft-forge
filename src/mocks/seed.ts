@@ -6,9 +6,18 @@ import { nftImageUrl } from './images'
 export type EditionRecord = {
   id: string
   name: string
+  label: string
   supply: number
   remaining: number
   priceEth: string
+}
+
+export type ReviewRecord = {
+  id: string
+  author: string
+  rating: number
+  body: string
+  createdAt: string
 }
 
 export type NftRecord = {
@@ -25,6 +34,14 @@ export type NftRecord = {
   priceEth: string
   previousPriceEth: string | null
   editions: EditionRecord[]
+  tokenId: string
+  attributes: string[]
+  rating: number
+  reviews: ReviewRecord[]
+  contractAddress: string
+  networkNote: string
+  contractNote: string
+  royaltyNote: string
   favoritesCount: number
   version: number
   createdAt: string
@@ -114,7 +131,7 @@ export type OrderRecord = {
 }
 
 export type Database = {
-  schemaVersion: 2
+  schemaVersion: 3
   users: UserRecord[]
   sessions: SessionRecord[]
   nfts: NftRecord[]
@@ -122,6 +139,7 @@ export type Database = {
   carts: CartRecord[]
   wallets: WalletRecord[]
   orders: OrderRecord[]
+  subscribers: { email: string; createdAt: string }[]
 }
 
 const titles = [
@@ -232,16 +250,43 @@ const creators = [
 
 const descriptions = [
   (name: string, collection: string, category: string) =>
-    `${name} is a ${category.toLowerCase()} edition from ${collection}. The print run is fixed in this mock catalog so stock, price, and filters stay deterministic.`,
+    `${name} é uma obra de ${category.toLowerCase()} da coleção ${collection}. A tiragem fica fixa neste catálogo para o estoque, o preço e os filtros permanecerem determinísticos.`,
   (name: string, collection: string, category: string) =>
-    `${collection} released ${name} as a ${category.toLowerCase()} work with a public edition and, on some pieces, a smaller artist proof.`,
+    `${collection} publicou ${name} como peça de ${category.toLowerCase()}, com uma edição aberta e tiragens menores para colecionadores.`,
   (name: string, collection: string, category: string) =>
-    `Collectors use ${name} to compare ${category.toLowerCase()} pricing inside ${collection}. Values are decimal ETH strings, not floating-point numbers.`,
+    `Colecionadores usam ${name} para comparar preços de ${category.toLowerCase()} dentro de ${collection}. Os valores viajam como texto decimal em ETH.`,
   (name: string, collection: string, category: string) =>
-    `${name} sits in the ${collection} series. Its ${category.toLowerCase()} metadata is what the catalog filters and the live price channel both key off.`,
+    `${name} faz parte da série ${collection}. Os metadados de ${category.toLowerCase()} alimentam os filtros do catálogo e o canal de preço ao vivo.`,
 ] as const
 
-const catalogNetworkCycle = ['ethereum', 'polygon', 'solana'] as const satisfies readonly CatalogNetwork[]
+const attributeSets = [
+  ['Óculos', 'Esmeralda', 'Raro'],
+  ['Chapéu', 'Violeta', 'Série'],
+  ['Paletó', 'Marfim', 'Único'],
+  ['Fone', 'Dourado', 'Limitado'],
+  ['Capuz', 'Lilás', 'Noturno'],
+] as const
+
+const reviewAuthors = ['Marina Costa', 'Theo Almeida', 'Lia Ferreira'] as const
+
+const reviewBodies = [
+  'A cor segura a tela inteira e a ficha na rede confere com a página.',
+  'Entrou na coleção pelo acabamento. A edição aberta ainda tem presença.',
+  'O recorte é raro sem parecer forçado. Bom para uma coleção pequena.',
+  'Preço e tiragem batem com o que o catálogo promete.',
+] as const
+
+const networkNotes = {
+  ethereum: 'Cunhado na Ethereum com procedência imutável e metadados armazenados no IPFS.',
+  polygon: 'Cunhado na Polygon, com a ficha de metadados publicada no IPFS.',
+  solana: 'Registrado na Solana, com os metadados publicados para leitura pública.',
+} as const
+
+const catalogNetworkCycle = [
+  'ethereum',
+  'polygon',
+  'solana',
+] as const satisfies readonly CatalogNetwork[]
 
 function categoryFor(index: number): Category {
   const counts = [6, 5, 6, 5, 4, 4, 4, 3, 3]
@@ -271,6 +316,16 @@ function address(prefix: string): string {
   return value
 }
 
+function reviewsFor(index: number): ReviewRecord[] {
+  return [0, 1, 2].map((offset) => ({
+    id: `rev_${String(index + 1).padStart(2, '0')}_${offset}`,
+    author: reviewAuthors[offset] ?? 'Colecionador',
+    rating: [5, 4, 4][offset] ?? 4,
+    body: reviewBodies[(index + offset) % reviewBodies.length] ?? reviewBodies[0],
+    createdAt: new Date(Date.UTC(2025, offset, 4 + (index % 20))).toISOString(),
+  }))
+}
+
 function createNfts(): NftRecord[] {
   if (titles.length !== 40 || prices.length !== 40) {
     throw new Error('The NFT seed must contain 40 titles and 40 prices.')
@@ -286,21 +341,42 @@ function createNfts(): NftRecord[] {
     const editions: EditionRecord[] = [
       {
         id: `${id}_open`,
-        name: 'Open edition',
+        name: 'ABERTA',
+        label: 'ABERTA',
         supply: 80,
         remaining: 8 + (index % 17),
         priceEth,
       },
-    ]
-    if (index % 3 !== 0) {
-      editions.push({
-        id: `${id}_proof`,
-        name: 'Artist proof',
-        supply: 5,
-        remaining: index % 7 === 0 ? 0 : 1 + (index % 4),
+      {
+        id: `${id}_1`,
+        name: '1/1',
+        label: '1/1',
+        supply: 1,
+        remaining: index % 5 === 0 ? 0 : 1,
+        priceEth: mulEth(priceEth, 8),
+      },
+      {
+        id: `${id}_10`,
+        name: '1/10',
+        label: '1/10',
+        supply: 10,
+        remaining: 2 + (index % 6),
         priceEth: mulEth(priceEth, 3),
-      })
-    }
+      },
+      {
+        id: `${id}_50`,
+        name: '1/50',
+        label: '1/50',
+        supply: 50,
+        remaining: 5 + (index % 12),
+        priceEth: mulEth(priceEth, '1.5'),
+      },
+    ]
+    const reviews = reviewsFor(index)
+    const rating =
+      Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10) /
+      10
+    const network = networkFor(index)
     return {
       id,
       slug: slugify(title),
@@ -310,12 +386,21 @@ function createNfts(): NftRecord[] {
       collectionId: collection.id,
       collectionName: collection.name,
       category,
-      network: networkFor(index),
+      network,
       creator,
       imageHue: (index * 37) % 360,
       priceEth,
       previousPriceEth: index % 4 === 2 ? mulEth(priceEth, '1.15') : null,
       editions,
+      tokenId: `#${String(index + 1).padStart(4, '0')}`,
+      attributes: [...(attributeSets[index % attributeSets.length] ?? attributeSets[0])],
+      rating,
+      reviews,
+      contractAddress: address(index.toString(16).padStart(8, 'a')),
+      networkNote: networkNotes[network],
+      contractNote:
+        'Contrato inteligente verificado. Os metadados públicos repetem a ficha desta página.',
+      royaltyNote: `${creator} recebe 5% de direitos autorais nas vendas secundárias, pagos pelos mercados compatíveis.`,
       favoritesCount: (index * 3) % 28,
       version: 1,
       createdAt,
@@ -327,7 +412,7 @@ function createNfts(): NftRecord[] {
 export function createSeed(): Database {
   const createdAt = '2024-03-01T12:00:00.000Z'
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     users: [
       {
         id: 'user_ada',
@@ -393,9 +478,14 @@ export function createSeed(): Database {
       },
     ],
     orders: [],
+    subscribers: [],
   }
 }
 
 export function imageFor(nft: NftRecord): string {
   return nftImageUrl(nft.name, nft.collectionName, nft.imageHue)
+}
+
+export function galleryFor(nft: NftRecord): string[] {
+  return [0, 1, 2, 3].map((frame) => nftImageUrl(nft.name, nft.collectionName, nft.imageHue, frame))
 }

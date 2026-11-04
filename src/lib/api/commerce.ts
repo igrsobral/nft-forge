@@ -5,6 +5,7 @@ import {
   createOrderSchema,
   favoriteListSchema,
   favoriteWriteSchema,
+  newsletterResponseSchema,
   orderSchema,
   quoteRequestSchema,
   quoteSchema,
@@ -29,6 +30,11 @@ export async function addFavorite(nftId: string): Promise<string[]> {
 
 export async function removeFavorite(nftId: string): Promise<void> {
   await api.delete(`/favorites/${encodeURIComponent(nftId)}`)
+}
+
+export async function subscribeNewsletter(email: string): Promise<void> {
+  const response = await api.post('/newsletter', { email })
+  newsletterResponseSchema.parse(response.data)
 }
 
 export async function getCart(signal?: AbortSignal): Promise<Cart> {

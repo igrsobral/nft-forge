@@ -2,6 +2,7 @@ import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react
 import { useQuery } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
+import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { NotFoundPage, RouteError } from '@/components/route-error'
 import { Toaster } from '@/components/ui/sonner'
@@ -32,6 +33,7 @@ function RootLayout() {
       <div id="content">
         <Outlet />
       </div>
+      <Footer />
       <RealtimeBridge />
       <Toaster />
     </>

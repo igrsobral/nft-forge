@@ -67,9 +67,7 @@ export function Header() {
           className="absolute left-1/2 hidden -translate-x-1/2 items-start gap-8 lg:flex"
         >
           <TopLink to="/" label="Início" active={pathname === '/'} />
-          <a href="#catalogo" className="type-b-16 text-foreground hover:text-primary">
-            Mercado
-          </a>
+          <MercadoLink active={pathname.startsWith('/nfts')} />
           <button type="button" className="type-b-16 text-foreground hover:text-primary">
             Criadores
           </button>
@@ -158,7 +156,15 @@ export function Header() {
         >
           Início
         </Link>
-        <a href="#catalogo" className="type-c-13 shrink-0 text-foreground">
+        <a
+          href="/#catalogo"
+          aria-current={pathname.startsWith('/nfts') ? 'page' : undefined}
+          className={
+            pathname.startsWith('/nfts')
+              ? 'type-c-13 shrink-0 font-bold text-primary'
+              : 'type-c-13 shrink-0 text-foreground'
+          }
+        >
           Mercado
         </a>
         <span className="type-c-13 shrink-0 text-foreground">Criadores</span>
@@ -178,6 +184,24 @@ export function Header() {
         </nav>
       ) : null}
     </header>
+  )
+}
+
+function MercadoLink({ active }: { active: boolean }) {
+  return (
+    <a
+      href="/#catalogo"
+      aria-current={active ? 'page' : undefined}
+      className="flex flex-col items-center gap-2"
+    >
+      <span className={active ? 'type-b-16 font-bold text-primary' : 'type-b-16 text-foreground'}>
+        Mercado
+      </span>
+      <span
+        aria-hidden
+        className={active ? 'h-[3px] w-full bg-primary' : 'h-[3px] w-full bg-transparent'}
+      />
+    </a>
   )
 }
 

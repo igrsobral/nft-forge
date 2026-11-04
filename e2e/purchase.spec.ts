@@ -9,7 +9,7 @@ test('signs in, checks out, and shows the confirmed receipt', async ({ page }) =
   await expect(page.getByRole('heading', { name: /seja dono do futuro/i })).toBeVisible()
 
   await page.goto('/nfts/nft_01')
-  await page.getByRole('button', { name: 'Add to cart' }).click()
+  await page.getByRole('button', { name: 'COMPRAR' }).click()
   await expect(page.getByTestId('cart-item')).toBeVisible()
   await page.getByRole('link', { name: 'Checkout' }).click()
   await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible()
