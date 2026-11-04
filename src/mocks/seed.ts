@@ -112,6 +112,8 @@ export type ReceiptLineRecord = {
   quantity: number
   unitPriceEth: string
   lineTotalEth: string
+  tokenId?: string
+  imageUrl?: string
 }
 
 export type OrderRecord = {
@@ -125,6 +127,7 @@ export type OrderRecord = {
   network: Network
   txRef: string | null
   explorerUrl: string | null
+  walletLabel?: string
   receipt: {
     lines: ReceiptLineRecord[]
     subtotalEth: string

@@ -88,8 +88,13 @@ export const quoteRequestSchema = z.object({
   couponCode: z.string().trim().min(1).max(40).optional(),
 })
 
+export const receiptLineSchema = quoteLineSchema.extend({
+  tokenId: z.string().default(''),
+  imageUrl: z.string().default(''),
+})
+
 export const receiptSchema = z.object({
-  lines: z.array(quoteLineSchema),
+  lines: z.array(receiptLineSchema),
   subtotalEth: ethAmountSchema,
   discountEth: ethAmountSchema,
   networkFeeEth: ethAmountSchema,
@@ -106,6 +111,7 @@ export const orderSchema = z.object({
   network: networkSchema,
   txRef: z.string().nullable(),
   explorerUrl: z.string().nullable(),
+  walletLabel: z.string().default(''),
   receipt: receiptSchema,
   createdAt: z.string(),
   updatedAt: z.string(),

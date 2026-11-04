@@ -243,6 +243,8 @@ function presentCart(db: Database, cart: CartRecord) {
 }
 
 function presentOrder(order: OrderRecord) {
+  const db = getDb()
+  const wallet = db.wallets.find((item) => item.id === order.walletId)
   return orderSchema.parse({
     id: order.id,
     status: order.status,
@@ -251,7 +253,18 @@ function presentOrder(order: OrderRecord) {
     network: order.network,
     txRef: order.txRef,
     explorerUrl: order.explorerUrl,
-    receipt: order.receipt,
+    walletLabel: order.walletLabel || wallet?.label || '',
+    receipt: {
+      ...order.receipt,
+      lines: order.receipt.lines.map((line) => {
+        const nft = findNft(db.nfts, line.nftId)
+        return {
+          ...line,
+          tokenId: line.tokenId || nft?.tokenId || '',
+          imageUrl: line.imageUrl || (nft ? imageFor(nft) : ''),
+        }
+      }),
+    },
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
   })
@@ -409,7 +422,7 @@ function scheduleResolution(orderId: string, scenario: Scenario) {
     } else if (confirmOrder(db, order)) {
       order.status = 'confirmed'
       order.txRef = txRefFor(order.id)
-      order.explorerUrl = `https://explorer.atelier.test/tx/${order.txRef}`
+      order.explorerUrl = `https://etherscan.io/tx/${order.txRef}`
     } else {
       order.status = 'declined'
     }
@@ -954,8 +967,16 @@ export const httpHandlers = [
       network: parsed.data.network,
       txRef: null,
       explorerUrl: null,
+      walletLabel: wallet.label,
       receipt: {
-        lines: quote.lines,
+        lines: quote.lines.map((line) => {
+          const nft = findNft(result.db.nfts, line.nftId)
+          return {
+            ...line,
+            tokenId: nft?.tokenId ?? '',
+            imageUrl: nft ? imageFor(nft) : '',
+          }
+        }),
         subtotalEth: quote.subtotalEth,
         discountEth: quote.discountEth,
         networkFeeEth: quote.networkFeeEth,
@@ -976,7 +997,7 @@ export const httpHandlers = [
       }
       order.status = 'confirmed'
       order.txRef = txRefFor(order.id)
-      order.explorerUrl = `https://explorer.atelier.test/tx/${order.txRef}`
+      order.explorerUrl = `https://etherscan.io/tx/${order.txRef}`
       order.version = 2
       order.updatedAt = new Date().toISOString()
     }

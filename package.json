@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test:unit": "node --experimental-strip-types --test unit/receipt.test.ts",
     "test:e2e": "playwright install chromium && playwright test",
     "lighthouse": "pnpm build && lhci autorun --config=lighthouserc.mobile.cjs && lhci autorun --config=lighthouserc.desktop.cjs"
   },

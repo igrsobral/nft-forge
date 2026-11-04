@@ -53,7 +53,7 @@ function RootLayout() {
       </div>
       <RealtimeBridge />
       <AuthModal />
-      <Toaster />
+      <Toaster position="top-center" />
     </>
   )
 }
