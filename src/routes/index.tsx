@@ -16,10 +16,11 @@ export const Route = createFileRoute('/')({
     }),
   head: () => ({
     meta: [
-      { title: 'Discover editions · Atelier Market' },
+      { title: 'Kurio · Seja dono do futuro da arte digital' },
       {
         name: 'description',
-        content: 'Browse NFT editions with search, filters, and live prices.',
+        content:
+          'Descubra NFTs selecionados, filtre por coleção, rede e preço, e acompanhe o mercado ao vivo.',
       },
     ],
   }),

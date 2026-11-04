@@ -26,7 +26,7 @@ import {
   quoteSchema,
 } from '@/contracts/commerce'
 import type { ErrorCode, FieldError } from '@/contracts/common'
-import { categories } from '@/contracts/common'
+import { catalogNetworks, categories } from '@/contracts/common'
 import { addEth, cmpEth, mulEth } from '@/lib/money'
 import { HttpResponse, http } from 'msw'
 import type { z } from 'zod'
@@ -153,8 +153,10 @@ function presentSummary(nft: NftRecord) {
     collectionId: nft.collectionId,
     collectionName: nft.collectionName,
     category: nft.category,
+    network: nft.network,
     creator: nft.creator,
     priceEth: nft.priceEth,
+    previousPriceEth: nft.previousPriceEth,
     imageUrl: imageFor(nft),
     available: nft.editions.some((edition) => edition.remaining > 0),
     version: nft.version,
@@ -274,7 +276,15 @@ function mergeGuestCart(db: Database, userId: string, request: Request) {
   cart.updatedAt = new Date().toISOString()
 }
 
+const networkLabels = { ethereum: 'Ethereum', polygon: 'Polygon', solana: 'Solana' } as const
+
 function facets(nfts: NftRecord[]) {
+  let min = nfts[0]?.priceEth ?? '0'
+  let max = min
+  for (const nft of nfts) {
+    if (cmpEth(nft.priceEth, min) < 0) min = nft.priceEth
+    if (cmpEth(nft.priceEth, max) > 0) max = nft.priceEth
+  }
   return {
     categories: categories.map((category) => ({
       value: category,
@@ -288,7 +298,32 @@ function facets(nfts: NftRecord[]) {
       label,
       count: nfts.filter((nft) => nft.collectionId === value).length,
     })),
+    networks: catalogNetworks.map((network) => ({
+      value: network,
+      label: networkLabels[network],
+      count: nfts.filter((nft) => nft.network === network).length,
+    })),
+    price: { min, max },
   }
+}
+
+function applyTab(nfts: NftRecord[], tab: NftListQuery['tab']): NftRecord[] {
+  if (tab === 'new') {
+    const newest = [...nfts].sort(
+      (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt),
+    )
+    const cutoff = newest[Math.min(11, Math.max(0, newest.length - 1))]?.createdAt
+    return cutoff ? nfts.filter((nft) => nft.createdAt >= cutoff) : nfts
+  }
+  if (tab === 'trending') return nfts.filter((nft) => nft.favoritesCount >= 12)
+  return nfts
+}
+
+function featuredNft(nfts: NftRecord[]): NftRecord | null {
+  return nfts.reduce<NftRecord | null>((best, nft) => {
+    if (!best || nft.favoritesCount > best.favoritesCount) return nft
+    return best
+  }, null)
 }
 
 function sortNfts(items: NftRecord[], sort: NftListQuery['sort']): NftRecord[] {
@@ -515,10 +550,12 @@ export const httpHandlers = [
           total: 0,
           totalPages: 0,
           facets: facets(result.db.nfts),
+          featured: null,
         }),
       )
     }
-    const filtered = result.db.nfts.filter((nft) => {
+    const scoped = applyTab(result.db.nfts, query.tab)
+    const filtered = scoped.filter((nft) => {
       if (query.q) {
         const haystack =
           `${nft.name} ${nft.creator} ${nft.collectionName} ${nft.description}`.toLowerCase()
@@ -526,6 +563,7 @@ export const httpHandlers = [
       }
       if (query.collection && nft.collectionId !== query.collection) return false
       if (query.category && nft.category !== query.category) return false
+      if (query.network && nft.network !== query.network) return false
       if (query.minPrice && cmpEth(nft.priceEth, query.minPrice) < 0) return false
       if (query.maxPrice && cmpEth(nft.priceEth, query.maxPrice) > 0) return false
       const inStock = nft.editions.some((edition) => edition.remaining > 0)
@@ -545,6 +583,10 @@ export const httpHandlers = [
         total,
         totalPages,
         facets: facets(result.db.nfts),
+        featured: (() => {
+          const featured = featuredNft(result.db.nfts)
+          return featured ? presentSummary(featured) : null
+        })(),
       }),
     )
   }),

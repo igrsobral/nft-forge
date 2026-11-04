@@ -1,4 +1,5 @@
-import type { Category, Network, WalletRole } from '@/contracts/common'
+import type { CatalogNetwork, Category, Network, WalletRole } from '@/contracts/common'
+import { categories } from '@/contracts/common'
 import { mulEth } from '@/lib/money'
 import { nftImageUrl } from './images'
 
@@ -18,9 +19,11 @@ export type NftRecord = {
   collectionId: string
   collectionName: string
   category: Category
+  network: CatalogNetwork
   creator: string
   imageHue: number
   priceEth: string
+  previousPriceEth: string | null
   editions: EditionRecord[]
   favoritesCount: number
   version: number
@@ -111,7 +114,7 @@ export type OrderRecord = {
 }
 
 export type Database = {
-  schemaVersion: 1
+  schemaVersion: 2
   users: UserRecord[]
   sessions: SessionRecord[]
   nfts: NftRecord[]
@@ -238,12 +241,20 @@ const descriptions = [
     `${name} sits in the ${collection} series. Its ${category.toLowerCase()} metadata is what the catalog filters and the live price channel both key off.`,
 ] as const
 
+const catalogNetworkCycle = ['ethereum', 'polygon', 'solana'] as const satisfies readonly CatalogNetwork[]
+
 function categoryFor(index: number): Category {
-  if (index < 10) return 'Photography'
-  if (index < 20) return 'Art'
-  if (index < 26) return 'Music'
-  if (index < 34) return 'Gaming'
-  return 'Membership'
+  const counts = [6, 5, 6, 5, 4, 4, 4, 3, 3]
+  let cursor = 0
+  for (let bucket = 0; bucket < counts.length; bucket += 1) {
+    cursor += counts[bucket] ?? 0
+    if (index < cursor) return categories[bucket] ?? 'Arte digital'
+  }
+  return 'Arte digital'
+}
+
+function networkFor(index: number): CatalogNetwork {
+  return catalogNetworkCycle[index % catalogNetworkCycle.length] ?? 'ethereum'
 }
 
 function slugify(value: string): string {
@@ -299,9 +310,11 @@ function createNfts(): NftRecord[] {
       collectionId: collection.id,
       collectionName: collection.name,
       category,
+      network: networkFor(index),
       creator,
       imageHue: (index * 37) % 360,
       priceEth,
+      previousPriceEth: index % 4 === 2 ? mulEth(priceEth, '1.15') : null,
       editions,
       favoritesCount: (index * 3) % 28,
       version: 1,
@@ -314,7 +327,7 @@ function createNfts(): NftRecord[] {
 export function createSeed(): Database {
   const createdAt = '2024-03-01T12:00:00.000Z'
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     users: [
       {
         id: 'user_ada',

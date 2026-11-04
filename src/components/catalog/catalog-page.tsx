@@ -1,45 +1,46 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import type { NftListQuery } from '@/contracts/catalog'
+import { ChevronRight, SlidersHorizontal } from 'lucide-react'
+import { useState } from 'react'
+import type { NftListQuery, NftSummary } from '@/contracts/catalog'
+import type { CatalogTab, Sort } from '@/contracts/common'
 import { CatalogFilters } from '@/components/catalog/catalog-filters'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api/errors'
-import { formatEth } from '@/lib/money'
 import { toListQuery, toRouteSearch } from '@/lib/catalog-search'
+import { formatEth } from '@/lib/money'
 import { nftListQuery } from '@/lib/queries'
 import { getStoredUserId } from '@/lib/storage'
 import { Route } from '@/routes/index'
+
+const heroQuery = toListQuery({ sort: 'newest', page: 1, pageSize: 3 })
+
+const tabs: { id: CatalogTab; label: string }[] = [
+  { id: 'all', label: 'Todos os NFTs' },
+  { id: 'new', label: 'Novos lançamentos' },
+  { id: 'trending', label: 'Em alta' },
+]
+
+const sorts: { id: Sort; label: string }[] = [
+  { id: 'newest', label: 'Listados recentemente' },
+  { id: 'price_asc', label: 'Menor preço' },
+  { id: 'price_desc', label: 'Maior preço' },
+  { id: 'name_asc', label: 'Nome' },
+]
 
 export function CatalogPage() {
   const routeSearch = Route.useSearch()
   const search = toListQuery(routeSearch)
   const navigate = Route.useNavigate()
   const query = useQuery(nftListQuery(getStoredUserId(), search))
+  const hero = useQuery(nftListQuery(getStoredUserId(), heroQuery))
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [draft, setDraft] = useState(search.q ?? '')
-  const [previousQuery, setPreviousQuery] = useState(search.q)
-  if (search.q !== previousQuery) {
-    setPreviousQuery(search.q)
-    setDraft(search.q ?? '')
-  }
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      const next = draft.trim()
-      if ((search.q ?? '') === next) return
-      void navigate({
-        to: '/',
-        search: (previous) =>
-          toRouteSearch(toListQuery({ ...toListQuery(previous), q: next || undefined, page: 1 })),
-        replace: true,
-      })
-    }, 300)
-    return () => window.clearTimeout(handle)
-  }, [draft, navigate, search.q])
+  const [slide, setSlide] = useState(0)
+  const slides = hero.data?.items ?? []
+  const slideIndex = slides.length === 0 ? 0 : Math.min(slide, slides.length - 1)
+  const activeSlide = slides[slideIndex]
 
   function updateFilters(patch: Partial<NftListQuery>) {
     void navigate({
@@ -49,254 +50,357 @@ export function CatalogPage() {
     })
   }
 
-  const featured = query.data?.items[0]
+  function goToPage(page: number) {
+    void navigate({
+      to: '/',
+      search: (previous) => toRouteSearch(toListQuery({ ...toListQuery(previous), page })),
+    })
+  }
+
+  const featured = query.data?.featured ?? null
 
   return (
-    <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-4 lg:gap-16 lg:px-10 lg:py-8">
-      <div className="flex gap-2 lg:hidden">
-        <div
-          role="search"
-          className="flex h-[45px] min-w-0 flex-1 items-center rounded-[10px] bg-surface-card px-3 focus-within:ring-2 focus-within:ring-accent"
-        >
-          <label htmlFor="catalog-search" className="sr-only">
-            Search
-          </label>
-          <input
-            id="catalog-search"
-            type="search"
-            value={draft}
-            placeholder="Explorar coleções"
-            autoComplete="off"
-            onChange={(event) => setDraft(event.target.value)}
-            className="type-b-14-bold h-full min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-secondary"
-          />
-        </div>
-        <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <SheetTrigger
-            aria-label="Filters"
-            className="flex size-[45px] shrink-0 items-center justify-center rounded-[14px] bg-gradient-filter-btn text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    <main className="overflow-x-clip">
+      <section className="mx-auto grid w-full max-w-[1440px] min-w-0 items-center gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-12 lg:px-10 lg:py-14">
+        <div className="flex max-w-[620px] flex-col items-start">
+          <p className="type-b-14 text-foreground">Bem-vindo à Kurio</p>
+          <h1 className="mt-5 text-[28px] leading-[1.15] font-bold tracking-tight text-foreground uppercase min-[420px]:text-[32px] lg:text-[clamp(32px,3.15vw,46px)] lg:leading-[1.12]">
+            <span className="block lg:whitespace-nowrap">Seja dono do futuro</span>
+            <span className="block lg:whitespace-nowrap">da arte digital</span>
+          </h1>
+          <p className="type-b-14 mt-5 max-w-[540px] text-[#c9a27a] lg:text-[15px] lg:leading-6">
+            Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital
+            rara, apoie artistas e tenha uma parte da cultura da internet.
+          </p>
+          <a
+            href="#catalogo"
+            className="type-b-14-bold mt-8 inline-flex h-11 items-center rounded-lg bg-primary px-8 text-primary-foreground uppercase tracking-[0.08em]"
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="size-5 fill-none stroke-current stroke-2"
-            >
-              <path d="M4 6h16M7 12h10M10 18h4" />
-            </svg>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[min(100%,320px)] overflow-y-auto bg-background">
-            <SheetHeader>
-              <SheetTitle className="type-b-16-bold">Filters</SheetTitle>
-            </SheetHeader>
-            <div className="px-4 pb-8">
-              {query.data ? (
-                <CatalogFilters
-                  idPrefix="mobile"
-                  search={search}
-                  facets={query.data.facets}
-                  onChange={(patch) => {
-                    updateFilters(patch)
-                    setFiltersOpen(false)
-                  }}
+            Explorar
+          </a>
+          <div
+            className="mt-12 flex w-full items-center justify-center gap-2 lg:mt-16"
+            role="tablist"
+            aria-label="Destaques"
+          >
+            {(slides.length > 0 ? slides : [0, 1, 2]).map((item, index) => {
+              const selected = index === slideIndex
+              return (
+                <button
+                  key={typeof item === 'number' ? index : item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  aria-label={`Destaque ${index + 1}`}
+                  disabled={slides.length === 0}
+                  onClick={() => setSlide(index)}
+                  className={
+                    selected
+                      ? 'size-2.5 rounded-full bg-primary'
+                      : 'size-2 rounded-full bg-[#6a4332]'
+                  }
                 />
-              ) : (
-                <p className="type-b-14 text-text-secondary">
-                  Filters appear when the catalog loads.
-                </p>
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      <section className="flex items-center gap-3 overflow-hidden rounded-[30px] bg-gradient-tile p-4 lg:h-[450px] lg:justify-between lg:gap-10 lg:rounded-[24px] lg:bg-surface-card lg:bg-none lg:p-0 lg:pl-10">
-        <div className="flex min-w-0 flex-1 flex-col gap-3 lg:max-w-[600px] lg:gap-8">
-          <p className="type-c-12 tracking-[1.4px] text-foreground uppercase lg:type-b-14">
-            Editions
-          </p>
-          <h1 className="type-t-18-bold text-foreground lg:type-display-43">Discover editions</h1>
-          <p className="type-c-12 max-w-[557px] text-text-secondary lg:type-b-14 lg:leading-6">
-            Search, filters, and sort stay in the address bar. Prices move when the market socket
-            emits an update.
-          </p>
+              )
+            })}
+          </div>
         </div>
-        {featured ? (
-          <img
-            src={featured.imageUrl}
-            alt=""
-            width={450}
-            height={450}
-            className="aspect-square w-full max-w-[180px] self-end rounded-[16px] object-cover lg:max-w-none lg:w-[min(450px,40%)] lg:shrink-0 lg:rounded-[24px]"
-          />
+        {activeSlide ? (
+          <Link
+            to="/nfts/$nftId"
+            params={{ nftId: activeSlide.id }}
+            className="block min-w-0 overflow-hidden rounded-[28px] bg-[#24140f]"
+          >
+            <img
+              src={activeSlide.imageUrl}
+              alt={`${activeSlide.name} por ${activeSlide.creator}`}
+              width={460}
+              height={460}
+              className="aspect-square w-full min-w-0 object-cover"
+            />
+          </Link>
         ) : (
-          <Skeleton className="aspect-square w-full max-w-[180px] self-end rounded-[16px] lg:h-[450px] lg:max-w-none lg:w-[min(450px,40%)] lg:rounded-[24px]" />
+          <Skeleton className="aspect-square w-full rounded-[28px]" />
         )}
       </section>
 
-      <div className="flex items-start gap-12">
-        <aside aria-label="Filters" className="hidden w-[310px] shrink-0 flex-col gap-6 lg:flex">
-          <label className="grid gap-2" htmlFor="catalog-search-desktop">
-            <span className="type-b-14 text-text-secondary">Search</span>
-            <Input
-              id="catalog-search-desktop"
-              value={draft}
-              placeholder="Name, creator, or collection"
-              onChange={(event) => setDraft(event.target.value)}
-              className="h-11 rounded-[10px] border-line bg-surface-card"
-            />
-          </label>
-          {query.data ? (
-            <CatalogFilters
-              idPrefix="desktop"
-              search={search}
-              facets={query.data.facets}
-              onChange={updateFilters}
-            />
-          ) : null}
-        </aside>
-        <div className="flex min-w-0 flex-1 flex-col gap-6">
-          {query.isPending ? <CatalogSkeleton /> : null}
-          {query.isError ? (
-            <CatalogError error={query.error} onRetry={() => void query.refetch()} />
-          ) : null}
-          {query.data ? (
-            <>
-              <p
-                data-testid="result-count"
-                aria-live="polite"
-                className="text-sm text-muted-foreground"
+      <section
+        id="catalogo"
+        className="mx-auto w-full max-w-[1440px] min-w-0 scroll-mt-24 overflow-x-clip px-4 pb-16 lg:px-10"
+      >
+        <div className="mb-4 lg:hidden">
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button type="button" variant="outline" className="h-11 gap-2 rounded-lg px-4">
+                <SlidersHorizontal className="size-4" />
+                Filtros
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[min(100%,340px)] overflow-y-auto bg-background">
+              <SheetHeader>
+                <SheetTitle>Filtros</SheetTitle>
+              </SheetHeader>
+              <div className="px-4 pb-8">
+                {query.data ? (
+                  <CatalogFilters
+                    search={search}
+                    facets={query.data.facets}
+                    onChange={(patch) => {
+                      updateFilters(patch)
+                      setFiltersOpen(false)
+                    }}
+                  />
+                ) : (
+                  <p className="type-b-14 text-text-secondary">
+                    Os filtros aparecem quando o catálogo carrega.
+                  </p>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        <div className="grid min-w-0 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-x-6">
+          <div className="hidden flex-col gap-8 lg:flex">
+            {query.data ? (
+              <CatalogFilters search={search} facets={query.data.facets} onChange={updateFilters} />
+            ) : (
+              <Skeleton className="h-[520px] rounded-xl" />
+            )}
+            <FeaturedCard nft={featured} />
+          </div>
+
+          <div className="min-w-0">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div
+                role="tablist"
+                aria-label="Recorte do catálogo"
+                className="flex gap-6 overflow-x-auto"
               >
-                {query.data.total} editions
-                {query.isFetching ? ' · updating' : ''}
-              </p>
-              {query.data.items.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center">
-                  <h2 className="text-lg font-medium">No editions match</h2>
-                  <p className="mt-2 text-muted-foreground">Clear a filter or try another name.</p>
-                </div>
-              ) : (
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-6 pb-10 max-md:[&>li:nth-child(even)]:translate-y-8 md:grid-cols-3 md:gap-6 md:pb-0 lg:gap-x-[34px] lg:gap-y-16">
-                  {query.data.items.map((nft) => (
-                    <li key={nft.id}>
-                      <article
-                        data-testid="nft-card"
-                        data-category={nft.category}
-                        className="group relative flex min-w-0 flex-col gap-2 lg:gap-3"
-                      >
-                        <div className="relative rounded-[20px] bg-gradient-tile px-1 pt-3 pb-5 lg:rounded-none lg:bg-card lg:bg-none lg:pt-6 lg:pb-[26px]">
+                {tabs.map((tab) => {
+                  const selected = search.tab === tab.id
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={selected}
+                      className={
+                        selected
+                          ? 'type-b-14-bold shrink-0 border-b-2 border-primary pb-2 text-primary'
+                          : 'type-b-14 shrink-0 border-b-2 border-transparent pb-2 text-foreground hover:text-primary'
+                      }
+                      onClick={() => updateFilters({ tab: tab.id })}
+                    >
+                      {tab.label}
+                    </button>
+                  )
+                })}
+              </div>
+              <label className="type-c-13 flex shrink-0 items-center gap-2 text-foreground/90">
+                <span>Ordenar por:</span>
+                <select
+                  aria-label="Ordenar por"
+                  value={search.sort}
+                  onChange={(event) => updateFilters({ sort: event.target.value as Sort })}
+                  className="bg-transparent font-medium text-foreground outline-none"
+                >
+                  {sorts.map((option) => (
+                    <option key={option.id} value={option.id} className="bg-background">
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {query.isPending ? <CatalogSkeleton compact /> : null}
+            {query.isError ? (
+              <CatalogError error={query.error} onRetry={() => void query.refetch()} />
+            ) : null}
+            {query.data ? (
+              <>
+                <p data-testid="result-count" aria-live="polite" className="sr-only">
+                  {query.data.total} edições
+                  {query.isFetching ? ' · atualizando' : ''}
+                </p>
+                {query.data.items.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center">
+                    <h2 className="text-lg font-medium">Nenhuma edição encontrada</h2>
+                    <p className="mt-2 text-muted-foreground">
+                      Limpe um filtro ou tente outro nome.
+                    </p>
+                  </div>
+                ) : (
+                  <ul className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-5">
+                    {query.data.items.map((nft) => (
+                      <li key={nft.id} className="min-w-0">
+                        <article
+                          data-testid="nft-card"
+                          data-category={nft.category}
+                          className="group relative flex h-full min-w-0 flex-col rounded-xl bg-[#24140f] p-3"
+                        >
                           <img
                             src={nft.imageUrl}
-                            alt={`${nft.name} by ${nft.creator}`}
+                            alt={`${nft.name} por ${nft.creator}`}
                             width={250}
                             height={250}
-                            className="aspect-square w-full rounded-[16px] object-cover lg:rounded-[15px]"
+                            className="aspect-square w-full min-w-0 rounded-xl object-cover"
                           />
-                        </div>
-                        <div className="flex flex-col gap-1 pl-2 lg:pl-0">
-                          <h2 className="type-b-15 truncate text-foreground lg:type-b-16">
+                          <h2 className="type-b-14 mt-3 truncate text-foreground">
                             <Link
                               to="/nfts/$nftId"
                               params={{ nftId: nft.id }}
                               data-testid="nft-name"
-                              className="after:absolute after:inset-0 after:content-[''] hover:text-accent"
+                              className="after:absolute after:inset-0 after:content-[''] hover:text-primary"
                             >
                               {nft.name}
                             </Link>
                           </h2>
-                          <p className="type-c-13 truncate text-text-secondary lg:hidden">
-                            {nft.collectionName}
+                          <p className="mt-1.5 flex items-baseline gap-2">
+                            <span
+                              data-testid="nft-card-price"
+                              className="type-b-16-bold text-primary"
+                            >
+                              {formatEth(nft.priceEth)}
+                            </span>
+                            {nft.previousPriceEth ? (
+                              <span className="type-c-13 text-[#8d847c] line-through">
+                                {formatEth(nft.previousPriceEth)}
+                              </span>
+                            ) : null}
                           </p>
-                          <p data-testid="nft-card-price" className="type-b-16-bold text-accent">
-                            {formatEth(nft.priceEth)}
-                          </p>
-                        </div>
-                      </article>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="flex items-center justify-between gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={search.page <= 1}
-                  onClick={() =>
-                    void navigate({
-                      to: '/',
-                      search: (previous) =>
-                        toRouteSearch(
-                          toListQuery({
-                            ...toListQuery(previous),
-                            page: Math.max(1, toListQuery(previous).page - 1),
-                          }),
-                        ),
-                    })
-                  }
-                >
-                  Previous
-                </Button>
-                <p className="text-sm text-muted-foreground">
-                  Page {search.page}
-                  {query.data.totalPages > 0 ? ` of ${query.data.totalPages}` : ''}
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={query.data.totalPages === 0 || search.page >= query.data.totalPages}
-                  onClick={() =>
-                    void navigate({
-                      to: '/',
-                      search: (previous) =>
-                        toRouteSearch(
-                          toListQuery({
-                            ...toListQuery(previous),
-                            page: toListQuery(previous).page + 1,
-                          }),
-                        ),
-                    })
-                  }
-                >
-                  Next
-                </Button>
-              </div>
-            </>
-          ) : null}
+                        </article>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <Pagination
+                  page={search.page}
+                  totalPages={query.data.totalPages}
+                  onPage={goToPage}
+                />
+              </>
+            ) : null}
+          </div>
         </div>
-      </div>
+        <div className="mt-8 lg:hidden">
+          <FeaturedCard nft={featured} />
+        </div>
+      </section>
     </main>
   )
 }
 
-export function CatalogSkeleton() {
+function FeaturedCard({ nft }: { nft: NftSummary | null }) {
+  if (!nft) return null
+  return (
+    <section aria-label="NFT em destaque">
+      <p className="type-c-13 font-bold tracking-[0.16em] text-primary uppercase">
+        NFT em destaque
+      </p>
+      <p className="type-c-13 mt-1 font-bold tracking-[0.14em] text-foreground uppercase">
+        Oferta limitada
+      </p>
+      <Link
+        to="/nfts/$nftId"
+        params={{ nftId: nft.id }}
+        className="mt-4 block overflow-hidden rounded-[24px] bg-[#24140f]"
+      >
+        <img
+          src={nft.imageUrl}
+          alt={`${nft.name}, oferta limitada`}
+          width={260}
+          height={320}
+          className="aspect-[4/5] w-full object-cover"
+        />
+      </Link>
+    </section>
+  )
+}
+
+function Pagination({
+  page,
+  totalPages,
+  onPage,
+}: {
+  page: number
+  totalPages: number
+  onPage: (page: number) => void
+}) {
+  if (totalPages <= 1) return null
+  return (
+    <nav aria-label="Paginação" className="mt-8 flex items-center justify-end gap-2">
+      {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => {
+        const current = number === page
+        return (
+          <button
+            key={number}
+            type="button"
+            aria-current={current ? 'page' : undefined}
+            onClick={() => onPage(number)}
+            className={
+              current
+                ? 'flex size-9 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground'
+                : 'flex size-9 items-center justify-center rounded-md bg-[#2a1c16] text-sm text-foreground hover:bg-[#3a2820]'
+            }
+          >
+            {number}
+          </button>
+        )
+      })}
+      <button
+        type="button"
+        aria-label="Próxima página"
+        disabled={page >= totalPages}
+        onClick={() => onPage(page + 1)}
+        className="flex size-9 items-center justify-center rounded-md bg-[#2a1c16] text-foreground hover:bg-[#3a2820] disabled:opacity-40"
+      >
+        <ChevronRight className="size-4" />
+      </button>
+    </nav>
+  )
+}
+
+export function CatalogSkeleton({ compact = false }: { compact?: boolean }) {
   return (
     <div
       aria-busy="true"
       aria-live="polite"
-      className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:gap-8"
+      className={compact ? '' : 'mx-auto w-full max-w-[1440px] px-4 py-8 lg:px-10'}
     >
-      <span className="sr-only">Loading editions</span>
-      {Array.from({ length: 8 }, (_, index) => (
-        <div key={index} className="overflow-hidden rounded-xl border border-border">
-          <Skeleton className="aspect-square w-full rounded-none" />
-          <div className="flex flex-col gap-2 p-3">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
+      <span className="sr-only">Carregando edições</span>
+      {compact ? null : (
+        <div className="mb-12 grid gap-8 lg:grid-cols-2">
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-14 w-full max-w-xl" />
+            <Skeleton className="h-14 w-4/5" />
+            <Skeleton className="h-11 w-36" />
           </div>
+          <Skeleton className="aspect-square w-full rounded-[28px]" />
         </div>
-      ))}
+      )}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-5">
+        {Array.from({ length: 9 }, (_, index) => (
+          <div key={index} className="rounded-xl bg-[#24140f] p-3">
+            <Skeleton className="aspect-square w-full rounded-xl" />
+            <Skeleton className="mt-3 h-4 w-3/4" />
+            <Skeleton className="mt-2 h-4 w-1/3" />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
 function CatalogError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
-  const message = error instanceof ApiError ? error.message : 'The catalog could not be loaded.'
+  const message = error instanceof ApiError ? error.message : 'O catálogo não pôde ser carregado.'
   return (
     <div role="alert" className="rounded-xl border border-border px-4 py-8">
-      <h2 className="text-lg font-medium">Catalog unavailable</h2>
+      <h2 className="text-lg font-medium">Catálogo indisponível</h2>
       <p className="mt-2 text-muted-foreground">{message}</p>
       <Button type="button" className="mt-4" onClick={onRetry}>
-        Try again
+        Tentar de novo
       </Button>
     </div>
   )

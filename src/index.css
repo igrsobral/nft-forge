@@ -188,6 +188,34 @@
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
+.price-range::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 4px;
+}
+.price-range::-moz-range-track {
+  background: transparent;
+  height: 4px;
+}
+.price-range::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 999px;
+  background: #d28a4c;
+  border: 0;
+  cursor: pointer;
+}
+.price-range::-moz-range-thumb {
+  pointer-events: auto;
+  height: 16px;
+  width: 16px;
+  border-radius: 999px;
+  background: #d28a4c;
+  border: 0;
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton-shimmer {
     animation: none;

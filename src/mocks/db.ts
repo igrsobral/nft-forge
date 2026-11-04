@@ -7,7 +7,7 @@ function isDatabase(value: unknown): value is Database {
   if (!value || typeof value !== 'object') return false
   const record = value as Partial<Database>
   return (
-    record.schemaVersion === 1 &&
+    record.schemaVersion === 2 &&
     Array.isArray(record.nfts) &&
     record.nfts.length > 0 &&
     Array.isArray(record.users)

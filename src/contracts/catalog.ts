@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { categorySchema, ethAmountSchema, sortSchema } from './common'
+import {
+  catalogNetworkSchema,
+  catalogTabSchema,
+  categorySchema,
+  ethAmountSchema,
+  sortSchema,
+} from './common'
 
 export const editionSchema = z.object({
   id: z.string(),
@@ -16,8 +22,10 @@ export const nftSummarySchema = z.object({
   collectionId: z.string(),
   collectionName: z.string(),
   category: categorySchema,
+  network: catalogNetworkSchema,
   creator: z.string(),
   priceEth: ethAmountSchema,
+  previousPriceEth: ethAmountSchema.nullable(),
   imageUrl: z.string().min(1),
   available: z.boolean(),
   version: z.number().int().nonnegative(),
@@ -43,10 +51,12 @@ export const nftListQuerySchema = z.object({
   category: categorySchema.optional().catch(undefined),
   minPrice: ethAmountSchema.optional().catch(undefined),
   maxPrice: ethAmountSchema.optional().catch(undefined),
+  network: catalogNetworkSchema.optional().catch(undefined),
+  tab: catalogTabSchema.catch('all'),
   inStock: optionalInStock,
   sort: sortSchema.catch('newest'),
   page: z.coerce.number().int().min(1).catch(1),
-  pageSize: z.coerce.number().int().min(1).max(24).catch(8),
+  pageSize: z.coerce.number().int().min(1).max(24).catch(9),
 })
 
 export const facetCountSchema = z.object({
@@ -64,7 +74,10 @@ export const nftListResponseSchema = z.object({
   facets: z.object({
     categories: z.array(facetCountSchema),
     collections: z.array(facetCountSchema),
+    networks: z.array(facetCountSchema),
+    price: z.object({ min: ethAmountSchema, max: ethAmountSchema }),
   }),
+  featured: nftSummarySchema.nullable(),
 })
 
 export type Edition = z.infer<typeof editionSchema>

@@ -31,11 +31,27 @@ export const apiErrorEnvelopeSchema = z.object({
   }),
 })
 
-export const categories = ['Art', 'Photography', 'Music', 'Gaming', 'Membership'] as const
+export const categories = [
+  'Arte digital',
+  'Fotografia',
+  'Música',
+  'Arte 3D',
+  'Colecionáveis',
+  'Generativa',
+  'Jogos',
+  'Assinaturas',
+  'Utilidade',
+] as const
 export const categorySchema = z.enum(categories)
 
 export const networks = ['ethereum', 'polygon', 'base'] as const
 export const networkSchema = z.enum(networks)
+
+export const catalogNetworks = ['ethereum', 'polygon', 'solana'] as const
+export const catalogNetworkSchema = z.enum(catalogNetworks)
+
+export const catalogTabs = ['all', 'new', 'trending'] as const
+export const catalogTabSchema = z.enum(catalogTabs)
 
 export const sorts = ['newest', 'price_asc', 'price_desc', 'name_asc'] as const
 export const sortSchema = z.enum(sorts)
@@ -55,6 +71,8 @@ export type FieldError = z.infer<typeof fieldErrorSchema>
 export type ApiErrorEnvelope = z.infer<typeof apiErrorEnvelopeSchema>
 export type Category = z.infer<typeof categorySchema>
 export type Network = z.infer<typeof networkSchema>
+export type CatalogNetwork = z.infer<typeof catalogNetworkSchema>
+export type CatalogTab = z.infer<typeof catalogTabSchema>
 export type Sort = z.infer<typeof sortSchema>
 export type WalletRole = z.infer<typeof walletRoleSchema>
 export type OrderStatus = z.infer<typeof orderStatusSchema>
