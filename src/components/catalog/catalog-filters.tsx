@@ -3,7 +3,6 @@ import type { NftListQuery, NftListResponse } from '@/contracts/catalog'
 import type { CatalogNetwork, Category } from '@/contracts/common'
 import { categories, catalogNetworks } from '@/contracts/common'
 import { toEth } from '@/lib/money'
-import { Button } from '@/components/ui/button'
 
 type FilterPatch = Partial<NftListQuery>
 
@@ -18,6 +17,19 @@ function stepEth(step: number): string {
 function commaFixed(value: string): string {
   const [whole, fraction = ''] = toEth(value).split('.')
   return `${whole ?? '0'},${(fraction + '00').slice(0, 2)}`
+}
+
+function stepByKey(current: number, key: string, min: number, max: number): number | null {
+  if (key === 'Home') return min
+  if (key === 'End') return max
+  const jump = key === 'PageUp' || key === 'PageDown' ? 10 : 1
+  if (key === 'ArrowRight' || key === 'ArrowUp' || key === 'PageUp') {
+    return Math.min(max, current + jump)
+  }
+  if (key === 'ArrowLeft' || key === 'ArrowDown' || key === 'PageDown') {
+    return Math.max(min, current - jump)
+  }
+  return null
 }
 
 export function CatalogFilters({
@@ -44,15 +56,13 @@ export function CatalogFilters({
 
   const low = Math.min(minStep, maxStep)
   const high = Math.max(minStep, maxStep)
-  const span = Math.max(1, boundMax - boundMin)
-  const start = ((low - boundMin) / span) * 100
-  const end = ((high - boundMin) / span) * 100
+  const priceLabel = `Preço: ${commaFixed(stepEth(low))} - ${commaFixed(stepEth(high))} ETH`
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="rounded-xl bg-[#24140f] px-5 py-5">
-        <h2 className="type-b-16-bold mb-4 text-foreground">Coleções</h2>
-        <ul className="flex flex-col gap-2.5">
+    <div className="flex flex-col gap-8" data-testid="catalog-filters">
+      <section className="rounded-2xl bg-[#24140f] px-5 py-6">
+        <h2 className="mb-4 text-base font-bold text-foreground">Coleções</h2>
+        <ul className="flex flex-col gap-1">
           {facets.categories.map((facet) => {
             const active = search.category === facet.value
             return (
@@ -60,55 +70,67 @@ export function CatalogFilters({
                 <button
                   type="button"
                   aria-pressed={active}
-                  className="type-b-14 flex w-full items-baseline justify-between gap-3 text-left"
+                  className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md px-1 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   onClick={() =>
                     onChange({
                       category: active ? undefined : (facet.value as Category),
                     })
                   }
                 >
-                  <span className={active ? 'font-bold text-foreground' : 'text-primary'}>
+                  <span className={active ? 'font-bold text-primary' : 'text-[#c9a27a]'}>
                     {facet.label}
                   </span>
-                  <span className="text-foreground/75">({facet.count})</span>
+                  <span className={active ? 'font-bold text-primary' : 'font-bold text-[#c9a27a]'}>
+                    ({facet.count})
+                  </span>
                 </button>
               </li>
             )
           })}
         </ul>
         <div className="mt-8">
-          <h3 className="type-b-16-bold mb-4 text-foreground">Faixa de preço</h3>
-          <div className="relative mb-3 h-6">
-            <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#5a3a28]" />
-            <div
-              className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-primary"
-              style={{ left: `${start}%`, width: `${Math.max(0, end - start)}%` }}
-            />
+          <h3 className="mb-4 text-base font-bold text-foreground">Faixa de preço</h3>
+          <div className="relative mb-3 h-11">
+            <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-primary" />
             <input
               aria-label="Preço mínimo"
+              aria-valuetext={`${commaFixed(stepEth(low))} ETH`}
               type="range"
               min={boundMin}
               max={boundMax}
+              step={1}
               value={low}
               onChange={(event) => setMinStep(Math.min(Number(event.target.value), high))}
-              className="price-range pointer-events-none absolute inset-x-0 top-1/2 z-20 h-4 w-full -translate-y-1/2 appearance-none bg-transparent"
+              onKeyDown={(event) => {
+                const next = stepByKey(low, event.key, boundMin, high)
+                if (next === null) return
+                event.preventDefault()
+                setMinStep(next)
+              }}
+              className="price-range pointer-events-none absolute inset-x-0 top-1/2 z-20 h-11 w-full -translate-y-1/2 appearance-none bg-transparent"
             />
             <input
               aria-label="Preço máximo"
+              aria-valuetext={`${commaFixed(stepEth(high))} ETH`}
               type="range"
               min={boundMin}
               max={boundMax}
+              step={1}
               value={high}
               onChange={(event) => setMaxStep(Math.max(Number(event.target.value), low))}
-              className="price-range pointer-events-none absolute inset-x-0 top-1/2 z-20 h-4 w-full -translate-y-1/2 appearance-none bg-transparent"
+              onKeyDown={(event) => {
+                const next = stepByKey(high, event.key, low, boundMax)
+                if (next === null) return
+                event.preventDefault()
+                setMaxStep(next)
+              }}
+              className="price-range pointer-events-none absolute inset-x-0 top-1/2 z-30 h-11 w-full -translate-y-1/2 appearance-none bg-transparent"
             />
           </div>
-          <p className="type-c-13 text-foreground">
-            Preço: {commaFixed(stepEth(low))} - {commaFixed(stepEth(high))} ETH
-          </p>
-          <Button
+          <p className="text-sm text-foreground">{priceLabel}</p>
+          <button
             type="button"
-            className="mt-3 h-8 rounded-md px-4"
+            className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-bold text-[#140d0a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             onClick={() => {
               const minPrice = stepEth(low)
               const maxPrice = stepEth(high)
@@ -119,11 +141,11 @@ export function CatalogFilters({
             }}
           >
             Aplicar
-          </Button>
+          </button>
         </div>
         <div className="mt-8">
-          <h3 className="type-b-16-bold mb-4 text-foreground">Rede</h3>
-          <ul className="flex flex-col gap-2.5">
+          <h3 className="mb-4 text-base font-bold text-foreground">Rede</h3>
+          <ul className="flex flex-col gap-1">
             {facets.networks.map((facet) => {
               const active = search.network === facet.value
               return (
@@ -131,15 +153,21 @@ export function CatalogFilters({
                   <button
                     type="button"
                     aria-pressed={active}
-                    className="flex w-full items-baseline justify-between text-left text-foreground/90"
+                    className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md px-1 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     onClick={() =>
                       onChange({
                         network: active ? undefined : (facet.value as CatalogNetwork),
                       })
                     }
                   >
-                    <span>{facet.label}</span>
-                    <span>({facet.count})</span>
+                    <span className={active ? 'font-bold text-primary' : 'text-[#c9a27a]'}>
+                      {facet.label}
+                    </span>
+                    <span
+                      className={active ? 'font-bold text-primary' : 'font-bold text-[#c9a27a]'}
+                    >
+                      ({facet.count})
+                    </span>
                   </button>
                 </li>
               )

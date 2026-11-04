@@ -80,6 +80,11 @@ test('keeps tab, sort, pagination, network, and price in the query string', asyn
   await expect(page).toHaveURL(/network=solana/)
 
   const priceFilters = await openFilters()
+  const priceLabel = priceFilters.getByText(/^Preço:/)
+  const beforePrice = (await priceLabel.innerText()).trim()
+  await priceFilters.getByLabel('Preço mínimo').focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(priceLabel).not.toHaveText(beforePrice)
   await priceFilters.getByLabel('Preço máximo').evaluate((element) => {
     const input = element as HTMLInputElement
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
