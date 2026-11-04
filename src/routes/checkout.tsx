@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { ChevronLeft } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Page } from '@/components/page'
@@ -50,6 +51,7 @@ function CheckoutPage() {
   const [walletId, setWalletId] = useState('')
   const selected = wallets.data?.find((wallet) => wallet.id === walletId) ?? wallets.data?.[0]
   const [acceptedTotal, setAcceptedTotal] = useState<string | null>(null)
+  const [provider, setProvider] = useState('WalletConnect')
   const activeWalletId = selected?.id ?? ''
   const stale = Boolean(quote.data && acceptedTotal && acceptedTotal !== quote.data.totalEth)
   const blocked = !quote.data?.availabilityOk || stale || !selected?.connected
@@ -92,11 +94,89 @@ function CheckoutPage() {
   })
 
   return (
-    <Page title="Checkout">
+    <Page
+      title="Checkout"
+      titleClassName="type-t-18-bold text-foreground max-lg:sr-only lg:text-[32px] lg:leading-tight"
+      className="max-lg:pb-40"
+    >
+      <div className="lg:hidden">
+        <a href="/cart" aria-label="Voltar" className="mb-3 flex size-11 items-center">
+          <ChevronLeft className="size-5" />
+        </a>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm text-[#c9a27a]">Carteira conectada</p>
+            <p className="font-bold">{roleLabel(selected?.role)}</p>
+            <p className="text-xs break-all text-[#c9a27a]">
+              {selected
+                ? `${shortAddress(selected.address)} · ${networkLabel(selected.network)}`
+                : 'Nenhuma carteira'}
+            </p>
+          </div>
+          <a
+            href="/profile/wallets"
+            className="flex min-h-11 shrink-0 items-center text-sm text-primary"
+          >
+            Trocar carteira
+          </a>
+        </div>
+        <fieldset className="grid gap-2">
+          <legend className="sr-only">Carteiras salvas</legend>
+          {wallets.data?.map((wallet) => {
+            const checked = (selected?.id ?? '') === wallet.id
+            return (
+              <label
+                key={wallet.id}
+                className={
+                  checked
+                    ? 'flex min-h-11 items-start gap-3 rounded-xl border border-primary bg-[#24140f] px-3 py-3'
+                    : 'flex min-h-11 items-start gap-3 rounded-xl border border-transparent bg-[#24140f] px-3 py-3'
+                }
+              >
+                <input
+                  type="radio"
+                  name="wallet-mobile"
+                  className="mt-1 size-4 accent-primary"
+                  checked={checked}
+                  onChange={() => setWalletId(wallet.id)}
+                />
+                <span className="min-w-0">
+                  <span className="block font-bold">{roleLabel(wallet.role)}</span>
+                  <span className="block text-xs break-all text-[#c9a27a]">
+                    {shortAddress(wallet.address)} · {networkLabel(wallet.network)}
+                  </span>
+                </span>
+              </label>
+            )
+          })}
+        </fieldset>
+        <fieldset className="mt-5 grid gap-2">
+          <legend className="mb-2 text-sm text-foreground">Carteira e rede</legend>
+          {(['WalletConnect', 'MetaMask', 'Coinbase Wallet'] as const).map((name) => (
+            <label
+              key={name}
+              className="flex min-h-11 items-center justify-between gap-3 rounded-xl bg-[#24140f] px-3"
+            >
+              <span>{name}</span>
+              <input
+                type="radio"
+                name="provider"
+                className="size-4 accent-primary"
+                checked={provider === name}
+                disabled={!selected}
+                onChange={() => {
+                  setProvider(name)
+                  if (selected && !selected.connected) connect.mutate('connect')
+                }}
+              />
+            </label>
+          ))}
+        </fieldset>
+      </div>
       {session.isPending || quote.isPending || wallets.isPending ? (
         <Skeleton className="h-40 w-full" />
       ) : null}
-      <p className="type-b-14 text-text-secondary">
+      <p className="type-b-14 hidden text-text-secondary lg:block">
         Collector {session.data?.user?.displayName} · {session.data?.user?.email}
       </p>
       {cart.data?.items.some((item) => item.changed) ? (
@@ -104,7 +184,7 @@ function CheckoutPage() {
           The market moved while this cart was open. Confirm the new total before paying.
         </p>
       ) : null}
-      <fieldset className="grid gap-2">
+      <fieldset className="hidden gap-2 lg:grid">
         <legend className="type-b-14 text-text-secondary">Wallet and network</legend>
         {wallets.data?.map((wallet) => (
           <label
@@ -128,7 +208,7 @@ function CheckoutPage() {
         ))}
       </fieldset>
       {selected ? (
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="hidden flex-col gap-2 sm:flex-row lg:flex">
           <Button type="button" variant="outline" onClick={() => connect.mutate('connect')}>
             Connect
           </Button>
@@ -140,14 +220,14 @@ function CheckoutPage() {
           </Button>
         </div>
       ) : (
-        <p className="text-text-secondary">
+        <p className="hidden text-text-secondary lg:block">
           Add a wallet before paying.{' '}
           <a className="text-accent" href="/profile/wallets">
             Wallets
           </a>
         </p>
       )}
-      <p className="type-b-14">Network {selected?.network ?? '—'}</p>
+      <p className="type-b-14 hidden lg:block">Network {selected?.network ?? '—'}</p>
       {quote.data ? (
         <div className="grid gap-2">
           {!quote.data.availabilityOk ? (
@@ -175,18 +255,47 @@ function CheckoutPage() {
           ) : null}
         </div>
       ) : null}
-      <Button
-        type="button"
-        className="w-full sm:w-auto"
-        disabled={blocked || acceptedTotal !== quote.data?.totalEth || place.isPending || !selected}
-        onClick={() => place.mutate()}
-      >
-        {place.isPending ? 'Sending…' : 'Confirm purchase'}
-      </Button>
-      <p className="type-c-12 text-text-secondary">
+      <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:bg-[#140d0a] max-lg:p-3">
+        <Button
+          type="button"
+          className="h-11 w-full sm:w-auto"
+          disabled={
+            blocked || acceptedTotal !== quote.data?.totalEth || place.isPending || !selected
+          }
+          onClick={() => place.mutate()}
+        >
+          {place.isPending ? (
+            'Sending…'
+          ) : (
+            <>
+              <span className="lg:hidden">Confirmar compra</span>
+              <span className="hidden lg:inline">Confirm purchase</span>
+            </>
+          )}
+        </Button>
+      </div>
+      <p className="type-c-12 hidden text-text-secondary lg:block">
         Network on the wallet is {selected ? (selected.network as Network) : 'not selected'}. A
         repeated click reuses the same idempotency key.
       </p>
     </Page>
   )
+}
+
+function roleLabel(role: string | undefined): string {
+  if (role === 'primary') return 'Principal'
+  if (role === 'secondary') return 'Reserva'
+  return 'Nenhuma carteira'
+}
+
+function networkLabel(network: string): string {
+  if (network === 'ethereum') return 'Ethereum'
+  if (network === 'polygon') return 'Polygon'
+  if (network === 'base') return 'Base'
+  return network
+}
+
+function shortAddress(address: string): string {
+  if (address.length < 12) return address
+  return `${address.slice(0, 6)}…${address.slice(-4)}`
 }

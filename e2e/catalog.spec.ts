@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('lists editions, keeps a filter in the url, and opens the detail', async ({ page }) => {
   await page.goto('/?reset=1')
-  await expect(page.getByRole('heading', { name: /seja dono do futuro/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /seja dono/i })).toBeVisible()
   await expect(page.getByTestId('result-count')).toContainText('40 edições')
   await expect(page.getByTestId('nft-card')).toHaveCount(9)
 

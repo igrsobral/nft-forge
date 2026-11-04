@@ -1,4 +1,9 @@
-import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  useRouterState,
+} from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
@@ -20,6 +25,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootLayout() {
   useSyncExternalStore(subscribeSession, getSessionEpoch, () => 0)
   useQuery(sessionQuery(getStoredUserId()))
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const stickyBuyBar =
+    pathname === '/cart' || pathname === '/checkout' || pathname.startsWith('/nfts/')
 
   return (
     <>
@@ -31,10 +39,18 @@ function RootLayout() {
         Skip to content
       </a>
       <Header />
-      <div id="content">
-        <Outlet />
+      <div
+        className={
+          stickyBuyBar
+            ? 'pb-[calc(11rem+env(safe-area-inset-bottom))] lg:pb-0'
+            : 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-0'
+        }
+      >
+        <div id="content">
+          <Outlet />
+        </div>
+        <Footer />
       </div>
-      <Footer />
       <RealtimeBridge />
       <AuthModal />
       <Toaster />

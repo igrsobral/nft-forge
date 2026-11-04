@@ -79,7 +79,7 @@ export function AuthModal() {
       <DialogContent
         showCloseButton={false}
         overlayClassName="bg-black/75"
-        className="gap-0 border-b-4 border-primary bg-[#24140f] p-0 text-foreground sm:max-w-[420px] max-sm:!inset-x-0 max-sm:!top-auto max-sm:!bottom-0 max-sm:!max-h-[100dvh] max-sm:!w-full max-sm:!max-w-none max-sm:!translate-x-0 max-sm:!translate-y-0 max-sm:overflow-y-auto max-sm:rounded-none"
+        className="gap-0 border-b-4 border-primary bg-[#24140f] p-0 text-foreground sm:max-w-[420px] max-lg:!inset-0 max-lg:!h-[100dvh] max-lg:!max-h-none max-lg:!w-full max-lg:!max-w-none max-lg:!translate-x-0 max-lg:!translate-y-0 max-lg:overflow-y-auto max-lg:!rounded-none max-lg:!border-0 max-lg:!bg-[#140d0a]"
         aria-describedby={undefined}
       >
         {mode ? (
@@ -103,15 +103,16 @@ function AuthPanel({
 }) {
   return (
     <div className="relative px-6 pt-6 pb-7">
+      <p className="mb-6 text-center text-sm font-bold tracking-[0.2em] lg:hidden">KURIO</p>
       <button
         type="button"
         onClick={onClose}
         aria-label="Fechar"
-        className="absolute top-4 right-4 text-[#c9a27a] hover:text-foreground"
+        className="absolute top-4 right-4 flex size-11 items-center justify-center text-[#c9a27a] hover:text-foreground"
       >
         <X className="size-4" />
       </button>
-      <div className="mb-4 flex items-center justify-center gap-3">
+      <div className="mb-4 hidden items-center justify-center gap-3 lg:flex">
         <button
           type="button"
           aria-pressed={mode === 'login' || mode === 'forgot'}
@@ -146,6 +147,26 @@ function AuthPanel({
       ) : (
         <LoginForm onForgot={() => onMode('forgot')} onSuccess={onSuccess} />
       )}
+      {mode === 'login' ? (
+        <button
+          type="button"
+          aria-label="Criar conta"
+          className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
+          onClick={() => onMode('signup')}
+        >
+          Novo na Kurio? <span className="text-primary">Crie uma conta</span>
+        </button>
+      ) : null}
+      {mode === 'signup' ? (
+        <button
+          type="button"
+          aria-label="Entrar"
+          className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
+          onClick={() => onMode('login')}
+        >
+          Já tem uma conta? <span className="text-primary">Entre</span>
+        </button>
+      ) : null}
     </div>
   )
 }

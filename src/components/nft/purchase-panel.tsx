@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { Heart } from 'lucide-react'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Heart, ShoppingCart } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { rememberFavorite, takeFavoriteResume, useOpenAuth } from '@/components/auth/auth-modal'
 import { toast } from 'sonner'
@@ -10,6 +10,7 @@ import { ApiError } from '@/lib/api/errors'
 import { addFavorite, addCartItem, removeFavorite } from '@/lib/api/commerce'
 import { favoritesQuery } from '@/lib/queries'
 import { queryKeys } from '@/lib/query-keys'
+import { formatEth } from '@/lib/money'
 import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
 import { useSyncExternalStore } from 'react'
 
@@ -111,8 +112,8 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
                 }}
                 className={
                   selected
-                    ? 'type-c-13 rounded-md border border-primary px-2.5 py-1 font-bold text-primary'
-                    : 'type-c-13 rounded-md px-2.5 py-1 text-primary/80 hover:text-primary disabled:opacity-40'
+                    ? 'type-c-13 min-h-11 rounded-md border border-primary px-3 font-bold text-primary lg:min-h-0 lg:px-2.5 lg:py-1'
+                    : 'type-c-13 min-h-11 rounded-md px-3 text-primary/80 hover:text-primary disabled:opacity-40 lg:min-h-0 lg:px-2.5 lg:py-1'
                 }
               >
                 {item.label}
@@ -121,60 +122,95 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           })}
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          aria-label="Diminuir quantidade"
-          disabled={maxQuantity === 0 || nextQuantity <= 1}
-          onClick={() => setQuantity(nextQuantity - 1)}
-          className="flex size-8 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40"
-        >
-          −
-        </button>
-        <span data-testid="quantity" className="type-b-16 min-w-4 text-center">
-          {maxQuantity === 0 ? 0 : nextQuantity}
-        </span>
-        <button
-          type="button"
-          aria-label="Aumentar quantidade"
-          disabled={maxQuantity === 0 || nextQuantity >= maxQuantity}
-          onClick={() => setQuantity(nextQuantity + 1)}
-          className="flex size-8 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40"
-        >
-          +
-        </button>
-        <span className="type-c-12 text-[#c9a27a]">
-          {maxQuantity === 0
-            ? 'Edição esgotada.'
-            : `${edition?.remaining ?? 0} de ${edition?.supply ?? 0} disponíveis.`}
-        </span>
+      <div className="flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:border-t max-lg:border-[#6a4332] max-lg:bg-[#24140f] max-lg:px-3 max-lg:py-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
+        <div className="flex w-full items-center gap-2">
+          <button
+            type="button"
+            aria-label="Diminuir quantidade"
+            disabled={maxQuantity === 0 || nextQuantity <= 1}
+            onClick={() => setQuantity(nextQuantity - 1)}
+            className="flex size-11 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40 lg:size-8"
+          >
+            −
+          </button>
+          <span data-testid="quantity" className="type-b-16 min-w-4 text-center">
+            {maxQuantity === 0 ? 0 : nextQuantity}
+          </span>
+          <button
+            type="button"
+            aria-label="Aumentar quantidade"
+            disabled={maxQuantity === 0 || nextQuantity >= maxQuantity}
+            onClick={() => setQuantity(nextQuantity + 1)}
+            className="flex size-11 items-center justify-center rounded-full border border-primary text-lg leading-none text-primary disabled:opacity-40 lg:size-8"
+          >
+            +
+          </button>
+          <span className="type-c-12 hidden text-[#c9a27a] lg:inline">
+            {maxQuantity === 0
+              ? 'Edição esgotada.'
+              : `${edition?.remaining ?? 0} de ${edition?.supply ?? 0} disponíveis.`}
+          </span>
+          <span className="ml-auto text-sm font-bold text-primary lg:hidden">
+            {formatEth(nft.priceEth)}
+          </span>
+        </div>
+        <div className="flex w-full min-w-0 items-center gap-2 lg:contents">
+          <Button
+            type="button"
+            className="h-11 min-h-11 flex-1 rounded-lg px-4 tracking-wide lg:flex-none lg:px-8"
+            disabled={!edition || maxQuantity === 0 || add.isPending}
+            onClick={() => add.mutate()}
+          >
+            {add.isPending ? (
+              'Enviando…'
+            ) : (
+              <>
+                <span className="lg:hidden">Comprar NFT</span>
+                <span className="hidden lg:inline">COMPRAR</span>
+              </>
+            )}
+          </Button>
+          <Link
+            to="/cart"
+            aria-label="Abrir carrinho"
+            className="flex size-11 items-center justify-center rounded-xl border border-[#6a4332] text-foreground lg:hidden"
+          >
+            <ShoppingCart className="size-5" />
+          </Link>
+          <Button
+            type="button"
+            variant="outline"
+            className="hidden h-11 gap-2 rounded-lg border-primary/80 px-5 text-foreground lg:inline-flex"
+            aria-pressed={saved}
+            onClick={() => {
+              if (!userId) {
+                askSignIn()
+                return
+              }
+              favorite.mutate()
+            }}
+          >
+            <Heart className={saved ? 'size-4 fill-primary text-primary' : 'size-4 text-primary'} />
+            {saved ? 'Favorito' : 'Favoritar'}
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          className="h-11 rounded-lg px-8 tracking-wide"
-          disabled={!edition || maxQuantity === 0 || add.isPending}
-          onClick={() => add.mutate()}
-        >
-          {add.isPending ? 'Enviando…' : 'COMPRAR'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11 gap-2 rounded-lg border-primary/80 px-5 text-foreground"
-          aria-pressed={saved}
-          onClick={() => {
-            if (!userId) {
-              askSignIn()
-              return
-            }
-            favorite.mutate()
-          }}
-        >
-          <Heart className={saved ? 'size-4 fill-primary text-primary' : 'size-4 text-primary'} />
-          {saved ? 'Favorito' : 'Favoritar'}
-        </Button>
-      </div>
+      <Button
+        type="button"
+        variant="outline"
+        className="h-11 gap-2 self-start rounded-lg border-primary/80 px-5 text-foreground lg:hidden"
+        aria-pressed={saved}
+        onClick={() => {
+          if (!userId) {
+            askSignIn()
+            return
+          }
+          favorite.mutate()
+        }}
+      >
+        <Heart className={saved ? 'size-4 fill-primary text-primary' : 'size-4 text-primary'} />
+        {saved ? 'Favorito' : 'Favoritar'}
+      </Button>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ChevronRight, SlidersHorizontal } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronRight, Search, SlidersHorizontal } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import type { NftListQuery, NftSummary } from '@/contracts/catalog'
 import type { CatalogTab, Sort } from '@/contracts/common'
 import { CatalogFilters } from '@/components/catalog/catalog-filters'
@@ -37,6 +37,7 @@ export function CatalogPage() {
   const query = useQuery(nftListQuery(getStoredUserId(), search))
   const hero = useQuery(nftListQuery(getStoredUserId(), heroQuery))
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [draft, setDraft] = useState(search.q ?? '')
   const [slide, setSlide] = useState(0)
   const slides = hero.data?.items ?? []
   const slideIndex = slides.length === 0 ? 0 : Math.min(slide, slides.length - 1)
@@ -50,6 +51,19 @@ export function CatalogPage() {
     })
   }
 
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      const next = draft.trim()
+      if ((search.q ?? '') === next) return
+      void navigate({
+        to: '/',
+        search: (previous) =>
+          toRouteSearch(toListQuery({ ...toListQuery(previous), q: next || undefined, page: 1 })),
+      })
+    }, 300)
+    return () => window.clearTimeout(handle)
+  }, [draft, navigate, search.q])
+
   function goToPage(page: number) {
     void navigate({
       to: '/',
@@ -61,7 +75,47 @@ export function CatalogPage() {
 
   return (
     <main className="overflow-x-clip">
-      <section className="mx-auto grid w-full max-w-[1440px] min-w-0 items-center gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-12 lg:px-10 lg:py-14">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-2 px-4 pt-4 lg:hidden">
+        <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-[#6a4332] bg-[#24140f] px-3">
+          <Search className="size-4 shrink-0 text-[#c9a27a]" />
+          <span className="sr-only">Explorar coleções</span>
+          <input
+            value={draft}
+            placeholder="Explorar coleções"
+            onChange={(event) => setDraft(event.target.value)}
+            className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#c9a27a]"
+          />
+        </label>
+        <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <SheetTrigger asChild>
+            <Button type="button" aria-label="Filtros" className="size-11 shrink-0 rounded-xl p-0">
+              <SlidersHorizontal className="size-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[min(100%,340px)] overflow-y-auto bg-background">
+            <SheetHeader>
+              <SheetTitle>Filtros</SheetTitle>
+            </SheetHeader>
+            <div className="px-4 pb-8">
+              {query.data ? (
+                <CatalogFilters
+                  search={search}
+                  facets={query.data.facets}
+                  onChange={(patch) => {
+                    updateFilters(patch)
+                    setFiltersOpen(false)
+                  }}
+                />
+              ) : (
+                <p className="type-b-14 text-text-secondary">
+                  Os filtros aparecem quando o catálogo carrega.
+                </p>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+      <section className="mx-auto hidden w-full max-w-[1440px] min-w-0 items-center gap-8 px-4 py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-12 lg:px-10 lg:py-14">
         <div className="flex max-w-[620px] flex-col items-start">
           <p className="type-b-14 text-foreground">Bem-vindo à Kurio</p>
           <h1 className="mt-5 text-[28px] leading-[1.15] font-bold tracking-tight text-foreground uppercase min-[420px]:text-[32px] lg:text-[clamp(32px,3.15vw,46px)] lg:leading-[1.12]">
@@ -122,43 +176,50 @@ export function CatalogPage() {
           <Skeleton className="aspect-square w-full rounded-[28px]" />
         )}
       </section>
+      <section className="mx-auto w-full max-w-[1440px] px-4 pt-4 lg:hidden">
+        <div className="flex items-center gap-3 rounded-[24px] bg-[#24140f] p-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[26px] leading-[1.1] font-bold tracking-tight text-foreground uppercase">
+              Seja dono da cultura digital
+            </h1>
+            <div className="mt-4 flex items-center gap-2" role="tablist" aria-label="Destaques">
+              {(slides.length > 0 ? slides : [0, 1, 2]).map((item, index) => {
+                const selected = index === slideIndex
+                return (
+                  <button
+                    key={typeof item === 'number' ? `m-${index}` : `m-${item.id}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={selected}
+                    aria-label={`Destaque ${index + 1}`}
+                    disabled={slides.length === 0}
+                    onClick={() => setSlide(index)}
+                    className={
+                      selected
+                        ? 'size-2.5 rounded-full bg-primary'
+                        : 'size-2 rounded-full bg-[#6a4332]'
+                    }
+                  />
+                )
+              })}
+            </div>
+          </div>
+          {activeSlide ? (
+            <img
+              src={activeSlide.imageUrl}
+              alt=""
+              className="size-28 shrink-0 rounded-2xl object-cover"
+            />
+          ) : (
+            <Skeleton className="size-28 shrink-0 rounded-2xl" />
+          )}
+        </div>
+      </section>
 
       <section
         id="catalogo"
-        className="mx-auto w-full max-w-[1440px] min-w-0 scroll-mt-24 overflow-x-clip px-4 pb-16 lg:px-10"
+        className="mx-auto w-full max-w-[1440px] min-w-0 scroll-mt-24 overflow-x-clip px-4 pb-8 lg:px-10 lg:pb-16"
       >
-        <div className="mb-4 lg:hidden">
-          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <SheetTrigger asChild>
-              <Button type="button" variant="outline" className="h-11 gap-2 rounded-lg px-4">
-                <SlidersHorizontal className="size-4" />
-                Filtros
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[min(100%,340px)] overflow-y-auto bg-background">
-              <SheetHeader>
-                <SheetTitle>Filtros</SheetTitle>
-              </SheetHeader>
-              <div className="px-4 pb-8">
-                {query.data ? (
-                  <CatalogFilters
-                    search={search}
-                    facets={query.data.facets}
-                    onChange={(patch) => {
-                      updateFilters(patch)
-                      setFiltersOpen(false)
-                    }}
-                  />
-                ) : (
-                  <p className="type-b-14 text-text-secondary">
-                    Os filtros aparecem quando o catálogo carrega.
-                  </p>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-
         <div className="grid min-w-0 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-x-6">
           <div className="hidden flex-col gap-8 lg:flex">
             {query.data ? (
@@ -196,7 +257,7 @@ export function CatalogPage() {
                   )
                 })}
               </div>
-              <label className="type-c-13 flex shrink-0 items-center gap-2 text-foreground/90">
+              <label className="type-c-13 flex shrink-0 items-center gap-2 text-foreground/90 max-lg:sr-only">
                 <span>Ordenar por:</span>
                 <select
                   aria-label="Ordenar por"
@@ -282,9 +343,6 @@ export function CatalogPage() {
               </>
             ) : null}
           </div>
-        </div>
-        <div className="mt-8 lg:hidden">
-          <FeaturedCard nft={featured} />
         </div>
       </section>
     </main>

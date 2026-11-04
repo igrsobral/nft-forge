@@ -66,8 +66,18 @@ function CartPage() {
   const hasItems = (cart.data?.items.length ?? 0) > 0
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-6 lg:px-10 lg:py-8">
-      <p className="type-c-13 mb-6 text-[#c9a27a]">
+    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-4 pb-28 max-lg:min-h-[calc(100dvh-4.25rem)] lg:px-10 lg:py-8 lg:pb-8">
+      <div className="mb-4 flex items-center gap-2 lg:hidden">
+        <a
+          href="/#catalogo"
+          aria-label="Voltar"
+          className="flex size-11 items-center justify-center rounded-full text-foreground"
+        >
+          ←
+        </a>
+        <h1 className="text-lg font-bold">Carrinho de NFTs</h1>
+      </div>
+      <p className="type-c-13 mb-6 hidden text-[#c9a27a] lg:block">
         <Link to="/" className="hover:text-primary">
           Início
         </Link>
@@ -134,9 +144,9 @@ function CartPage() {
           </section>
 
           <aside className="rounded-xl bg-[#24140f] p-5">
-            <h1 className="type-b-16-bold border-b border-[#6a4332] pb-3 text-foreground">
+            <h2 className="type-b-16-bold border-b border-[#6a4332] pb-3 text-foreground max-lg:sr-only">
               Resumo da carteira
-            </h1>
+            </h2>
             <form
               className="mt-4"
               onSubmit={(event) => {
@@ -152,12 +162,12 @@ function CartPage() {
                   id="coupon"
                   value={coupon}
                   onChange={(event) => setCoupon(event.target.value)}
-                  placeholder="Digite o código promocional..."
-                  className="type-c-13 h-10 min-w-0 flex-1 rounded-l-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70"
+                  placeholder="Digite o código"
+                  className="type-c-13 h-11 min-w-0 flex-1 rounded-l-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70"
                 />
                 <button
                   type="submit"
-                  className="type-b-14-bold h-10 rounded-r-md bg-primary px-4 text-primary-foreground"
+                  className="type-b-14-bold h-11 rounded-r-md bg-primary px-4 text-primary-foreground"
                 >
                   Aplicar
                 </button>
@@ -211,21 +221,23 @@ function CartPage() {
             ) : (
               <Skeleton className="mt-5 h-28 w-full" />
             )}
-            {signedIn ? (
-              <Button asChild className="mt-5 h-11 w-full rounded-md">
-                <Link to="/checkout" search={checkoutSearch}>
+            <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:bg-[#140d0a] max-lg:p-3">
+              {signedIn ? (
+                <Button asChild className="mt-5 h-11 w-full rounded-md max-lg:mt-0">
+                  <Link to="/checkout" search={checkoutSearch}>
+                    Conectar e finalizar
+                  </Link>
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  className="mt-5 h-11 w-full rounded-md bg-primary font-bold text-primary-foreground max-lg:mt-0"
+                  onClick={() => openAuth('login', loginRedirect)}
+                >
                   Conectar e finalizar
-                </Link>
-              </Button>
-            ) : (
-              <button
-                type="button"
-                className="mt-5 h-11 w-full rounded-md bg-primary font-bold text-primary-foreground"
-                onClick={() => openAuth('login', loginRedirect)}
-              >
-                Conectar e finalizar
-              </button>
-            )}
+                </button>
+              )}
+            </div>
             <Link
               to="/"
               hash="catalogo"
@@ -237,7 +249,9 @@ function CartPage() {
         </div>
       ) : null}
 
-      <EditionCarousel title="Colecionadores também viram" items={suggestions} />
+      <div className="hidden lg:block">
+        <EditionCarousel title="Colecionadores também viram" items={suggestions} />
+      </div>
     </main>
   )
 }
@@ -257,34 +271,31 @@ function CartRow({
   return (
     <li
       data-testid="cart-item"
-      className="grid items-center gap-3 rounded-xl bg-[#24140f] p-3 lg:grid-cols-[minmax(0,1.7fr)_0.7fr_0.9fr_0.7fr_2.5rem] lg:px-4"
+      className="flex items-center gap-2 rounded-xl bg-[#24140f] p-2 lg:grid lg:grid-cols-[minmax(0,1.7fr)_0.7fr_0.9fr_0.7fr_2.5rem] lg:items-center lg:gap-3 lg:px-4 lg:py-3"
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
         <img
           src={item.imageUrl}
           alt=""
           width={64}
           height={64}
-          className="size-14 shrink-0 rounded-lg object-cover sm:size-16"
+          className="size-12 shrink-0 rounded-lg object-cover lg:size-16"
         />
         <div className="min-w-0">
           <p className="type-b-14-bold truncate text-foreground">{item.name}</p>
-          <p className="type-c-12 text-[#c9a27a]">ID do token: {item.tokenId}</p>
+          <p className="type-c-12 hidden text-[#c9a27a] lg:block">ID do token: {item.tokenId}</p>
           <p className="type-c-12 text-[#8d847c]">Edição {item.editionName}</p>
+          <p className="type-b-14-bold text-primary lg:hidden">{formatEth(item.unitPriceEth)}</p>
         </div>
       </div>
-      <p className="type-b-14 text-foreground">
-        <span className="type-c-12 mr-2 text-[#c9a27a] lg:hidden">Preço</span>
-        {formatEth(item.unitPriceEth)}
-      </p>
-      <div className="flex items-center gap-2">
-        <span className="type-c-12 text-[#c9a27a] lg:hidden">Edições</span>
+      <p className="type-b-14 hidden text-foreground lg:block">{formatEth(item.unitPriceEth)}</p>
+      <div className="flex shrink-0 items-center gap-1">
         <button
           type="button"
           aria-label="Diminuir quantidade"
           disabled={pending || item.quantity <= 1}
           onClick={() => onQuantity(item.quantity - 1)}
-          className="flex size-7 items-center justify-center border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40"
+          className="flex size-11 items-center justify-center rounded-md border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40 lg:size-7 lg:rounded-none"
         >
           −
         </button>
@@ -296,21 +307,18 @@ function CartRow({
           aria-label="Aumentar quantidade"
           disabled={pending || item.quantity >= max}
           onClick={() => onQuantity(item.quantity + 1)}
-          className="flex size-7 items-center justify-center border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40"
+          className="flex size-11 items-center justify-center rounded-md border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40 lg:size-7 lg:rounded-none"
         >
           +
         </button>
       </div>
-      <p className="type-b-14-bold text-primary">
-        <span className="type-c-12 mr-2 font-normal text-[#c9a27a] lg:hidden">Total</span>
-        {formatEth(item.lineTotalEth)}
-      </p>
+      <p className="type-b-14-bold hidden text-primary lg:block">{formatEth(item.lineTotalEth)}</p>
       <button
         type="button"
         aria-label={`Remover ${item.name}`}
         disabled={pending}
         onClick={onRemove}
-        className="justify-self-end text-[#c9a27a] hover:text-primary disabled:opacity-40"
+        className="flex size-11 shrink-0 items-center justify-center text-[#c9a27a] hover:text-primary disabled:opacity-40 lg:size-auto lg:justify-self-end"
       >
         <Trash2 className="size-4" />
       </button>

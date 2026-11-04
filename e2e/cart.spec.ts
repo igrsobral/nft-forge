@@ -10,10 +10,10 @@ test('changes quantity, validates coupons, opens checkout, and removes the item'
   await dialog.getByLabel('E-mail').fill('ada@collector.dev')
   await dialog.getByLabel('Senha', { exact: true }).fill('orchid-harbor')
   await dialog.locator('form').getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByRole('heading', { name: /seja dono do futuro/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /seja dono/i })).toBeVisible()
 
   await page.goto('/nfts/nft_01')
-  await page.getByRole('button', { name: 'COMPRAR' }).click()
+  await page.getByRole('button', { name: /comprar/i }).click()
   const item = page.getByTestId('cart-item')
   await expect(item).toBeVisible()
   await expect(item).toContainText('ID do token:')

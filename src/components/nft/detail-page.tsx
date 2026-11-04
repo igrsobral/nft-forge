@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Mail, Star, ZoomIn } from 'lucide-react'
+import { ChevronLeft, Mail, Star, ZoomIn } from 'lucide-react'
 import { useState } from 'react'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
 import { tickNftPrice } from '@/lib/api/catalog'
@@ -77,8 +77,8 @@ export function NftDetailPage() {
   const filledStars = Math.round(nft.rating)
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-6 lg:px-10 lg:py-8">
-      <p className="type-c-13 mb-5 text-[#c9a27a]">
+    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-6 pb-48 lg:px-10 lg:py-8 lg:pb-8">
+      <p className="type-c-13 mb-5 hidden text-[#c9a27a] lg:block">
         <Link to="/" className="hover:text-primary">
           Início
         </Link>
@@ -89,8 +89,12 @@ export function NftDetailPage() {
       </p>
 
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:gap-10">
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
-          <div className="flex gap-2 sm:flex-col" role="list" aria-label="Miniaturas">
+        <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
+          <div
+            className="relative hidden gap-2 lg:flex lg:flex-col"
+            role="list"
+            aria-label="Miniaturas"
+          >
             {gallery.map((src, index) => (
               <button
                 key={src}
@@ -109,12 +113,19 @@ export function NftDetailPage() {
             ))}
           </div>
           <div className="relative min-w-0 flex-1 rounded-[24px] bg-[#24140f] p-3">
+            <a
+              href="/#catalogo"
+              aria-label="Voltar"
+              className="absolute top-3 left-3 z-10 flex size-11 items-center justify-center rounded-full bg-[#140d0a]/80 text-foreground lg:hidden"
+            >
+              <ChevronLeft className="size-5" />
+            </a>
             <img
               src={image}
               alt={`${nft.name} por ${nft.creator}`}
               width={800}
               height={800}
-              className="aspect-square w-full min-w-0 rounded-[18px] object-cover"
+              className="aspect-square w-full min-w-0 rounded-[18px] object-cover max-lg:h-[300px] max-lg:aspect-auto"
             />
             <Dialog>
               <DialogTrigger asChild>
@@ -137,10 +148,15 @@ export function NftDetailPage() {
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
-          <h1 className="text-[28px] leading-tight font-bold text-foreground lg:text-[34px]">
-            {nft.name}
-          </h1>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-[28px] leading-tight font-bold text-foreground lg:text-[34px]">
+              {nft.name}
+            </h1>
+            <p className="mt-1 shrink-0 rounded-full bg-[#24140f] px-2.5 py-1 text-sm font-bold text-primary lg:hidden">
+              {nft.rating.toFixed(1)}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 max-lg:sr-only">
             <p data-testid="nft-price" className="text-2xl font-bold text-primary">
               {formatEth(nft.priceEth)}
             </p>
@@ -162,7 +178,9 @@ export function NftDetailPage() {
           </div>
           <div>
             <h2 className="type-b-14-bold text-foreground">Sobre este NFT:</h2>
-            <p className="type-b-14 mt-2 leading-6 text-[#c9a27a]">{nft.description}</p>
+            <p className="type-b-14 mt-2 leading-6 text-[#c9a27a] max-lg:line-clamp-3">
+              {nft.description}
+            </p>
           </div>
           <PurchasePanel nft={nft} />
           <dl className="type-c-13 grid gap-1 text-[#c9a27a]">

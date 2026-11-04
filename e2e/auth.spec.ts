@@ -14,7 +14,12 @@ test('opens the login modal, rejects a bad password, and signs in', async ({ pag
 
   await dialog.getByLabel('Senha', { exact: true }).fill('orchid-harbor')
   await dialog.locator('form').getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible()
+  await expect(
+    page
+      .getByRole('link', { name: 'Perfil', exact: true })
+      .or(page.getByRole('button', { name: 'Sair' }))
+      .first(),
+  ).toBeVisible()
   await expect(page.getByRole('dialog')).toBeHidden()
 })
 
@@ -48,7 +53,12 @@ test('switches modes, validates signup, rejects a duplicate, and creates an acco
 
   await dialog.getByLabel('E-mail').fill(`nova-${Date.now()}@collector.dev`)
   await dialog.locator('form').getByRole('button', { name: 'Criar conta' }).click()
-  await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible()
+  await expect(
+    page
+      .getByRole('link', { name: 'Perfil', exact: true })
+      .or(page.getByRole('button', { name: 'Sair' }))
+      .first(),
+  ).toBeVisible()
   await expect(page.getByRole('dialog')).toBeHidden()
 })
 
@@ -80,11 +90,16 @@ test('resumes checkout after the login modal', async ({ page }) => {
     'true',
   )
 
-  await page.getByRole('button', { name: 'COMPRAR' }).click()
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await page.getByRole('button', { name: /comprar/i }).click()
+  if ((page.viewportSize()?.width ?? 1440) < 1024) {
+    await page.getByRole('link', { name: 'Perfil', exact: true }).click()
+    await page.getByLabel('Seção do perfil').selectOption('sair')
+  } else {
+    await page.getByRole('button', { name: 'Sair' }).click()
+  }
   await expect(page.getByRole('banner').getByRole('button', { name: 'Entrar' })).toBeVisible()
   await page.goto('/nfts/nft_02')
-  await page.getByRole('button', { name: 'COMPRAR' }).click()
+  await page.getByRole('button', { name: /comprar/i }).click()
   await page.getByRole('button', { name: 'Conectar e finalizar' }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await page.getByRole('dialog').getByLabel('E-mail').fill('ada@collector.dev')

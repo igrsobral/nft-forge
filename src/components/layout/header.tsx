@@ -1,7 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { LogIn, Search, ShoppingCart } from 'lucide-react'
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  Compass,
+  Heart,
+  House,
+  LogIn,
+  ScanLine,
+  Search,
+  ShoppingCart,
+  UserRound,
+} from 'lucide-react'
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { MockLab } from '@/components/mock-lab'
 import { Button } from '@/components/ui/button'
 import {
@@ -59,8 +68,8 @@ export function Header() {
   }, [navigate, query])
 
   return (
-    <header className="sticky top-0 z-40 bg-background">
-      <div className="relative mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-4 lg:px-10">
+    <header className="z-40 lg:sticky lg:top-0 lg:bg-background">
+      <div className="relative mx-auto hidden max-w-[1440px] items-center justify-between gap-3 px-4 py-4 lg:flex lg:px-10">
         <Link to="/" aria-label="Kurio, início" className="type-wordmark text-foreground">
           KURIO
         </Link>
@@ -146,36 +155,63 @@ export function Header() {
           )}
         </div>
       </div>
-      <div aria-hidden className="border-t border-[#6a4332]" />
-      <nav aria-label="Principal" className="flex gap-5 overflow-x-auto px-4 py-3 lg:hidden">
-        <Link
-          to="/"
-          className={
-            pathname === '/'
-              ? 'type-c-13 shrink-0 font-bold text-primary'
-              : 'type-c-13 shrink-0 text-foreground'
-          }
-        >
-          Início
-        </Link>
+      <div aria-hidden className="hidden border-t border-[#6a4332] lg:block" />
+      <nav
+        aria-label="Principal"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[#6a4332] bg-background px-2 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] lg:hidden"
+      >
+        <div className="mx-auto grid max-w-md grid-cols-5 items-end">
+          <TabLink to="/" label="Início" active={pathname === '/'}>
+            <House className="size-5" />
+          </TabLink>
+          <TabLink
+            to="/profile/watchlist"
+            label="Favoritos"
+            active={pathname === '/profile/watchlist'}
+          >
+            <Heart className="size-5" />
+          </TabLink>
+          <Link
+            to="/cart"
+            aria-label={count > 0 ? `Carrinho, ${count} itens` : 'Carrinho'}
+            className="-mt-5 flex size-14 items-center justify-center justify-self-center rounded-full bg-primary text-primary-foreground shadow-lg"
+          >
+            <ScanLine className="size-6" />
+          </Link>
+          <a
+            href="/#catalogo"
+            className="flex min-h-11 flex-col items-center justify-center gap-0.5 text-[10px] text-foreground"
+          >
+            <Compass className="size-5" />
+            Explorar
+          </a>
+          {user ? (
+            <TabLink to="/profile" label="Perfil" active={pathname.startsWith('/profile')}>
+              <UserRound className="size-5" />
+            </TabLink>
+          ) : (
+            <button
+              type="button"
+              className="flex min-h-11 flex-col items-center justify-center gap-0.5 text-[10px] text-foreground"
+              onClick={() => openAuth('login')}
+            >
+              <UserRound className="size-5" />
+              Entrar
+            </button>
+          )}
+        </div>
         <a
           href="/#catalogo"
+          className="sr-only"
           aria-current={isMercado(pathname) ? 'page' : undefined}
-          className={
-            isMercado(pathname)
-              ? 'type-c-13 shrink-0 font-bold text-primary'
-              : 'type-c-13 shrink-0 text-foreground'
-          }
         >
           Mercado
         </a>
-        <span className="type-c-13 shrink-0 text-foreground">Criadores</span>
-        <span className="type-c-13 shrink-0 text-foreground">Aprenda</span>
       </nav>
       {user ? (
         <nav
           aria-label="Conta"
-          className="mx-auto flex max-w-[1440px] gap-4 overflow-x-auto px-4 py-2 lg:px-10"
+          className="mx-auto hidden max-w-[1440px] gap-4 overflow-x-auto px-4 py-2 lg:flex lg:px-10"
         >
           <Link to="/profile" className="type-c-12 text-text-secondary">
             Perfil
@@ -186,6 +222,33 @@ export function Header() {
         </nav>
       ) : null}
     </header>
+  )
+}
+
+function TabLink({
+  to,
+  label,
+  active,
+  children,
+}: {
+  to: '/' | '/profile' | '/profile/watchlist'
+  label: string
+  active: boolean
+  children: ReactNode
+}) {
+  return (
+    <Link
+      to={to}
+      aria-current={active ? 'page' : undefined}
+      className={
+        active
+          ? 'flex min-h-11 flex-col items-center justify-center gap-0.5 text-[10px] font-bold text-primary'
+          : 'flex min-h-11 flex-col items-center justify-center gap-0.5 text-[10px] text-foreground'
+      }
+    >
+      {children}
+      {label}
+    </Link>
   )
 }
 

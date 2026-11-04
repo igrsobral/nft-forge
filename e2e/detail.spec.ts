@@ -8,7 +8,7 @@ test('selects an edition, changes quantity, favorites, and adds to the cart', as
   await dialog.getByLabel('E-mail').fill('ada@collector.dev')
   await dialog.getByLabel('Senha', { exact: true }).fill('orchid-harbor')
   await dialog.locator('form').getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByRole('heading', { name: /seja dono do futuro/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /seja dono/i })).toBeVisible()
 
   await page.goto('/nfts/nft_03')
   await expect(page.getByRole('heading', { level: 1, name: 'Glass Orchard' })).toBeVisible()
@@ -33,7 +33,7 @@ test('selects an edition, changes quantity, favorites, and adds to the cart', as
   await page.getByRole('tab', { name: /Avaliações de colecionadores/ }).click()
   await expect(page.getByTestId('review')).toHaveCount(3)
 
-  await page.getByRole('button', { name: 'COMPRAR' }).click()
+  await page.getByRole('button', { name: /comprar/i }).click()
   const item = page.getByTestId('cart-item')
   await expect(item).toBeVisible()
   await expect(item).toContainText('1/50')

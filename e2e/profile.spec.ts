@@ -7,7 +7,12 @@ async function signIn(page: import('@playwright/test').Page, email: string, pass
   await dialog.getByLabel('E-mail').fill(email)
   await dialog.getByLabel('Senha', { exact: true }).fill(password)
   await dialog.locator('form').getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByRole('banner').getByRole('button', { name: 'Sair' })).toBeVisible()
+  await expect(
+    page
+      .getByRole('link', { name: 'Perfil', exact: true })
+      .or(page.getByRole('button', { name: 'Sair' }))
+      .first(),
+  ).toBeVisible()
 }
 
 test('edits the profile, rejects a bad password, and updates the avatar', async ({ page }) => {
