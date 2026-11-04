@@ -1,7 +1,7 @@
 import {
   authResponseSchema,
   avatarUpdateSchema,
-  loginBodySchema,
+  forgotPasswordResponseSchema,
   passwordChangeSchema,
   profileUpdateSchema,
   publicUserSchema,
@@ -14,6 +14,7 @@ import {
   type AuthResponse,
   type LoginBody,
   type PasswordChange,
+  type RegisterBody,
   type ProfileUpdate,
   type PublicUser,
   type SessionResponse,
@@ -37,10 +38,22 @@ export async function signup(body: SignupBody): Promise<AuthResponse> {
 }
 
 export async function login(body: LoginBody): Promise<AuthResponse> {
-  const response = await api.post('/auth/login', loginBodySchema.parse(body))
+  const response = await api.post('/auth/login', body)
   const parsed = authResponseSchema.parse(response.data)
   setStoredSession(parsed.token, parsed.user.id)
   return parsed
+}
+
+export async function register(body: RegisterBody): Promise<AuthResponse> {
+  const response = await api.post('/auth/register', body)
+  const parsed = authResponseSchema.parse(response.data)
+  setStoredSession(parsed.token, parsed.user.id)
+  return parsed
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const response = await api.post('/auth/forgot', { email })
+  forgotPasswordResponseSchema.parse(response.data)
 }
 
 export async function logout(): Promise<void> {

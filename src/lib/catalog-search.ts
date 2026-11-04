@@ -1,12 +1,13 @@
 import { nftListQuerySchema, type NftListQuery } from '@/contracts/catalog'
+import { pickAuth } from '@/lib/auth-search'
 
 export function toListQuery(search: unknown): NftListQuery {
   return nftListQuerySchema.parse(search ?? {})
 }
 
 /** Drop default values so links to `/` do not have to repeat them. */
-export function toRouteSearch(query: NftListQuery): Partial<NftListQuery> {
-  const search: Partial<NftListQuery> = {}
+export function toRouteSearch(query: NftListQuery, raw?: Record<string, unknown>) {
+  const search: Partial<NftListQuery> & ReturnType<typeof pickAuth> = {}
   if (query.q) search.q = query.q
   if (query.collection) search.collection = query.collection
   if (query.category) search.category = query.category
@@ -18,5 +19,5 @@ export function toRouteSearch(query: NftListQuery): Partial<NftListQuery> {
   if (query.sort !== 'newest') search.sort = query.sort
   if (query.page !== 1) search.page = query.page
   if (query.pageSize !== 9) search.pageSize = query.pageSize
-  return search
+  return { ...search, ...pickAuth(raw ?? {}) }
 }

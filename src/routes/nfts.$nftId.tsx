@@ -4,9 +4,11 @@ import { RouteError } from '@/components/route-error'
 import { ApiError } from '@/lib/api/errors'
 import { getNft } from '@/lib/api/catalog'
 import { queryKeys } from '@/lib/query-keys'
+import { pickAuth } from '@/lib/auth-search'
 import { getStoredUserId } from '@/lib/storage'
 
 export const Route = createFileRoute('/nfts/$nftId')({
+  validateSearch: (search: Record<string, unknown>) => pickAuth(search),
   loader: async ({ context, params }) => {
     try {
       await context.queryClient.ensureQueryData({

@@ -1,86 +1,16 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Field, Page } from '@/components/page'
-import { Button } from '@/components/ui/button'
-import { ApiError } from '@/lib/api/errors'
-import { login } from '@/lib/api/account'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { safeRedirect } from '@/lib/auth'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>) => {
-    const redirect = typeof search.redirect === 'string' ? safeRedirect(search.redirect) : undefined
-    return redirect && redirect !== '/' ? { redirect } : {}
+    const target = typeof search.redirect === 'string' ? safeRedirect(search.redirect) : undefined
+    return target && target !== '/' ? { redirect: target } : {}
   },
-  head: () => ({ meta: [{ title: 'Sign in · Kurio' }] }),
-  component: LoginPage,
+  beforeLoad: ({ search }) => {
+    throw redirect({
+      to: '/',
+      search: search.redirect ? { auth: 'login', next: search.redirect } : { auth: 'login' },
+    })
+  },
+  component: () => null,
 })
-
-function LoginPage() {
-  const search = Route.useSearch()
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<ApiError | null>(null)
-  const [pending, setPending] = useState(false)
-
-  return (
-    <Page title="Sign in">
-      <form
-        className="grid gap-4"
-        onSubmit={(event) => {
-          event.preventDefault()
-          setPending(true)
-          setError(null)
-          void login({ email, password })
-            .then(() => {
-              const target = safeRedirect(search.redirect)
-              window.location.assign(target)
-            })
-            .catch((caught: unknown) => {
-              setError(caught instanceof ApiError ? caught : null)
-              setPending(false)
-            })
-        }}
-      >
-        <Field label="Email" error={error?.details.find((item) => item.path === 'email')?.message}>
-          <input
-            type="email"
-            required
-            autoComplete="username"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="type-b-14 h-11 rounded-[10px] border border-line bg-background px-3"
-          />
-        </Field>
-        <Field
-          label="Password"
-          error={error?.details.find((item) => item.path === 'password')?.message}
-        >
-          <input
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="type-b-14 h-11 rounded-[10px] border border-line bg-background px-3"
-          />
-        </Field>
-        {error ? (
-          <p role="alert" className="type-c-13 text-destructive">
-            {error.message}
-          </p>
-        ) : null}
-        <Button type="submit" disabled={pending} className="w-full sm:w-auto">
-          {pending ? 'Signing in…' : 'Sign in'}
-        </Button>
-        <button
-          type="button"
-          className="type-b-14 text-left text-accent"
-          onClick={() => void navigate({ to: '/signup', search: search.redirect ? { redirect: search.redirect } : {} })}
-        >
-          Create an account
-        </button>
-      </form>
-    </Page>
-  )
-}

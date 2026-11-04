@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { useState, useSyncExternalStore } from 'react'
+import { useOpenAuth } from '@/components/auth/auth-modal'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,9 +13,11 @@ import { toListQuery } from '@/lib/catalog-search'
 import { formatEth } from '@/lib/money'
 import { cartOwnerKey } from '@/lib/owner'
 import { cartQuery, nftListQuery, quoteQuery, sessionQuery } from '@/lib/queries'
+import { pickAuth } from '@/lib/auth-search'
 import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
 
 export const Route = createFileRoute('/cart')({
+  validateSearch: (search: Record<string, unknown>) => pickAuth(search),
   head: () => ({ meta: [{ title: 'Carrinho · Kurio' }] }),
   component: CartPage,
 })
@@ -42,6 +45,7 @@ function CartPage() {
   const signedIn = Boolean(session.data?.user)
   const checkoutSearch = applied ? { coupon: applied } : {}
   const loginRedirect = applied ? `/checkout?coupon=${encodeURIComponent(applied)}` : '/checkout'
+  const openAuth = useOpenAuth()
 
   const update = useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
@@ -207,17 +211,21 @@ function CartPage() {
             ) : (
               <Skeleton className="mt-5 h-28 w-full" />
             )}
-            <Button asChild className="mt-5 h-11 w-full rounded-md">
-              {signedIn ? (
+            {signedIn ? (
+              <Button asChild className="mt-5 h-11 w-full rounded-md">
                 <Link to="/checkout" search={checkoutSearch}>
                   Conectar e finalizar
                 </Link>
-              ) : (
-                <Link to="/login" search={{ redirect: loginRedirect }}>
-                  Conectar e finalizar
-                </Link>
-              )}
-            </Button>
+              </Button>
+            ) : (
+              <button
+                type="button"
+                className="mt-5 h-11 w-full rounded-md bg-primary font-bold text-primary-foreground"
+                onClick={() => openAuth('login', loginRedirect)}
+              >
+                Conectar e finalizar
+              </button>
+            )}
             <Link
               to="/"
               hash="catalogo"

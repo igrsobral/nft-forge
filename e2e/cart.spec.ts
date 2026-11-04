@@ -5,9 +5,11 @@ test('changes quantity, validates coupons, opens checkout, and removes the item'
 }) => {
   await page.goto('/?reset=1')
   await page.goto('/login')
-  await page.getByLabel('Email').fill('ada@collector.dev')
-  await page.getByLabel('Password').fill('orchid-harbor')
-  await page.locator('#content').getByRole('button', { name: 'Sign in' }).click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  await dialog.getByLabel('E-mail').fill('ada@collector.dev')
+  await dialog.getByLabel('Senha', { exact: true }).fill('orchid-harbor')
+  await dialog.locator('form').getByRole('button', { name: 'Entrar' }).click()
   await expect(page.getByRole('heading', { name: /seja dono do futuro/i })).toBeVisible()
 
   await page.goto('/nfts/nft_01')

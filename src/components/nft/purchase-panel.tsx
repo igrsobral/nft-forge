@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Heart } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { rememberFavorite, takeFavoriteResume, useOpenAuth } from '@/components/auth/auth-modal'
 import { toast } from 'sonner'
 import type { NftDetail } from '@/contracts/catalog'
 import { Button } from '@/components/ui/button'
@@ -9,11 +10,14 @@ import { ApiError } from '@/lib/api/errors'
 import { addFavorite, addCartItem, removeFavorite } from '@/lib/api/commerce'
 import { favoritesQuery } from '@/lib/queries'
 import { queryKeys } from '@/lib/query-keys'
-import { getStoredUserId } from '@/lib/storage'
+import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
+import { useSyncExternalStore } from 'react'
 
 const pillOrder = ['1/1', '1/10', '1/50', 'ABERTA']
 
 export function PurchasePanel({ nft }: { nft: NftDetail }) {
+  useSyncExternalStore(subscribeSession, getSessionEpoch, () => 0)
+  const openAuth = useOpenAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const userId = getStoredUserId()
@@ -34,10 +38,8 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
   )
 
   function askSignIn() {
-    void navigate({
-      to: '/login',
-      search: { redirect: `${window.location.pathname}${window.location.search}` },
-    })
+    rememberFavorite(nft.id)
+    openAuth('login')
   }
 
   const favorite = useMutation({
@@ -67,6 +69,11 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
       if (userId) await queryClient.invalidateQueries({ queryKey: queryKeys.favorites(userId) })
     },
   })
+
+  useEffect(() => {
+    if (!userId || !takeFavoriteResume(nft.id)) return
+    favorite.mutate()
+  }, [favorite, nft.id, userId])
 
   const add = useMutation({
     mutationFn: () => {

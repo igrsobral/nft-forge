@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { useOpenAuth } from '@/components/auth/auth-modal'
 import { logout } from '@/lib/api/account'
 import { cartOwnerKey } from '@/lib/owner'
 import { cartQuery, sessionQuery } from '@/lib/queries'
@@ -37,6 +38,7 @@ export function Header() {
   const cart = useQuery(cartQuery(cartOwnerKey(user?.id ?? userId)))
   const count = cart.data?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0
   const navigate = useNavigate()
+  const openAuth = useOpenAuth()
   const [query, setQuery] = useState('')
   const typed = useRef(false)
 
@@ -136,7 +138,7 @@ export function Header() {
               type="button"
               size="sm"
               className="h-9 gap-2 rounded-lg px-4"
-              onClick={() => void navigate({ to: '/login', search: {} })}
+              onClick={() => openAuth('login')}
             >
               <LogIn className="size-4" />
               Entrar

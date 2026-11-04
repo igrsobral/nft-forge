@@ -3,9 +3,10 @@ import { getStoredToken } from '@/lib/storage'
 
 export function requireSession(href: string): void {
   if (getStoredToken()) return
+  const next = safeRedirect(href)
   throw redirect({
-    to: '/login',
-    search: { redirect: safeRedirect(href) },
+    to: '/',
+    search: next === '/' ? { auth: 'login' } : { auth: 'login', next },
   })
 }
 

@@ -3,8 +3,11 @@ import { nftDetailSchema, nftListQuerySchema, nftListResponseSchema } from '@/co
 import {
   authResponseSchema,
   avatarUpdateSchema,
+  forgotPasswordResponseSchema,
+  forgotPasswordSchema,
   loginBodySchema,
   passwordChangeSchema,
+  registerBodySchema,
   profileUpdateSchema,
   publicUserSchema,
   sessionResponseSchema,
@@ -523,7 +526,7 @@ export const httpHandlers = [
     if (!result.ok) return result.response
     const parsed = loginBodySchema.safeParse(await readJson(request))
     if (!parsed.success)
-      return apiError(422, 'validation', 'Enter your email and password.', zodDetails(parsed.error))
+      return apiError(422, 'validation', 'Informe e-mail e senha.', zodDetails(parsed.error))
     const user = result.db.users.find(
       (item) => item.email.toLowerCase() === parsed.data.email.toLowerCase(),
     )
@@ -531,12 +534,56 @@ export const httpHandlers = [
       ? await verifyPassword(parsed.data.password, user.passwordSalt, user.passwordHash)
       : false
     if (!user || !valid) {
-      return apiError(401, 'invalid_session', 'Email or password is incorrect.')
+      return apiError(401, 'invalid_session', 'E-mail ou senha incorretos.')
     }
     mergeGuestCart(result.db, user.id, request)
     const response = issueSession(result.db, user, result.scenario)
     persist(result.db)
     return HttpResponse.json(response)
+  }),
+
+  http.post('/api/auth/register', async ({ request }) => {
+    const result = await gate(request)
+    if (!result.ok) return result.response
+    const parsed = registerBodySchema.safeParse(await readJson(request))
+    if (!parsed.success) {
+      return apiError(422, 'validation', 'Revise os dados da conta.', zodDetails(parsed.error))
+    }
+    if (
+      result.scenario === 'signup_conflict' ||
+      result.db.users.some((user) => user.email.toLowerCase() === parsed.data.email.toLowerCase())
+    ) {
+      return apiError(409, 'conflict', 'Já existe uma conta com esse e-mail.', [
+        { path: 'email', message: 'Esse e-mail já está cadastrado.' },
+      ])
+    }
+    const now = new Date().toISOString()
+    const passwordSalt = randomSalt()
+    const user: UserRecord = {
+      id: crypto.randomUUID(),
+      email: parsed.data.email.toLowerCase(),
+      displayName: parsed.data.username.trim(),
+      bio: '',
+      avatarUrl: null,
+      passwordSalt,
+      passwordHash: await hashPassword(parsed.data.password, passwordSalt),
+      createdAt: now,
+    }
+    result.db.users.push(user)
+    mergeGuestCart(result.db, user.id, request)
+    const response = issueSession(result.db, user, result.scenario)
+    persist(result.db)
+    return HttpResponse.json(response, { status: 201 })
+  }),
+
+  http.post('/api/auth/forgot', async ({ request }) => {
+    const result = await gate(request)
+    if (!result.ok) return result.response
+    const parsed = forgotPasswordSchema.safeParse(await readJson(request))
+    if (!parsed.success) {
+      return apiError(422, 'validation', 'Informe um e-mail válido.', zodDetails(parsed.error))
+    }
+    return HttpResponse.json(forgotPasswordResponseSchema.parse({ ok: true }))
   }),
 
   http.post('/api/auth/logout', ({ request }) => {

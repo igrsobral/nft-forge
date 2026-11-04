@@ -7,7 +7,7 @@ import { queryKeys } from '@/lib/query-keys'
 import { getStoredUserId } from '@/lib/storage'
 
 export const Route = createFileRoute('/')({
-  validateSearch: (search: Record<string, unknown>) => toRouteSearch(toListQuery(search)),
+  validateSearch: (search: Record<string, unknown>) => toRouteSearch(toListQuery(search), search),
   loaderDeps: ({ search }) => toListQuery(search),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData({

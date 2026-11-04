@@ -10,6 +10,7 @@ import { createOrder } from '@/lib/api/commerce'
 import { setWalletConnection } from '@/lib/api/account'
 import { ApiError } from '@/lib/api/errors'
 import { requireSession } from '@/lib/auth'
+import { pickAuth } from '@/lib/auth-search'
 import { formatEth } from '@/lib/money'
 import { cartOwnerKey } from '@/lib/owner'
 import { cartQuery, quoteQuery, sessionQuery, walletsQuery } from '@/lib/queries'
@@ -19,8 +20,9 @@ const idempotencyStorageKey = 'nft-market:order-key'
 
 export const Route = createFileRoute('/checkout')({
   validateSearch: (search: Record<string, unknown>) => {
-    const coupon = typeof search.coupon === 'string' && search.coupon.trim() ? search.coupon.trim() : undefined
-    return coupon ? { coupon } : {}
+    const coupon =
+      typeof search.coupon === 'string' && search.coupon.trim() ? search.coupon.trim() : undefined
+    return { ...(coupon ? { coupon } : {}), ...pickAuth(search) }
   },
   beforeLoad: ({ location }) => requireSession(location.href),
   head: () => ({ meta: [{ title: 'Checkout · Kurio' }] }),
@@ -91,7 +93,9 @@ function CheckoutPage() {
 
   return (
     <Page title="Checkout">
-      {session.isPending || quote.isPending || wallets.isPending ? <Skeleton className="h-40 w-full" /> : null}
+      {session.isPending || quote.isPending || wallets.isPending ? (
+        <Skeleton className="h-40 w-full" />
+      ) : null}
       <p className="type-b-14 text-text-secondary">
         Collector {session.data?.user?.displayName} · {session.data?.user?.email}
       </p>
@@ -103,7 +107,10 @@ function CheckoutPage() {
       <fieldset className="grid gap-2">
         <legend className="type-b-14 text-text-secondary">Wallet and network</legend>
         {wallets.data?.map((wallet) => (
-          <label key={wallet.id} className="flex items-start gap-2 rounded-[10px] border border-line p-3">
+          <label
+            key={wallet.id}
+            className="flex items-start gap-2 rounded-[10px] border border-line p-3"
+          >
             <input
               type="radio"
               name="wallet"
@@ -134,7 +141,10 @@ function CheckoutPage() {
         </div>
       ) : (
         <p className="text-text-secondary">
-          Add a wallet before paying. <a className="text-accent" href="/wallets">Wallets</a>
+          Add a wallet before paying.{' '}
+          <a className="text-accent" href="/wallets">
+            Wallets
+          </a>
         </p>
       )}
       <p className="type-b-14">Network {selected?.network ?? '—'}</p>
@@ -152,7 +162,9 @@ function CheckoutPage() {
             <input
               type="checkbox"
               checked={acceptedTotal === quote.data.totalEth}
-              onChange={(event) => setAcceptedTotal(event.target.checked ? quote.data?.totalEth ?? null : null)}
+              onChange={(event) =>
+                setAcceptedTotal(event.target.checked ? (quote.data?.totalEth ?? null) : null)
+              }
             />
             <span className="type-b-14">I confirm this total, fee, and availability.</span>
           </label>
@@ -172,8 +184,8 @@ function CheckoutPage() {
         {place.isPending ? 'Sending…' : 'Confirm purchase'}
       </Button>
       <p className="type-c-12 text-text-secondary">
-        Network on the wallet is {selected ? (selected.network as Network) : 'not selected'}. A repeated click reuses
-        the same idempotency key.
+        Network on the wallet is {selected ? (selected.network as Network) : 'not selected'}. A
+        repeated click reuses the same idempotency key.
       </p>
     </Page>
   )
