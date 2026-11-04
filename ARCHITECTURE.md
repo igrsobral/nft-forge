@@ -1,65 +1,96 @@
-# Architecture
+# Arquitetura
 
-Foundation slice only. Screens for auth, cart, checkout, profile, and wallets are not built. Their REST handlers, Zod contracts, and query keys are.
+Kurio é um SPA Vite. A UI não contém respostas fictícias: tudo que parece dado de negócio passa por Axios e volta do MSW, ou chega pelo `socket.io-client`.
 
-## Contracts
+## Pastas
 
-Zod schemas in `src/contracts` are the boundary. Axios responses are parsed with those schemas, and MSW handlers validate request bodies with the same ones. ETH amounts are decimal strings. Math and display go through `decimal.js` in `src/lib/money.ts`. Quantities are integers.
+```
+src/
+  routes/            rotas de arquivo do TanStack Router
+  components/        telas e layout; ui/ são os primitivos shadcn
+  contracts/         schemas Zod compartilhados pelo cliente e pelo mock
+  lib/api/           Axios e funções REST
+  lib/               query client, chaves, dinheiro, sessão, guarda de rota
+  realtime/          socket.io-client, deduplicação e patch do cache
+  mocks/             banco em memória, handlers REST e Socket.IO
+e2e/                 Playwright
+public/              mockServiceWorker.js
+```
 
-The error envelope is `{ error: { code, message, details, requestId } }`.
+O plugin do Router gera [`src/routeTree.gen.ts`](src/routeTree.gen.ts) no `dev` e no `build`. Esse arquivo entra no git para o `tsc` rodar sem o Vite.
 
-| Code                    | HTTP           | When                                                              |
-| ----------------------- | -------------- | ----------------------------------------------------------------- |
-| `validation`            | 422            | Body, query, or header is invalid                                 |
-| `invalid_session`       | 401            | Missing, unknown, or expired session, and bad login               |
-| `forbidden`             | 403            | `unauthorized` scenario                                           |
-| `not_found`             | 404            | Unknown NFT, cart line, order, or wallet                          |
-| `availability_conflict` | 409            | Price, stock, or total changed                                    |
-| `conflict`              | 409            | Duplicate signup, or idempotency key reused with a different body |
-| `transient`             | 503 or network | `http_error`, `offline`, and timeouts                             |
+## Fluxo de dados
 
-`POST /api/orders` requires `Idempotency-Key`. The same user, key, and canonical body return the original order. The same key with a different body returns 409. The receipt is a snapshot copied onto the order.
+```mermaid
+flowchart LR
+  UI[Telas em src/routes e src/components]
+  Q[TanStack Query]
+  AX[Axios em src/lib/api/client.ts]
+  MSW[MSW no navegador]
+  DB[(banco em memória)]
+  UI --> Q
+  Q --> AX
+  AX --> MSW
+  MSW --> DB
+  DB --> MSW
+  MSW --> AX
+  AX --> Q
+  Q --> UI
+```
 
-Query keys in `src/lib/query-keys.ts` always include a user id (`anon` when signed out) and the params that change the result.
+1. A rota valida a busca com Zod e monta a chave em [`src/lib/query-keys.ts`](src/lib/query-keys.ts).
+2. O `queryFn` chama uma função em [`src/lib/api`](src/lib/api).
+3. O interceptor de request coloca `X-Guest-Id` e, se houver token, `Authorization: Bearer`.
+4. O interceptor de response transforma falhas no envelope tipado `ApiError` ([`src/lib/api/errors.ts`](src/lib/api/errors.ts)). `invalid_session` apaga o token.
+5. A função REST faz `schema.parse` na resposta. O mock valida o corpo com o mesmo schema.
 
-## Cache
+Cancelamento: a listagem e o detalhe recebem o `AbortSignal` da Query. Trocar filtro troca a chave, e o request anterior é abortado. Resposta 4xx não faz retry. Rede e 5xx tentam mais uma vez. Mutações não repetem sozinhas. `staleTime` é 15 s e não há refetch ao focar a janela, para um patch de socket não ser mascarado por um reload.
 
-- Queries stay fresh for 15 seconds. Window focus does not refetch, so a visible price change is the socket patch rather than a hidden reload.
-- 4xx responses are not retried. Network and 5xx retry once. Aborted requests are not retried.
-- Catalog search is the route search. Each param set is its own query, and Axios receives the query `AbortSignal`, so a replaced request is cancelled.
-- `nft.updated` patches NFT list, NFT detail, and cart caches when `version` is newer, then invalidates quote queries if the price moved. Older versions and repeated `eventId`s are ignored.
-- `order.updated` patches the order only when `userId` matches the session. Confirmed and declined are written as the event states them.
-- On socket reconnect (not the first connect), list, detail, cart, quote, and order queries refetch from REST.
-- `invalid_session` clears the stored token and drops private queries. A later login must use a new user id in the key so the previous collector's cache cannot be reused.
+## Isolamento
 
-## Socket.IO
+A sessão fica em `localStorage` (`nft-market:token`, `nft-market:user-id`). O id entra na chave da Query. Visitante usa o segmento `anon`, exceto o carrinho, cuja chave é `guest:<uuid>` ou `user:<id>`.
 
-The browser uses `socket.io-client` with `transports: ['websocket']`. MSW intercepts that WebSocket. `@mswjs/socket.io-binding@0.2.0` `toSocketIo` completes the Engine.IO handshake and `client.emit` sends `nft.updated` / `order.updated`. Mutations that change price, stock, or order status emit from the same in-memory database the REST handlers use.
+Trocar de conta muda o id e portanto a chave. Logout chama a API e, no `finally`, apaga o token. Um 401 faz o mesmo e remove as queries que não são catálogo público. O pedido do socket só altera o cache se `event.userId` for o usuário da sessão.
 
-Import order matters. `socket.io-client` captures `globalThis.WebSocket` when the module evaluates, and MSW patches that global in `worker.start()`. `src/main.tsx` starts the worker first, then loads the app. The client is imported inside `getSocket()` after that.
+Checkout, perfil, carteiras e pedido usam `requireSession` em [`src/lib/auth.ts`](src/lib/auth.ts) e mandam para `/login?redirect=`. O redirect só aceita caminho que começa com `/` e não com `//`.
 
-### Binding findings
+## Tempo real
 
-- npm `0.2.0` exports `toSocketIo`. The `SocketIo` protocol class on the binding repo's default branch is not in the published package. MSW 3 exists, but the binding peers MSW `^2.10.2`, so this app pins MSW 2.15.
-- The handler URL is the page origin. MSW strips a leading `/socket.io/` before matching, so the link must not include that path.
-- Polling is not mocked. The client forces the websocket transport.
-- The 0.2.0 handshake advertises a 25s ping and 5s timeout and never sends a ping. The mock sends an Engine.IO ping (`2`) every 20s, or the client disconnects after about 30s.
-- Rooms, namespaces, acknowledgements, and binary frames are unsupported. Fan-out is a set of connected clients.
-- The binding's decoder is a module singleton. This app only emits server to client, so it does not depend on `client.on`.
-- A single text `client.emit` survived the websocket framing in Chromium. The Playwright test watches the detail price change, then the same price on the catalog card, without writing the tick response into the query cache.
+```mermaid
+sequenceDiagram
+  participant UI
+  participant Client as socket.io-client
+  participant MSW as toSocketIo
+  participant DB as banco
+  UI->>Client: getSocket após o worker.start
+  Client->>MSW: WebSocket, transporte websocket
+  Note over MSW: handshake Engine.IO e ping "2" a cada 20 s
+  DB->>MSW: preço, estoque ou status mudou
+  MSW->>Client: nft.updated ou order.updated
+  Client->>UI: ignora eventId repetido e version antiga
+  UI->>UI: patch do cache ou refetch na reconexão
+```
 
-## Mocks
+O cliente só é importado dentro de `getSocket()`, depois de `worker.start()` em [`src/main.tsx`](src/main.tsx). O `socket.io-client` guarda o construtor `WebSocket` na avaliação do módulo; se carregar antes do MSW, a interceptação não acontece.
 
-One module-level database is shared by every handler, persisted at `nft-market:db`, and replaced by `createSeed()` on reset or when the stored version does not match. The seed is 40 NFTs, two users, favorites, and wallets. Artwork is an inline SVG so the demo does not call an image host.
+Cada evento traz `eventId`, o id do recurso e `version`. [`src/realtime/bridge.tsx`](src/realtime/bridge.tsx) guarda os últimos `eventId`s (teto de 200). [`src/realtime/apply-events.ts`](src/realtime/apply-events.ts) ignora `version` menor ou igual à do cache. `nft.updated` reescreve lista, detalhe e itens do carrinho e, se o preço mudou, invalida cotações. `order.updated` só mexe no pedido daquele `userId`. Na segunda conexão em diante, lista, detalhe, carrinho, cotação e pedido são buscados de novo na REST. A primeira conexão não dispara esse refetch.
 
-## Known limitations
+O checkout exige um checkbox com o `totalEth` atual. Se a cotação mudar, a confirmação deixa de valer e o botão de compra desliga. Favoritar é a mutação otimista: o cache muda antes da resposta e volta ao anterior se a API falhar.
 
-- The Figma file still needs a desktop sign-in, so frames were not opened directly. Catalog, cart, checkout, profile, and wallets share the published tokens: ink `#140d0a`, copper `#d28a4c`, Roboto Mono, and a stacked layout under 768px.
-- Playwright covers the catalog slice and a signed-in purchase through a confirmed receipt on desktop and mobile. The rest of the spec’s matrix (visual baselines, session-expiry during checkout, idempotent timeout) is not automated yet.
-- Lighthouse is configured but the three-run mobile and desktop audit has not been collected in this environment.
-- TypeScript is 6.0.3 with `strict` and `noUncheckedIndexedAccess`. The Vite template's TypeScript 7 is not used because typescript-eslint does not parse it yet.
-- Auth, cart, checkout, profile, and wallet screens are not built. The sign-in control explains that and does not submit a login.
-- Optimistic updates are not wired yet. The socket patch is a cache write from a verified event, not a mutation rollback.
-- Lighthouse is configured for 3 mobile and 3 desktop runs of `/` and `/nfts/nft_01`. Scores are not collected in this slice.
-- Playwright covers the catalog slice (list, URL filter, detail, live price) on Chromium desktop and mobile. The rest of the spec's suite is still open.
-- Guest carts travel on `X-Guest-Id` and merge into the user cart at login. That path is only exercised by the handlers today.
+## Dinheiro e contratos
+
+ETH não trafega como `number`. [`src/lib/money.ts`](src/lib/money.ts) usa `decimal.js` com precisão 40 e meio para cima, e devolve string com no máximo 18 casas, sem zeros à direita. `formatEth` mostra até 4 casas. Quantidade é inteira.
+
+Os schemas ficam em [`src/contracts`](src/contracts). O envelope de erro é `{ error: { code, message, details, requestId } }`.
+
+| Código                  | HTTP                                                |
+| ----------------------- | --------------------------------------------------- |
+| `validation`            | 422                                                 |
+| `invalid_session`       | 401                                                 |
+| `forbidden`             | 403                                                 |
+| `not_found`             | 404                                                 |
+| `availability_conflict` | 409                                                 |
+| `conflict`              | 409                                                 |
+| `transient`             | 503, ou status 0 se a rede caiu ou estourou o tempo |
+
+`POST /api/orders` exige `Idempotency-Key`. A mesma chave e o mesmo corpo canônico devolvem o mesmo pedido. A mesma chave com outro corpo devolve 409. O recibo é cópia dos valores no momento da criação. A chave da tentativa fica em `sessionStorage` (`nft-market:order-key`) para um segundo clique reutilizar a mesma operação.
