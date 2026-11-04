@@ -11,7 +11,7 @@ test('signs in, checks out, and shows the confirmed receipt', async ({ page }) =
   await page.goto('/nfts/nft_01')
   await page.getByRole('button', { name: 'COMPRAR' }).click()
   await expect(page.getByTestId('cart-item')).toBeVisible()
-  await page.getByRole('link', { name: 'Checkout' }).click()
+  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
   await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible()
   await page.getByRole('checkbox', { name: /I confirm this total/ }).check()
   await page.getByRole('button', { name: 'Confirm purchase' }).click()

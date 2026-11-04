@@ -67,7 +67,7 @@ export function Header() {
           className="absolute left-1/2 hidden -translate-x-1/2 items-start gap-8 lg:flex"
         >
           <TopLink to="/" label="Início" active={pathname === '/'} />
-          <MercadoLink active={pathname.startsWith('/nfts')} />
+          <MercadoLink active={isMercado(pathname)} />
           <button type="button" className="type-b-16 text-foreground hover:text-primary">
             Criadores
           </button>
@@ -158,9 +158,9 @@ export function Header() {
         </Link>
         <a
           href="/#catalogo"
-          aria-current={pathname.startsWith('/nfts') ? 'page' : undefined}
+          aria-current={isMercado(pathname) ? 'page' : undefined}
           className={
-            pathname.startsWith('/nfts')
+            isMercado(pathname)
               ? 'type-c-13 shrink-0 font-bold text-primary'
               : 'type-c-13 shrink-0 text-foreground'
           }
@@ -185,6 +185,10 @@ export function Header() {
       ) : null}
     </header>
   )
+}
+
+function isMercado(pathname: string): boolean {
+  return pathname.startsWith('/nfts') || pathname === '/cart' || pathname === '/checkout'
 }
 
 function MercadoLink({ active }: { active: boolean }) {

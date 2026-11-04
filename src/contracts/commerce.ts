@@ -23,6 +23,7 @@ export const cartItemSchema = z.object({
   editionId: z.string(),
   name: z.string(),
   editionName: z.string(),
+  tokenId: z.string(),
   imageUrl: z.string(),
   quantity: z.number().int().positive(),
   unitPriceEth: ethAmountSchema,

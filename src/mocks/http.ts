@@ -214,6 +214,7 @@ function presentCart(db: Database, cart: CartRecord) {
           editionId: edition.id,
           name: nft.name,
           editionName: edition.name,
+          tokenId: nft.tokenId,
           imageUrl: imageFor(nft),
           quantity: item.quantity,
           unitPriceEth: edition.priceEth,

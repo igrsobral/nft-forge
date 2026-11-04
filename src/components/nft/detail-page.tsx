@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Mail, Star, ZoomIn } from 'lucide-react'
 import { useState } from 'react'
-import type { NftSummary } from '@/contracts/catalog'
+import { EditionCarousel } from '@/components/catalog/edition-carousel'
 import { tickNftPrice } from '@/lib/api/catalog'
 import { ApiError } from '@/lib/api/errors'
 import { toListQuery } from '@/lib/catalog-search'
@@ -32,14 +32,12 @@ export function NftDetailPage() {
   })
   const [frame, setFrame] = useState(0)
   const [tab, setTab] = useState<'details' | 'reviews'>('details')
-  const [relatedPage, setRelatedPage] = useState(0)
   const loadedId = query.data?.id
   const [seenId, setSeenId] = useState(loadedId)
   if (loadedId && loadedId !== seenId) {
     setSeenId(loadedId)
     setFrame(0)
     setTab('details')
-    setRelatedPage(0)
   }
 
   const related = useQuery({
@@ -76,10 +74,6 @@ export function NftDetailPage() {
   const image = gallery[Math.min(frame, gallery.length - 1)] ?? nft.imageUrl
   const shareUrl = typeof window === 'undefined' ? '' : window.location.href
   const others = (related.data?.items ?? []).filter((item) => item.id !== nft.id)
-  const pageSize = 5
-  const pageCount = Math.max(1, Math.ceil(others.length / pageSize))
-  const page = Math.min(relatedPage, pageCount - 1)
-  const relatedSlice = others.slice(page * pageSize, page * pageSize + pageSize)
   const filledStars = Math.round(nft.rating)
 
   return (
@@ -289,68 +283,12 @@ export function NftDetailPage() {
         )}
       </div>
 
-      <section className="mt-12" aria-label="Mais desta coleção">
-        <div className="mb-5 flex items-center gap-4">
-          <h2 className="type-b-16-bold shrink-0 text-primary">Mais desta coleção</h2>
-          <span aria-hidden className="h-px flex-1 bg-[#6a4332]" />
-        </div>
-        {relatedSlice.length === 0 ? (
-          <p className="text-[#c9a27a]">Esta coleção ainda não tem outras edições.</p>
-        ) : (
-          <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-            {relatedSlice.map((item) => (
-              <li key={item.id} className="min-w-0">
-                <RelatedCard nft={item} />
-              </li>
-            ))}
-          </ul>
-        )}
-        {pageCount > 1 ? (
-          <div
-            className="mt-5 flex justify-center gap-2"
-            role="tablist"
-            aria-label="Páginas da coleção"
-          >
-            {Array.from({ length: pageCount }, (_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-label={`Página ${index + 1} da coleção`}
-                aria-selected={index === page}
-                onClick={() => setRelatedPage(index)}
-                className={
-                  index === page
-                    ? 'size-2.5 rounded-full bg-primary'
-                    : 'size-2 rounded-full bg-[#6a4332]'
-                }
-              />
-            ))}
-          </div>
-        ) : null}
-      </section>
-    </main>
-  )
-}
-
-function RelatedCard({ nft }: { nft: NftSummary }) {
-  return (
-    <article className="relative flex h-full flex-col rounded-xl bg-[#24140f] p-3">
-      <img
-        src={nft.imageUrl}
-        alt=""
-        className="aspect-square w-full min-w-0 rounded-xl object-cover"
+      <EditionCarousel
+        title="Mais desta coleção"
+        items={others}
+        emptyLabel="Esta coleção ainda não tem outras edições."
       />
-      <h3 className="type-c-13 mt-3 truncate text-foreground">
-        <Link
-          to="/nfts/$nftId"
-          params={{ nftId: nft.id }}
-          className="after:absolute after:inset-0 after:content-[''] hover:text-primary"
-        >
-          {nft.name}
-        </Link>
-      </h3>
-      <p className="type-b-14-bold mt-1 text-primary">{formatEth(nft.priceEth)}</p>
-    </article>
+    </main>
   )
 }
 

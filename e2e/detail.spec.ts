@@ -35,7 +35,7 @@ test('selects an edition, changes quantity, favorites, and adds to the cart', as
   const item = page.getByTestId('cart-item')
   await expect(item).toBeVisible()
   await expect(item).toContainText('1/50')
-  await expect(item.getByRole('spinbutton')).toHaveValue('2')
+  await expect(item.getByTestId('cart-quantity')).toHaveText('2')
 })
 
 test('newsletter rejects an invalid email and accepts a valid one', async ({ page }) => {
