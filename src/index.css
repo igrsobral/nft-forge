@@ -7,7 +7,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Figma tokens for this challenge: warm ink ground, copper accent, Roboto Mono. */
 :root {
   --background: #140d0a;
   --foreground: #f5f1eb;

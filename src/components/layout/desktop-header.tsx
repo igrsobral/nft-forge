@@ -188,7 +188,6 @@ function DesktopNavItem({
       >
         {label}
       </span>
-      {/* Indicator pinned to the bottom edge of the bar so it lines up with the divider below */}
       <span
         aria-hidden
         className={`absolute inset-x-0 bottom-0 h-[3px] ${active ? 'bg-primary' : 'bg-transparent'}`}

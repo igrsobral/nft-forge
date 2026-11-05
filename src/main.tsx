@@ -1,7 +1,6 @@
 import { mocksEnabled, otelEnabled, otelEndpoint } from '@/lib/env'
 import { captureMockControlFromLocation } from '@/mocks/control'
 
-// The OTel SDK is code-split and only loaded when a collector is configured.
 if (otelEnabled && otelEndpoint) {
   void import('@/lib/telemetry').then((telemetry) => telemetry.initTelemetry())
 }
