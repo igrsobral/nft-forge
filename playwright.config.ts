@@ -5,14 +5,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 1,
-  workers: process.env.CI ? undefined : Number(process.env.PLAYWRIGHT_WORKERS ?? 2),
+  workers: process.env.CI ? undefined : Number(process.env.PLAYWRIGHT_WORKERS ?? 6),
   expect: { timeout: 10_000 },
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   use: {
     baseURL: 'http://127.0.0.1:4471',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: process.env.CI ? 'retain-on-failure' : 'off',
   },
   webServer: {
     command: 'pnpm dev',
