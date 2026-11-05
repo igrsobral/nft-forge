@@ -30,7 +30,10 @@ export function useOpenAuth() {
 }
 
 const inputClass =
-  'h-11 w-full rounded-md border border-[#6a4332] bg-[#140d0a] px-3 text-sm text-foreground outline-none placeholder:text-[#c9a27a]/70 focus:border-primary focus:ring-1 focus:ring-primary'
+  'h-11 max-lg:h-12 w-full rounded-md max-lg:rounded-lg border border-[#6a4332] bg-[#140d0a] px-3 text-sm text-foreground outline-none placeholder:text-[#c9a27a]/70 focus:border-primary focus:ring-1 focus:ring-primary'
+
+const submitClass =
+  'h-11 max-lg:h-12 rounded-md max-lg:rounded-lg bg-primary text-sm font-bold text-primary-foreground disabled:opacity-60'
 
 export function AuthModal() {
   const navigate = useNavigate()
@@ -102,8 +105,8 @@ function AuthPanel({
   onSuccess: () => void
 }) {
   return (
-    <div className="relative px-6 pt-6 pb-7">
-      <p className="mb-6 text-center text-sm font-bold tracking-[0.2em] lg:hidden">KURIO</p>
+    <div className="relative px-6 pt-8 pb-8 lg:px-6 lg:pt-6 lg:pb-7">
+      <p className="mb-9 text-center text-2xl font-bold tracking-[0.3em] lg:hidden">KURIO</p>
       <button
         type="button"
         onClick={onClose}
@@ -134,11 +137,15 @@ function AuthPanel({
           }
           onClick={() => onMode('signup')}
         >
-          Criar conta
+          Criar perfil
         </button>
       </div>
-      <DialogTitle className="sr-only">
-        {mode === 'signup' ? 'Criar conta' : mode === 'forgot' ? 'Redefinir senha' : 'Entrar'}
+      <DialogTitle className="mb-6 text-center text-lg font-bold lg:sr-only">
+        {mode === 'signup'
+          ? 'Criar perfil de colecionador'
+          : mode === 'forgot'
+            ? 'Redefinir senha'
+            : 'Entrar'}
       </DialogTitle>
       {mode === 'signup' ? (
         <SignupForm onSuccess={onSuccess} />
@@ -153,7 +160,7 @@ function AuthPanel({
           className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
           onClick={() => onMode('signup')}
         >
-          Novo na Kurio? <span className="text-primary">Crie uma conta</span>
+          Novo na Kurio? Crie uma conta
         </button>
       ) : null}
       {mode === 'signup' ? (
@@ -162,7 +169,7 @@ function AuthPanel({
           className="mt-6 min-h-11 w-full text-center text-sm text-[#c9a27a] lg:hidden"
           onClick={() => onMode('login')}
         >
-          Já tem uma conta? <span className="text-primary">Entre</span>
+          Já tem uma conta? Entre
         </button>
       ) : null}
     </div>
@@ -193,7 +200,7 @@ function LoginForm({ onForgot, onSuccess }: { onForgot: () => void; onSuccess: (
           })
       }}
     >
-      <DialogDescription className="text-center text-[#c9a27a]">
+      <DialogDescription className="max-lg:sr-only text-center text-[#c9a27a]">
         Entre para gerenciar sua carteira, coleção e perfil de criador.
       </DialogDescription>
       <Field id="login-email" label="E-mail" error={field('email')}>
@@ -213,7 +220,7 @@ function LoginForm({ onForgot, onSuccess }: { onForgot: () => void; onSuccess: (
         <PasswordInput
           id="login-password"
           autoComplete="current-password"
-          placeholder="••••••••"
+          placeholder="**********"
           value={password}
           shown={show}
           onToggle={() => setShow((value) => !value)}
@@ -232,11 +239,7 @@ function LoginForm({ onForgot, onSuccess }: { onForgot: () => void; onSuccess: (
           {error.message}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="h-11 rounded-md bg-primary font-bold text-primary-foreground disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className={submitClass}>
         {pending ? 'Entrando…' : 'Entrar'}
       </button>
       <SocialRow />
@@ -270,7 +273,7 @@ function SignupForm({ onSuccess }: { onSuccess: () => void }) {
           })
       }}
     >
-      <DialogDescription className="text-center text-[#c9a27a]">
+      <DialogDescription className="max-lg:sr-only text-center text-[#c9a27a]">
         Crie seu perfil de colecionador e conecte uma carteira quando quiser.
       </DialogDescription>
       <Field id="signup-username" label="Nome de usuário" error={field('username')}>
@@ -321,12 +324,8 @@ function SignupForm({ onSuccess }: { onSuccess: () => void }) {
           {error.message}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="h-11 rounded-md bg-primary font-bold text-primary-foreground disabled:opacity-60"
-      >
-        {pending ? 'Criando…' : 'Criar conta'}
+      <button type="submit" disabled={pending} className={submitClass}>
+        {pending ? 'Criando…' : 'Criar perfil'}
       </button>
       <SocialRow />
     </form>
@@ -357,7 +356,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
           })
       }}
     >
-      <DialogDescription className="text-center text-[#c9a27a]">
+      <DialogDescription className="max-lg:sr-only text-center text-[#c9a27a]">
         Informe o e-mail da conta. A demo só confirma o pedido, sem enviar uma mensagem real.
       </DialogDescription>
       <Field
@@ -380,11 +379,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
           {error.message}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="h-11 rounded-md bg-primary font-bold text-primary-foreground disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className={submitClass}>
         {pending ? 'Enviando…' : 'Enviar link'}
       </button>
       <button type="button" className="text-sm text-primary hover:underline" onClick={onBack}>
@@ -396,11 +391,50 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
 
 function SocialRow() {
   return (
-    <div className="mt-2 grid gap-2">
-      <p className="text-center text-xs tracking-wide text-[#c9a27a] uppercase">Ou continue com</p>
+    <div className="mt-2 grid gap-3">
+      <p className="flex items-center gap-3 text-xs text-[#c9a27a]">
+        <span aria-hidden className="h-px flex-1 bg-[#6a4332]" />
+        <span>Ou continue com</span>
+        <span aria-hidden className="h-px flex-1 bg-[#6a4332]" />
+      </p>
       <SocialButton label="Continuar com Google" />
       <SocialButton label="Continuar com Facebook" />
     </div>
+  )
+}
+
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+      <path
+        fill="#4285F4"
+        d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47a5.57 5.57 0 0 1-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09A12 12 0 0 0 12 24z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.27 14.29A7.2 7.2 0 0 1 4.89 12c0-.8.14-1.57.38-2.29V6.62H1.29a12 12 0 0 0 0 10.76l3.98-3.09z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42A11.97 11.97 0 0 0 12 0 12 12 0 0 0 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"
+      />
+    </svg>
+  )
+}
+
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+      <circle cx="12" cy="12" r="12" fill="#1877F2" />
+      <path
+        fill="#FFFFFF"
+        d="M15.44 12.73l.46-3.02h-2.83V7.82c0-.83.4-1.63 1.6-1.63h1.24V3.63s-1.12-.2-2.2-.2c-2.25 0-3.72 1.37-3.72 3.85v2.43H7.5v3.02h2.49v7.3c.54.08 1.09.13 1.65.13.56 0 1.11-.05 1.65-.13v-7.3h2.15z"
+      />
+    </svg>
   )
 }
 
@@ -408,12 +442,14 @@ function SocialButton({ label }: { label: string }) {
   return (
     <button
       type="button"
-      className="flex h-11 items-center justify-center gap-2 rounded-md border border-[#6a4332] text-sm text-foreground hover:border-primary"
+      className="flex h-11 max-lg:h-12 items-center justify-center gap-2 rounded-md max-lg:rounded-lg border border-[#6a4332] text-sm text-foreground hover:border-primary"
       onClick={() => toast.error('Não disponível na demo.')}
     >
-      <span aria-hidden className="text-xs font-bold text-primary">
-        {label.includes('Google') ? 'G' : 'f'}
-      </span>
+      {label.includes('Google') ? (
+        <GoogleIcon className="size-[18px] shrink-0" />
+      ) : (
+        <FacebookIcon className="size-[18px] shrink-0" />
+      )}
       {label}
     </button>
   )

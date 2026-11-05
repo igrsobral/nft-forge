@@ -33,14 +33,14 @@ test('switches modes, validates signup, rejects a duplicate, and creates an acco
   await dialog.getByRole('button', { name: /entrar|já tem uma conta/i }).click()
   await expect(page).toHaveURL(/auth=login/)
   await expect(dialog.getByRole('button', { name: 'Esqueceu a senha?' })).toBeVisible()
-  await dialog.getByRole('button', { name: /criar conta|crie uma conta/i }).click()
+  await dialog.getByRole('button', { name: /criar perfil|crie uma conta/i }).click()
   await expect(page).toHaveURL(/auth=signup/)
 
   await dialog.getByLabel('Nome de usuário').fill('Nova')
   await dialog.getByLabel('E-mail').fill('nao-e-email')
   await dialog.getByLabel('Senha', { exact: true }).fill('curta')
   await dialog.getByLabel('Confirmar senha').fill('outra')
-  await dialog.locator('form').getByRole('button', { name: 'Criar conta' }).click()
+  await dialog.locator('form').getByRole('button', { name: 'Criar perfil' }).click()
   await expect(dialog.getByRole('alert')).toHaveText('Revise os dados da conta.')
   await expect(dialog.getByText('Informe um e-mail válido.')).toBeVisible()
   await expect(dialog.getByText('As senhas não coincidem.')).toBeVisible()
@@ -48,11 +48,11 @@ test('switches modes, validates signup, rejects a duplicate, and creates an acco
   await dialog.getByLabel('E-mail').fill('ada@collector.dev')
   await dialog.getByLabel('Senha', { exact: true }).fill('orchid-harbor')
   await dialog.getByLabel('Confirmar senha').fill('orchid-harbor')
-  await dialog.locator('form').getByRole('button', { name: 'Criar conta' }).click()
+  await dialog.locator('form').getByRole('button', { name: 'Criar perfil' }).click()
   await expect(dialog.getByText('Esse e-mail já está cadastrado.')).toBeVisible()
 
   await dialog.getByLabel('E-mail').fill(`nova-${Date.now()}@collector.dev`)
-  await dialog.locator('form').getByRole('button', { name: 'Criar conta' }).click()
+  await dialog.locator('form').getByRole('button', { name: 'Criar perfil' }).click()
   await expect(
     page
       .getByRole('link', { name: 'Perfil', exact: true })
