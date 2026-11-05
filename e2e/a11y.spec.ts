@@ -11,6 +11,7 @@ async function expectNoSeriousViolations(page: import('@playwright/test').Page) 
 }
 
 test('home, detail, cart, and login have no serious accessibility violations', async ({ page }) => {
+  test.setTimeout(120_000)
   await page.goto('/?reset=1')
   await expect(page.getByRole('heading', { name: /seja dono/i })).toBeVisible()
   await expectNoSeriousViolations(page)

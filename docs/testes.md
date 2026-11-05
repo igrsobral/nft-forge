@@ -4,13 +4,13 @@ Os testes unitários e de integração rodam no Vitest. Os fluxos de ponta a pon
 
 ## Como rodar
 
-| Comando              | Descrição                                                                     |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `pnpm test:unit`     | Executa a suíte Vitest sem coleta de cobertura                                |
-| `pnpm test:coverage` | Executa Vitest com o provedor v8; gera relatório no terminal e em `coverage/` |
+| Comando              | Descrição                                                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm test:unit`     | Executa a suíte Vitest sem coleta de cobertura                                                                                                                     |
+| `pnpm test:coverage` | Executa Vitest com o provedor v8; gera relatório no terminal e em `coverage/`                                                                                      |
 | `pnpm test:e2e`      | Instala o Chromium, se necessário, e executa os projetos desktop e mobile; dependências de sistema são detalhadas em [Setup dos testes E2E](#setup-dos-testes-e2e) |
-| `pnpm typecheck`     | Verifica os projetos TypeScript com `tsc -b`                                  |
-| `pnpm lint`          | Verifica o código com Biome                                                   |
+| `pnpm typecheck`     | Verifica os projetos TypeScript com `tsc -b`                                                                                                                       |
+| `pnpm lint`          | Verifica o código com Biome                                                                                                                                        |
 
 A cobertura exige, nos módulos de lógica listados em [`vitest.config.ts`](../vitest.config.ts), pelo menos 85% de statements, 75% de branches, 85% de functions e 85% de lines. Entram `src/lib` (dinheiro, carrinho, carteira, busca, sessão e Axios), `src/contracts`, `src/realtime/apply-events.ts`, `src/realtime/dedupe.ts` e `src/mocks/pricing.ts`. Componentes visuais, rotas e o restante do mock HTTP ficam fora desses limiares.
 
@@ -49,7 +49,6 @@ pnpm exec playwright test --project=chromium-desktop # só um projeto
 ```
 
 Em falha, o relatório HTML fica em `playwright-report/` (`pnpm exec playwright show-report`) e o trace, com ação a ação, em `test-results/<nome-do-teste>/trace.zip` (`pnpm exec playwright show-trace <caminho>`). Screenshots são tirados só em falha.
-
 
 ## Matriz de comportamento
 

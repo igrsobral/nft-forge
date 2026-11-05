@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { MoveRight } from 'lucide-react'
 import { useState } from 'react'
+import { useCarouselSwipe } from '@/components/catalog/use-carousel-swipe'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { NftSummary } from '@/contracts/catalog'
 import { toListQuery } from '@/lib/catalog-search'
@@ -60,6 +61,9 @@ function HeroDots({
 
 export function HomeHeroDesktop() {
   const { slides, slideIndex, activeSlide, setSlide } = useHeroCarousel()
+  const swipe = useCarouselSwipe((direction) => {
+    if (slides.length > 1) setSlide((slideIndex + direction + slides.length) % slides.length)
+  })
   return (
     <section className="mx-auto hidden w-full max-w-[1440px] min-w-0 items-center gap-8 px-4 py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-12 lg:px-10 lg:py-14">
       <div className="flex max-w-[620px] flex-col items-start">
@@ -90,6 +94,7 @@ export function HomeHeroDesktop() {
         <Link
           to="/nfts/$nftId"
           params={{ nftId: activeSlide.id }}
+          {...swipe}
           className="block min-w-0 overflow-hidden rounded-[28px] bg-surface-panel"
         >
           <img
@@ -112,9 +117,15 @@ export function HomeHeroDesktop() {
 
 export function HomeHeroMobile() {
   const { slides, slideIndex, activeSlide, setSlide } = useHeroCarousel()
+  const swipe = useCarouselSwipe((direction) => {
+    if (slides.length > 1) setSlide((slideIndex + direction + slides.length) % slides.length)
+  })
   return (
     <section className="mx-auto w-full max-w-[1440px] px-4 pt-3.5 lg:hidden">
-      <div className="bg-gradient-hero relative overflow-hidden rounded-[22px] p-4">
+      <div
+        {...swipe}
+        className="bg-gradient-hero relative touch-pan-y overflow-hidden rounded-[22px] p-4"
+      >
         <div
           aria-hidden
           className="pointer-events-none absolute -bottom-48 -left-20 size-[420px] rounded-full border border-primary/25 bg-gradient-orbit"

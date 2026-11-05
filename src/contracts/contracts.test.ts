@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { loginBodySchema, passwordChangeSchema, registerBodySchema } from './account'
+import {
+  loginBodySchema,
+  passwordChangeSchema,
+  registerBodySchema,
+  walletWriteSchema,
+} from './account'
 import { nftListQuerySchema, reviewSchema } from './catalog'
 import { cartAddSchema, orderSchema } from './commerce'
 import { apiErrorEnvelopeSchema, ethAmountSchema, walletAddressSchema } from './common'
@@ -75,6 +80,22 @@ describe('Zod contracts', () => {
       }).success,
     ).toBe(true)
     expect(orderUpdatedEventSchema.safeParse({ status: 'timeout' }).success).toBe(false)
+  })
+
+  it('allows the optional ENS field on wallet forms to be empty', () => {
+    expect(
+      walletWriteSchema.safeParse({
+        label: 'Principal',
+        address: `0x${'a'.repeat(40)}`,
+        network: 'ethereum',
+        role: 'primary',
+        displayName: 'Ada',
+        profileName: 'ada',
+        ensName: '',
+        referralCode: 'KURIO',
+        contactEmail: 'ada@collector.dev',
+      }).success,
+    ).toBe(true)
   })
 
   it('accepts only known editorial categories and a positive reading time', () => {

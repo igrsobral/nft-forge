@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useCarouselSwipe } from '@/components/catalog/use-carousel-swipe'
 import type { NftSummary } from '@/contracts/catalog'
 import { formatEth } from '@/lib/money'
 
@@ -18,6 +19,9 @@ export function EditionCarousel({
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize))
   const current = Math.min(page, pageCount - 1)
   const slice = items.slice(current * pageSize, current * pageSize + pageSize)
+  const swipe = useCarouselSwipe((direction) => {
+    if (pageCount > 1) setPage((current + direction + pageCount) % pageCount)
+  })
 
   return (
     <section className="mt-12" aria-label={title}>
@@ -28,7 +32,7 @@ export function EditionCarousel({
       {slice.length === 0 ? (
         <p className="text-secondary-muted">{emptyLabel ?? 'Nenhuma edição para mostrar.'}</p>
       ) : (
-        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        <ul {...swipe} className="grid touch-pan-y grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {slice.map((item) => (
             <li key={item.id} className="min-w-0">
               <article className="relative flex h-full flex-col rounded-xl bg-surface-panel p-3">

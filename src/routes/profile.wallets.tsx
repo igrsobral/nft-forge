@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { ProfileField, profileInputClass } from '@/components/profile/profile-shell'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { Wallet } from '@/contracts/account'
 import type { Network, WalletRole } from '@/contracts/common'
 import { createWallet, updateWallet } from '@/lib/api/account'
@@ -32,6 +34,7 @@ function WalletsPage() {
   const userId = getStoredUserId()
   const session = useQuery(sessionQuery(userId))
   const wallets = useQuery({ ...walletsQuery(userId), enabled: Boolean(userId) })
+  const loading = session.isPending || wallets.isPending
   const user = session.data?.user
   const primary = wallets.data?.find((wallet) => wallet.role === 'primary')
   const secondary = wallets.data?.find((wallet) => wallet.role === 'secondary')
@@ -56,32 +59,35 @@ function WalletsPage() {
         <p className="mb-5 max-w-xl text-sm text-secondary-muted">
           Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.
         </p>
-        <WalletForm
-          key={primary?.id ?? 'new-primary'}
-          wallet={primary}
-          walletRole="primary"
-          defaults={{
-            displayName: primary?.displayName || user?.displayName || '',
-            label: primary?.label || user?.walletNickname || '',
-            network: primary?.network ?? 'ethereum',
-            profileName: primary?.profileName || user?.username || '',
-            address: primary?.address ?? '',
-            ensName: primary?.ensName || user?.ensName || '',
-            role: 'primary',
-            referralCode: primary?.referralCode || 'KURIO',
-            contactEmail: primary?.contactEmail || user?.email || '',
-          }}
-          submitLabel="Salvar carteira"
-        />
+        {loading ? (
+          <Skeleton className="h-64 w-full" />
+        ) : (
+          <WalletForm
+            key={primary?.id ?? 'new-primary'}
+            wallet={primary}
+            defaults={{
+              displayName: primary?.displayName || user?.displayName || '',
+              label: primary?.label || user?.walletNickname || '',
+              network: primary?.network ?? 'ethereum',
+              profileName: primary?.profileName || user?.username || '',
+              address: primary?.address ?? '',
+              ensName: primary?.ensName || user?.ensName || '',
+              role: 'primary',
+              referralCode: primary?.referralCode || 'KURIO',
+              contactEmail: primary?.contactEmail || user?.email || '',
+            }}
+            submitLabel="Salvar carteira"
+          />
+        )}
       </section>
       <section id="secundaria">
         <h2 className="type-b-16-bold text-foreground">Carteira secundária</h2>
-        {secondary ? (
+        {loading ? <Skeleton className="h-64 w-full" /> : null}
+        {!loading && secondary ? (
           <div className="mt-4">
             <WalletForm
               key={secondary.id}
               wallet={secondary}
-              walletRole="secondary"
               defaults={{
                 displayName: secondary.displayName,
                 label: secondary.label,
@@ -96,7 +102,7 @@ function WalletsPage() {
               submitLabel="Salvar carteira"
             />
           </div>
-        ) : (
+        ) : !loading ? (
           <div className="mt-3">
             <p className="text-sm text-secondary-muted">
               Você ainda não adicionou uma carteira secundária.
@@ -121,7 +127,6 @@ function WalletsPage() {
             {adding ? (
               <div className="mt-4">
                 <WalletForm
-                  walletRole="secondary"
                   defaults={
                     sameAsPrimary && primary
                       ? {
@@ -143,7 +148,7 @@ function WalletsPage() {
               </div>
             ) : null}
           </div>
-        )}
+        ) : null}
       </section>
     </div>
   )
@@ -151,13 +156,11 @@ function WalletsPage() {
 
 function WalletForm({
   wallet,
-  walletRole,
   defaults,
   submitLabel,
   onDone,
 }: {
   wallet?: Wallet
-  walletRole: WalletRole
   defaults: typeof empty
   submitLabel: string
   onDone?: () => void
@@ -175,7 +178,7 @@ function WalletForm({
         label: values.label,
         address: values.address,
         network: values.network,
-        role: walletRole,
+        role: values.role,
         displayName: values.displayName,
         profileName: values.profileName,
         ensName: values.ensName,
@@ -212,17 +215,23 @@ function WalletForm({
         <input className={profileInputClass} value={values.label} onChange={set('label')} />
       </ProfileField>
       <ProfileField label="Rede" error={field('network')}>
-        <select
-          className={profileInputClass}
-          value={values.network}
-          onChange={(event) =>
-            setValues((current) => ({ ...current, network: event.target.value as Network }))
-          }
-        >
-          <option value="ethereum">Ethereum</option>
-          <option value="polygon">Polygon</option>
-          <option value="base">Base</option>
-        </select>
+        <span className="relative block min-w-0">
+          <select
+            className={`${profileInputClass} appearance-none pr-10`}
+            value={values.network}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, network: event.target.value as Network }))
+            }
+          >
+            <option value="ethereum">Ethereum</option>
+            <option value="polygon">Polygon</option>
+            <option value="base">Base</option>
+          </select>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-secondary-muted"
+          />
+        </span>
       </ProfileField>
       <ProfileField label="Nome do perfil" error={field('profileName')}>
         <input
@@ -239,14 +248,30 @@ function WalletForm({
           onChange={set('address')}
         />
       </ProfileField>
-      <ProfileField label="ENS ou carteira secundária (opcional)" error={field('ensName')}>
+      <ProfileField
+        label="ENS ou carteira secundária (opcional)"
+        required={false}
+        error={field('ensName')}
+      >
         <input className={profileInputClass} value={values.ensName} onChange={set('ensName')} />
       </ProfileField>
       <ProfileField label="Tipo de carteira" error={field('role')}>
-        <select className={profileInputClass} value={walletRole} disabled>
-          <option value="primary">Principal</option>
-          <option value="secondary">Secundária</option>
-        </select>
+        <span className="relative block min-w-0">
+          <select
+            className={`${profileInputClass} appearance-none pr-10`}
+            value={values.role}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, role: event.target.value as WalletRole }))
+            }
+          >
+            <option value="primary">Principal</option>
+            <option value="secondary">Secundária</option>
+          </select>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-secondary-muted"
+          />
+        </span>
       </ProfileField>
       <ProfileField label="Código de indicação" error={field('referralCode')}>
         <input

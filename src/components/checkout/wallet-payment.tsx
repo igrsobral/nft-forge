@@ -413,7 +413,7 @@ export function WalletPayment({
           {(['WalletConnect', 'MetaMask', 'Coinbase Wallet'] as const).map((name) => (
             <label
               key={name}
-              className="flex min-h-11 items-center gap-3 rounded-2xl border border-border bg-surface-panel px-3 py-2.5"
+              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-surface-panel px-3 py-2.5"
             >
               <span
                 aria-hidden
@@ -427,7 +427,7 @@ export function WalletPayment({
                 name="provider"
                 className="size-4 shrink-0 cursor-pointer accent-primary"
                 checked={provider === name}
-                disabled={!selected}
+                aria-label={name}
                 onChange={() => {
                   setProvider(name)
                   if (selected && !selected.connected) {

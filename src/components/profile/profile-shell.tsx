@@ -1,6 +1,7 @@
 import { useRouterState } from '@tanstack/react-router'
 import {
   Activity,
+  ChevronDown,
   Download,
   Heart,
   LifeBuoy,
@@ -30,10 +31,10 @@ export function ProfileShell({ children }: { children: ReactNode }) {
     <main className="mx-auto grid w-full max-w-[1440px] min-w-0 gap-6 px-4 py-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-10 lg:py-8">
       <aside className="rounded-xl bg-surface-panel p-4">
         <h1 className="type-b-16-bold mb-4 text-foreground">Meu perfil</h1>
-        <label className="mb-3 block lg:hidden">
+        <label className="relative mb-3 block lg:hidden">
           <span className="sr-only">Seção do perfil</span>
           <select
-            className="h-11 w-full rounded-md border border-line-strong bg-background px-3"
+            className="h-11 w-full appearance-none rounded-md border border-line-strong bg-background px-3 pr-10"
             value={items.some((item) => item.to === pathname) ? pathname : '/profile'}
             onChange={(event) => {
               if (event.target.value === 'sair') {
@@ -50,6 +51,10 @@ export function ProfileShell({ children }: { children: ReactNode }) {
             ))}
             <option value="sair">Sair</option>
           </select>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute right-3 bottom-3 size-4 text-secondary-muted"
+          />
         </label>
         <nav aria-label="Meu perfil" className="hidden flex-col gap-1 lg:flex">
           {items.map((item) => (
@@ -108,11 +113,17 @@ function ProfileLink({
 export const profileInputClass =
   'h-11 w-full rounded-md border border-line-strong bg-background px-3 text-sm text-foreground outline-none placeholder:text-secondary-muted/70 focus:border-primary focus:ring-1 focus:ring-primary'
 
-export function RequiredLabel({ children }: { children: string }) {
+export function RequiredLabel({
+  children,
+  required = true,
+}: {
+  children: string
+  required?: boolean
+}) {
   return (
     <span className="text-sm text-foreground">
       {children}
-      <span className="text-primary">*</span>
+      {required ? <span className="text-primary">*</span> : null}
     </span>
   )
 }
@@ -120,16 +131,18 @@ export function RequiredLabel({ children }: { children: string }) {
 export function ProfileField({
   label,
   error,
+  required = true,
   children,
 }: {
   label: string
   error?: string
+  required?: boolean
   children: ReactNode
 }) {
   return (
     // biome-ignore lint/a11y/noLabelWithoutControl: the input is passed via `children` from the call site
     <label className="grid gap-1.5">
-      <RequiredLabel>{label}</RequiredLabel>
+      <RequiredLabel required={required}>{label}</RequiredLabel>
       {children}
       {error ? <span className="text-xs text-destructive">{error}</span> : null}
     </label>

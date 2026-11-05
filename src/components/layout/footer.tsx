@@ -119,7 +119,7 @@ export function Footer() {
                   autoComplete="email"
                   aria-invalid={fieldError ? true : undefined}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="type-c-13 h-10 w-full rounded-md border border-line-strong bg-surface-inset px-3 text-foreground placeholder:text-secondary-muted/70 sm:h-9 sm:px-2"
+                  className="type-c-13 h-16 w-full rounded-md border border-line-strong bg-surface-inset px-3 text-foreground placeholder:text-secondary-muted/70 sm:h-9 sm:px-2"
                 />
               </label>
               <button
@@ -222,7 +222,7 @@ export function Footer() {
               ))}
             </ul>
           </nav>
-          <div>
+          <div className="min-w-0">
             <h2 className="type-b-14-bold mb-2 text-foreground">Redes sociais</h2>
             <ul className="flex flex-wrap gap-1.5">
               {socials.map((item) => (
@@ -244,9 +244,16 @@ export function Footer() {
             <h2 className="type-b-14-bold mt-4 mb-2 text-foreground sm:mt-3">
               Carteiras compatíveis
             </h2>
-            <p className="type-c-12 inline-flex rounded-full border border-primary px-2 py-1 tracking-wide text-primary">
-              METAMASK · WALLETCONNECT · COINBASE
-            </p>
+            <ul aria-label="Carteiras compatíveis" className="flex flex-wrap gap-1.5">
+              {['METAMASK', 'WALLETCONNECT', 'COINBASE'].map((wallet) => (
+                <li
+                  key={wallet}
+                  className="type-c-12 whitespace-nowrap rounded-full border border-primary px-2 py-1 tracking-wide text-primary"
+                >
+                  {wallet}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

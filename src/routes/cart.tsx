@@ -360,7 +360,7 @@ function CartRow({
           aria-label={`Remover ${item.name}`}
           disabled={pending}
           onClick={onRemove}
-          className="absolute bottom-0 right-0 z-10 flex size-7 translate-x-[55%] translate-y-[55%] cursor-pointer items-center justify-center rounded-full text-primary transition-colors hover:text-destructive disabled:opacity-40 xl:hidden"
+          className="flex size-7 cursor-pointer items-center justify-center rounded-full text-primary transition-colors hover:text-destructive disabled:opacity-40 xl:hidden"
         >
           <Trash2 className="size-3.5" />
         </button>

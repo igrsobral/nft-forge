@@ -123,7 +123,7 @@ export const walletWriteSchema = z.object({
   role: walletRoleSchema,
   displayName: z.string().trim().min(2, 'Informe o nome de exibição.').max(40),
   profileName: z.string().trim().min(2, 'Informe o nome do perfil.').max(40),
-  ensName: z.string().trim().min(1, 'Informe o nome ENS.').max(40),
+  ensName: z.string().trim().max(40),
   referralCode: z.string().trim().min(1, 'Informe o código de indicação.').max(40),
   contactEmail: z.email('Informe um e-mail válido.'),
 })

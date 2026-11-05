@@ -81,8 +81,8 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
       if (!edition) throw new Error('Escolha uma edição')
       return addCartItem({ nftId: nft.id, editionId: edition.id, quantity: nextQuantity })
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['cart'] })
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success('Adicionado ao carrinho')
       void navigate({ to: '/cart' })
     },

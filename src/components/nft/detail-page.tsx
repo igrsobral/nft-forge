@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { ChevronLeft, Mail, Star, ZoomIn } from 'lucide-react'
 import { useState } from 'react'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
+import { useCarouselSwipe } from '@/components/catalog/use-carousel-swipe'
 import { PurchasePanel } from '@/components/nft/purchase-panel'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,6 +32,14 @@ export function NftDetailPage() {
     mutationFn: () => tickNftPrice(nftId),
   })
   const [frame, setFrame] = useState(0)
+  const gallery = query.data
+    ? query.data.gallery.length > 0
+      ? query.data.gallery
+      : [query.data.imageUrl]
+    : []
+  const swipeGallery = useCarouselSwipe((direction) => {
+    if (gallery.length > 1) setFrame((frame + direction + gallery.length) % gallery.length)
+  })
   const [tab, setTab] = useState<'details' | 'reviews'>('details')
   const loadedId = query.data?.id
   const [seenId, setSeenId] = useState(loadedId)
@@ -70,7 +79,6 @@ export function NftDetailPage() {
   }
 
   const nft = query.data
-  const gallery = nft.gallery.length > 0 ? nft.gallery : [nft.imageUrl]
   const image = gallery[Math.min(frame, gallery.length - 1)] ?? nft.imageUrl
   const shareUrl = typeof window === 'undefined' ? '' : window.location.href
   const others = (related.data?.items ?? []).filter((item) => item.id !== nft.id)
@@ -119,7 +127,10 @@ export function NftDetailPage() {
               </button>
             ))}
           </fieldset>
-          <div className="relative min-w-0 flex-1 rounded-[24px] border border-line-strong/70 bg-surface-panel p-3">
+          <div
+            {...swipeGallery}
+            className="relative min-w-0 flex-1 touch-pan-y rounded-[24px] border border-line-strong/70 bg-surface-panel p-3"
+          >
             <a
               href="/#catalogo"
               aria-label="Voltar"
@@ -162,6 +173,27 @@ export function NftDetailPage() {
                 />
               </DialogContent>
             </Dialog>
+            {gallery.length > 1 ? (
+              <fieldset
+                className="mt-3 flex justify-center gap-2 border-0 p-0 lg:hidden"
+                aria-label="Imagens do NFT"
+              >
+                {gallery.map((src, index) => (
+                  <button
+                    key={src}
+                    type="button"
+                    aria-label={`Imagem ${index + 1} de ${gallery.length}`}
+                    aria-pressed={index === Math.min(frame, gallery.length - 1)}
+                    onClick={() => setFrame(index)}
+                    className={
+                      index === Math.min(frame, gallery.length - 1)
+                        ? 'size-2.5 rounded-full bg-primary'
+                        : 'size-2 rounded-full bg-line-strong'
+                    }
+                  />
+                ))}
+              </fieldset>
+            ) : null}
           </div>
         </div>
 

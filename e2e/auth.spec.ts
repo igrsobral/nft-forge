@@ -91,6 +91,7 @@ test('resumes checkout after the login modal', async ({ page }) => {
   )
 
   await page.getByRole('button', { name: /comprar/i }).click()
+  await expect(page).toHaveURL(/\/cart/)
   if ((page.viewportSize()?.width ?? 1440) < 1024) {
     await page.getByRole('link', { name: 'Perfil', exact: true }).click()
     await page.getByLabel('Seção do perfil').selectOption('sair')
@@ -98,6 +99,8 @@ test('resumes checkout after the login modal', async ({ page }) => {
     await page.getByRole('button', { name: 'Sair' }).click()
   }
   await expect(page.getByRole('banner').getByRole('button', { name: 'Entrar' })).toBeVisible()
+
+  await expect(page).toHaveURL(/\/$/)
   await page.goto('/nfts/nft_02')
   await page.getByRole('button', { name: /comprar/i }).click()
   await page.getByRole('button', { name: 'Conectar e finalizar' }).click()
