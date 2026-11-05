@@ -16,7 +16,7 @@ export function MobileTabBar({
   return (
     <nav
       aria-label="Principal"
-      className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t border-[#6a4332] bg-background px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t border-line-strong bg-background px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
     >
       <div className="mx-auto grid max-w-md grid-cols-5 items-end">
         <TabLink to="/" label="Início" active={pathname === '/'}>
@@ -69,11 +69,11 @@ function ScanFab({ count }: { count: number }) {
     <Link
       to="/cart"
       aria-label={`Abrir carrinho, ${count} ${count === 1 ? 'item' : 'itens'}`}
-      className="relative -mt-7 flex size-14 items-center justify-center justify-self-center rounded-full bg-primary text-primary-foreground shadow-[0_0_0_6px_rgba(0,0,0,0.55),0_10px_20px_rgba(0,0,0,0.4)]"
+      className="relative -mt-7 flex size-14 items-center justify-center justify-self-center rounded-full bg-primary text-primary-foreground shadow-tab-float"
     >
       <ScanLine className="size-6" />
       {count > 0 ? (
-        <span className="absolute -top-0.5 -left-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-[#6a4332] bg-[#2f1d15] px-1 text-[10px] leading-none font-bold text-foreground">
+        <span className="absolute -top-0.5 -left-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-line-strong bg-muted px-1 text-[10px] leading-none font-bold text-foreground">
           {count}
         </span>
       ) : null}

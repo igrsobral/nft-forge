@@ -23,7 +23,7 @@ export function CatalogPagination({
             className={
               current
                 ? 'flex size-9 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground'
-                : 'flex size-9 items-center justify-center rounded-md bg-[#2a1c16] text-sm text-foreground hover:bg-[#3a2820]'
+                : 'flex size-9 items-center justify-center rounded-md bg-surface-pagination text-sm text-foreground hover:bg-surface-hover'
             }
           >
             {number}
@@ -35,7 +35,7 @@ export function CatalogPagination({
         aria-label="Próxima página"
         disabled={page >= totalPages}
         onClick={() => onPage(page + 1)}
-        className="flex size-9 items-center justify-center rounded-md bg-[#2a1c16] text-foreground hover:bg-[#3a2820] disabled:opacity-40"
+        className="flex size-9 items-center justify-center rounded-md bg-surface-pagination text-foreground hover:bg-surface-hover disabled:opacity-40"
       >
         <ChevronRight className="size-4" />
       </button>

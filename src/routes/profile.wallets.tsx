@@ -53,7 +53,7 @@ function WalletsPage() {
             Adicionar
           </button>
         </div>
-        <p className="mb-5 max-w-xl text-sm text-[#c9a27a]">
+        <p className="mb-5 max-w-xl text-sm text-secondary-muted">
           Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.
         </p>
         <WalletForm
@@ -98,7 +98,7 @@ function WalletsPage() {
           </div>
         ) : (
           <div className="mt-3">
-            <p className="text-sm text-[#c9a27a]">
+            <p className="text-sm text-secondary-muted">
               Você ainda não adicionou uma carteira secundária.
             </p>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -264,7 +264,7 @@ function WalletForm({
       </ProfileField>
       <ProfileField label="Nome ENS">
         <span className="flex">
-          <span className="flex h-11 items-center rounded-l-md border border-r-0 border-[#6a4332] bg-[#1a100c] px-3 text-sm text-[#c9a27a]">
+          <span className="flex h-11 items-center rounded-l-md border border-r-0 border-line-strong bg-surface-inset px-3 text-sm text-secondary-muted">
             .eth
           </span>
           <input

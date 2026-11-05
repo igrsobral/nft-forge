@@ -78,7 +78,7 @@ export function NftDetailPage() {
 
   return (
     <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-6 pb-48 lg:px-10 lg:py-8 lg:pb-8">
-      <p className="type-c-13 mb-5 hidden text-[#c9a27a] lg:block">
+      <p className="type-c-13 mb-5 hidden text-secondary-muted lg:block">
         <Link to="/" className="hover:text-primary">
           Início
         </Link>
@@ -119,11 +119,11 @@ export function NftDetailPage() {
               </button>
             ))}
           </fieldset>
-          <div className="relative min-w-0 flex-1 rounded-[24px] border border-[#6a4332]/70 bg-[#24140f] p-3">
+          <div className="relative min-w-0 flex-1 rounded-[24px] border border-line-strong/70 bg-surface-panel p-3">
             <a
               href="/#catalogo"
               aria-label="Voltar"
-              className="absolute top-3 left-3 z-10 flex size-11 items-center justify-center rounded-full bg-[#140d0a]/80 text-foreground lg:hidden"
+              className="absolute top-3 left-3 z-10 flex size-11 items-center justify-center rounded-full bg-background/80 text-foreground lg:hidden"
             >
               <ChevronLeft className="size-5" />
             </a>
@@ -142,7 +142,7 @@ export function NftDetailPage() {
                 <button
                   type="button"
                   aria-label="Ampliar imagem"
-                  className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-full border border-[#6a4332]/60 bg-[#140d0a]/85 text-foreground"
+                  className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-full border border-line-strong/60 bg-background/85 text-foreground"
                 >
                   <ZoomIn className="size-[18px]" />
                 </button>
@@ -170,7 +170,7 @@ export function NftDetailPage() {
             <h1 className="text-[28px] leading-tight font-bold text-foreground lg:text-[30px]">
               {nft.name}
             </h1>
-            <p className="mt-1 shrink-0 rounded-full bg-[#24140f] px-2.5 py-1 text-sm font-bold text-primary lg:hidden">
+            <p className="mt-1 shrink-0 rounded-full bg-surface-panel px-2.5 py-1 text-sm font-bold text-primary lg:hidden">
               {nft.rating.toFixed(1)}
             </p>
           </div>
@@ -178,7 +178,7 @@ export function NftDetailPage() {
             <p data-testid="nft-price" className="text-[26px] leading-none font-bold text-primary">
               {formatEth(nft.priceEth)}
             </p>
-            <p className="flex items-center gap-2 text-[#c9a27a]">
+            <p className="flex items-center gap-2 text-secondary-muted">
               <span className="inline-flex" role="img" aria-label={`${nft.rating} de 5`}>
                 {Array.from({ length: 5 }, (_, index) => (
                   <Star
@@ -197,17 +197,17 @@ export function NftDetailPage() {
           </div>
           <div>
             <h2 className="type-b-14-bold text-foreground">Sobre este NFT:</h2>
-            <p className="type-b-14 mt-2 leading-6 text-[#c9a27a] max-lg:line-clamp-3">
+            <p className="type-b-14 mt-2 leading-6 text-secondary-muted max-lg:line-clamp-3">
               {nft.description}
             </p>
           </div>
           <PurchasePanel nft={nft} />
-          <ul className="type-c-13 grid gap-2 text-[#c9a27a]">
+          <ul className="type-c-13 grid gap-2 text-secondary-muted">
             <li>ID do token: {nft.tokenId}</li>
             <li>Coleção: {nft.collectionName}</li>
             <li>Atributos: {nft.attributes.join(', ')}</li>
           </ul>
-          <p className="type-c-13 flex flex-wrap items-center gap-3 text-[#c9a27a]">
+          <p className="type-c-13 flex flex-wrap items-center gap-3 text-secondary-muted">
             <span>Compartilhar este NFT:</span>
             <a
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
@@ -241,7 +241,7 @@ export function NftDetailPage() {
           </p>
           <button
             type="button"
-            className="type-c-12 self-start text-[#8d847c] underline-offset-2 hover:underline"
+            className="type-c-12 self-start text-copy-muted underline-offset-2 hover:underline"
             disabled={tick.isPending}
             onClick={() => tick.mutate()}
           >
@@ -254,7 +254,7 @@ export function NftDetailPage() {
         <div
           role="tablist"
           aria-label="Ficha da edição"
-          className="flex gap-6 border-b border-[#6a4332]"
+          className="flex gap-6 border-b border-line-strong"
         >
           <button
             type="button"
@@ -284,7 +284,7 @@ export function NftDetailPage() {
           </button>
         </div>
         {tab === 'details' ? (
-          <div className="type-b-14 mt-5 max-w-4xl space-y-4 leading-6 text-[#c9a27a]">
+          <div className="type-b-14 mt-5 max-w-4xl space-y-4 leading-6 text-secondary-muted">
             <p>
               {nft.name} é uma obra de {nft.category.toLowerCase()} da coleção {nft.collectionName}.{' '}
               {nft.description} Cada atributo fica registrado nos metadados do token e pode ser
@@ -306,13 +306,13 @@ export function NftDetailPage() {
         ) : (
           <ul className="mt-5 flex max-w-3xl flex-col gap-4">
             {nft.reviews.length === 0 ? (
-              <li className="text-[#c9a27a]">Ainda não há avaliações.</li>
+              <li className="text-secondary-muted">Ainda não há avaliações.</li>
             ) : (
               nft.reviews.map((review) => (
-                <li key={review.id} data-testid="review" className="border-b border-[#3f2319] pb-4">
+                <li key={review.id} data-testid="review" className="border-b border-border pb-4">
                   <p className="type-b-14-bold text-foreground">{review.author}</p>
                   <p className="type-c-13 text-primary">{review.rating} de 5</p>
-                  <p className="type-b-14 mt-1 text-[#c9a27a]">{review.body}</p>
+                  <p className="type-b-14 mt-1 text-secondary-muted">{review.body}</p>
                 </li>
               ))
             )}

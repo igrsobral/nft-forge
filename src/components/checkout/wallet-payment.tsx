@@ -215,7 +215,7 @@ export function WalletPayment({
             {profileOpen ? (
               <button
                 type="button"
-                className="type-b-14 text-[#c9a27a] transition-colors hover:text-foreground"
+                className="type-b-14 text-secondary-muted transition-colors hover:text-foreground"
                 onClick={closeProfileEditor}
               >
                 Cancelar
@@ -298,7 +298,7 @@ export function WalletPayment({
               </ProfileField>
             </fieldset>
           ) : (
-            <p className="type-c-13 text-[#c9a27a]">
+            <p className="type-c-13 text-secondary-muted">
               Colecionador {user?.displayName} · {user?.email} · {user?.ensName}
             </p>
           )}
@@ -329,8 +329,8 @@ export function WalletPayment({
                 key={wallet.id}
                 className={
                   checked
-                    ? 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-primary/60 bg-[#24140f] px-3 py-3'
-                    : 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-[#3f2319] bg-[#24140f] px-3 py-3'
+                    ? 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-primary/60 bg-surface-panel px-3 py-3'
+                    : 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-border bg-surface-panel px-3 py-3'
                 }
               >
                 <input
@@ -347,7 +347,7 @@ export function WalletPayment({
                   <span className="type-b-14 block truncate text-foreground">
                     {shortAddress(wallet.address)}
                   </span>
-                  <span className="type-c-12 block text-[#8d847c]">
+                  <span className="type-c-12 block text-copy-muted">
                     {redeLabel(wallet.network)}
                   </span>
                 </span>
@@ -358,7 +358,7 @@ export function WalletPayment({
                   onClick={() =>
                     setMenuFor((current) => (current === wallet.id ? undefined : wallet.id))
                   }
-                  className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#c9a27a] transition-colors hover:text-foreground"
+                  className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-secondary-muted transition-colors hover:text-foreground"
                 >
                   <MoreVertical className="size-4" />
                 </button>
@@ -366,12 +366,12 @@ export function WalletPayment({
                   <div
                     role="menu"
                     aria-label={`Carteira ${roleLabel(wallet.role)}`}
-                    className="absolute right-2 bottom-2 z-20 flex flex-col rounded-xl border border-[#3f2319] bg-[#2f1d15] p-1 shadow-lg"
+                    className="absolute right-2 bottom-2 z-20 flex flex-col rounded-xl border border-border bg-muted p-1 shadow-lg"
                   >
                     <button
                       type="button"
                       role="menuitem"
-                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-foreground hover:bg-[#1a100c]"
+                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-foreground hover:bg-surface-inset"
                       onClick={() =>
                         connect.mutate({
                           walletId: wallet.id,
@@ -384,7 +384,7 @@ export function WalletPayment({
                     <button
                       type="button"
                       role="menuitem"
-                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-[#c9a27a] hover:bg-[#1a100c]"
+                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-secondary-muted hover:bg-surface-inset"
                       onClick={() => connect.mutate({ walletId: wallet.id, action: 'decline' })}
                     >
                       Simular recusa
@@ -396,7 +396,7 @@ export function WalletPayment({
           })}
         </fieldset>
         {wallets.data && wallets.data.length === 0 ? (
-          <p className="type-c-13 text-[#c9a27a]">
+          <p className="type-c-13 text-secondary-muted">
             Adicione uma carteira em{' '}
             <a className="text-primary underline-offset-2 hover:underline" href="/profile/wallets">
               Minhas carteiras
@@ -413,11 +413,11 @@ export function WalletPayment({
           {(['WalletConnect', 'MetaMask', 'Coinbase Wallet'] as const).map((name) => (
             <label
               key={name}
-              className="flex min-h-11 items-center gap-3 rounded-2xl border border-[#3f2319] bg-[#24140f] px-3 py-2.5"
+              className="flex min-h-11 items-center gap-3 rounded-2xl border border-border bg-surface-panel px-3 py-2.5"
             >
               <span
                 aria-hidden
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#6a4332] bg-[#1a100c] text-[13px] font-bold text-primary"
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-line-strong bg-surface-inset text-[13px] font-bold text-primary"
               >
                 {name === 'Coinbase Wallet' ? <Wallet className="size-4" /> : name.charAt(0)}
               </span>
@@ -479,7 +479,7 @@ export function WalletPayment({
               setAcceptedTotal(event.target.checked ? (quote.data?.totalEth ?? null) : null)
             }
           />
-          <span className="type-c-13 text-[#c9a27a]">
+          <span className="type-c-13 text-secondary-muted">
             Confirmo este total, a taxa e a disponibilidade.
           </span>
         </label>
@@ -524,7 +524,7 @@ export function WalletPayment({
               Simular recusa
             </Button>
           </div>
-          <p className="type-c-12 mt-3 hidden text-[#c9a27a] lg:block">
+          <p className="type-c-12 mt-3 hidden text-secondary-muted lg:block">
             Rede da carteira: {selected ? (selected.network as Network) : 'não selecionada'}. Um
             clique repetido reutiliza a mesma chave de idempotência.
           </p>

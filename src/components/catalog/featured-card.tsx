@@ -14,7 +14,7 @@ export function FeaturedCard({ nft }: { nft: NftSummary | null }) {
       <Link
         to="/nfts/$nftId"
         params={{ nftId: nft.id }}
-        className="mt-4 block overflow-hidden rounded-[24px] bg-[#24140f]"
+        className="mt-4 block overflow-hidden rounded-[24px] bg-surface-panel"
       >
         <img
           src={nft.imageUrl}

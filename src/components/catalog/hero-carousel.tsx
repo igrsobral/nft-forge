@@ -49,7 +49,7 @@ function HeroDots({
             disabled={slides.length === 0}
             onClick={() => onSelect(index)}
             className={
-              selected ? 'size-2.5 rounded-full bg-primary' : 'size-2 rounded-full bg-[#6a4332]'
+              selected ? 'size-2.5 rounded-full bg-primary' : 'size-2 rounded-full bg-line-strong'
             }
           />
         )
@@ -68,7 +68,7 @@ export function HomeHeroDesktop() {
           <span className="block lg:whitespace-nowrap">Seja dono do futuro</span>
           <span className="block lg:whitespace-nowrap">da arte digital</span>
         </h1>
-        <p className="type-b-14 mt-5 max-w-[540px] text-[#c9a27a] lg:text-[15px] lg:leading-6">
+        <p className="type-b-14 mt-5 max-w-[540px] text-secondary-muted lg:text-[15px] lg:leading-6">
           Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital
           rara, apoie artistas e tenha uma parte da cultura da internet.
         </p>
@@ -90,7 +90,7 @@ export function HomeHeroDesktop() {
         <Link
           to="/nfts/$nftId"
           params={{ nftId: activeSlide.id }}
-          className="block min-w-0 overflow-hidden rounded-[28px] bg-[#24140f]"
+          className="block min-w-0 overflow-hidden rounded-[28px] bg-surface-panel"
         >
           <img
             src={activeSlide.imageUrl}
@@ -117,7 +117,7 @@ export function HomeHeroMobile() {
       <div className="bg-gradient-hero relative overflow-hidden rounded-[22px] p-4">
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-48 -left-20 size-[420px] rounded-full border border-[#d28a4c]/25 bg-[radial-gradient(closest-side,rgba(210,138,76,0.3)_36%,rgba(210,138,76,0)_74%)]"
+          className="pointer-events-none absolute -bottom-48 -left-20 size-[420px] rounded-full border border-primary/25 bg-gradient-orbit"
         />
         <div className="relative flex items-center gap-3.5">
           <div className="min-w-0 flex-1">
@@ -152,7 +152,7 @@ export function HomeHeroMobile() {
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                className="size-32 rounded-[18px] object-cover shadow-[0_12px_32px_rgba(0,0,0,0.35)]"
+                className="size-32 rounded-[18px] object-cover shadow-artwork"
               />
             </Link>
           ) : (

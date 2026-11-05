@@ -51,7 +51,7 @@ export function FavoriteToggle({ nft }: { nft: NftSummary }) {
       type="button"
       aria-pressed={saved}
       aria-label={saved ? 'Remover da lista de interesse' : 'Salvar na lista de interesse'}
-      className="absolute top-2.5 right-2.5 z-10 grid size-9 place-items-center rounded-full border border-[#f5f1eb]/25 bg-[#140d0a]/85 backdrop-blur-sm transition-colors hover:border-[#f5f1eb]/40"
+      className="absolute top-2.5 right-2.5 z-10 grid size-9 place-items-center rounded-full border border-foreground/25 bg-background/85 backdrop-blur-sm transition-colors hover:border-foreground/40"
       onClick={(event) => {
         event.preventDefault()
         event.stopPropagation()

@@ -48,7 +48,7 @@ export function CatalogFilters({
 
   return (
     <div className="flex flex-col gap-8" data-testid="catalog-filters">
-      <section className="rounded-2xl bg-[#24140f] px-5 py-6">
+      <section className="rounded-2xl bg-surface-panel px-5 py-6">
         <h2 className="mb-4 text-base font-bold text-foreground">Coleções</h2>
         <ul className="flex flex-col gap-1">
           {facets.categories.map((facet) => {
@@ -65,10 +65,12 @@ export function CatalogFilters({
                     })
                   }
                 >
-                  <span className={active ? 'font-bold text-primary' : 'text-[#c9a27a]'}>
+                  <span className={active ? 'font-bold text-primary' : 'text-secondary-muted'}>
                     {facet.label}
                   </span>
-                  <span className={active ? 'font-bold text-primary' : 'font-bold text-[#c9a27a]'}>
+                  <span
+                    className={active ? 'font-bold text-primary' : 'font-bold text-secondary-muted'}
+                  >
                     ({facet.count})
                   </span>
                 </button>
@@ -118,7 +120,7 @@ export function CatalogFilters({
           <p className="text-sm text-foreground">{priceLabel}</p>
           <button
             type="button"
-            className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-bold text-[#140d0a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="mt-3 h-9 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             onClick={() => {
               const minPrice = stepEth(low)
               const maxPrice = stepEth(high)
@@ -148,11 +150,13 @@ export function CatalogFilters({
                       })
                     }
                   >
-                    <span className={active ? 'font-bold text-primary' : 'text-[#c9a27a]'}>
+                    <span className={active ? 'font-bold text-primary' : 'text-secondary-muted'}>
                       {facet.label}
                     </span>
                     <span
-                      className={active ? 'font-bold text-primary' : 'font-bold text-[#c9a27a]'}
+                      className={
+                        active ? 'font-bold text-primary' : 'font-bold text-secondary-muted'
+                      }
                     >
                       ({facet.count})
                     </span>

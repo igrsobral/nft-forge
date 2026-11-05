@@ -36,7 +36,7 @@ function EditorialSections({
         {data.promos.map((promo) => (
           <article
             key={promo.kind}
-            className="flex flex-col gap-4 rounded-[20px] bg-[#24140f] p-4 sm:flex-row"
+            className="flex flex-col gap-4 rounded-[20px] bg-surface-panel p-4 sm:flex-row"
           >
             <img
               src={promo.imageUrl}
@@ -49,7 +49,7 @@ function EditorialSections({
             />
             <div className="flex min-w-0 flex-1 flex-col">
               <h2 className="type-b-14-bold text-foreground">{promo.title}</h2>
-              <p className="type-b-14 mt-2 text-[#c9a27a]">{promo.excerpt}</p>
+              <p className="type-b-14 mt-2 text-secondary-muted">{promo.excerpt}</p>
               <div className="mt-4 flex sm:mt-auto sm:justify-end">
                 <Link
                   to="/"
@@ -71,14 +71,14 @@ function EditorialSections({
           <h2 className="text-[24px] leading-8 font-bold tracking-tight text-foreground">
             Diário da Cunhagem
           </h2>
-          <p className="type-b-14 mt-2 text-[#c9a27a]">
+          <p className="type-b-14 mt-2 text-secondary-muted">
             Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.
           </p>
         </div>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {data.journal.map((post) => (
             <li key={post.slug}>
-              <article className="flex h-full min-w-0 flex-col rounded-xl bg-[#24140f] p-3">
+              <article className="flex h-full min-w-0 flex-col rounded-xl bg-surface-panel p-3">
                 <img
                   src={post.imageUrl}
                   alt=""
@@ -88,21 +88,21 @@ function EditorialSections({
                   decoding="async"
                   className="aspect-square w-full min-w-0 rounded-lg object-cover"
                 />
-                <p className="type-c-12 mt-3 text-[#8d847c]">
+                <p className="type-c-12 mt-3 text-copy-muted">
                   {post.dateLabel}
                   <span aria-hidden className="mx-2">
                     |
                   </span>
                   Leitura de {post.readingMinutes} min
                 </p>
-                <p className="type-c-13 mt-1.5 text-[#8d847c]">{post.category}</p>
+                <p className="type-c-13 mt-1.5 text-copy-muted">{post.category}</p>
                 <h3 className="type-b-14-bold mt-1.5 text-foreground">{post.title}</h3>
-                <p className="type-c-12 mt-2 text-[#8d847c]">{post.excerpt}</p>
+                <p className="type-c-12 mt-2 text-copy-muted">{post.excerpt}</p>
                 <Link
                   to="/journal/$slug"
                   params={{ slug: post.slug }}
                   aria-label={`Ler mais: ${post.title}`}
-                  className="type-c-13 mt-3 inline-flex items-center gap-1 self-start text-[#c9a27a] hover:text-primary"
+                  className="type-c-13 mt-3 inline-flex items-center gap-1 self-start text-secondary-muted hover:text-primary"
                 >
                   ler mais
                   <ChevronRight className="size-3.5" aria-hidden />
@@ -125,7 +125,7 @@ function EditorialSkeleton() {
           <div
             // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton layout, list is never reordered
             key={index}
-            className="flex flex-col gap-4 rounded-[20px] bg-[#24140f] p-4 sm:flex-row"
+            className="flex flex-col gap-4 rounded-[20px] bg-surface-panel p-4 sm:flex-row"
           >
             <Skeleton className="aspect-square w-full shrink-0 rounded-2xl sm:size-[200px]" />
             <div className="flex flex-col gap-3 flex-1 py-2">
@@ -143,7 +143,7 @@ function EditorialSkeleton() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {Array.from({ length: 4 }, (_, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton layout, list is never reordered
-            <div key={index} className="rounded-xl bg-[#24140f] p-3">
+            <div key={index} className="rounded-xl bg-surface-panel p-3">
               <Skeleton className="aspect-square w-full rounded-lg" />
               <Skeleton className="mt-3 h-4 w-2/3" />
               <Skeleton className="mt-2 h-4 w-1/2" />

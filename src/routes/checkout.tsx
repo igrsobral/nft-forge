@@ -25,7 +25,7 @@ function CheckoutPage() {
         <a
           href="/cart"
           aria-label="Voltar"
-          className="absolute left-0 flex size-11 items-center justify-center rounded-full border border-[#3f2319] bg-[#241612] text-foreground transition-colors hover:bg-[#2f1d15]"
+          className="absolute left-0 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
         >
           <ChevronLeft className="size-5" />
         </a>

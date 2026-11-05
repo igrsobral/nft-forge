@@ -36,7 +36,7 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
   return (
     <main className="mx-auto w-full max-w-[1440px] px-4 py-6 pb-10 lg:px-10 lg:py-8">
       <article className="mx-auto max-w-3xl">
-        <p className="type-c-13 mb-6 text-[#c9a27a]">
+        <p className="type-c-13 mb-6 text-secondary-muted">
           <Link to="/" className="hover:text-primary">
             Início
           </Link>
@@ -50,7 +50,7 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
           <h1 className="text-[26px] leading-9 font-bold tracking-tight text-foreground min-[420px]:text-[32px] lg:text-4xl lg:leading-11">
             {post.title}
           </h1>
-          <p className="type-b-14 mt-4 text-[#8d847c]">
+          <p className="type-b-14 mt-4 text-copy-muted">
             {post.dateLabel}
             <span aria-hidden className="mx-2">
               |
@@ -61,7 +61,7 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
             </span>
             {post.category}
           </p>
-          <p className="type-b-15 mt-3 text-[#c9a27a]">{post.excerpt}</p>
+          <p className="type-b-15 mt-3 text-secondary-muted">{post.excerpt}</p>
         </header>
 
         <img
@@ -72,7 +72,7 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
           loading="eager"
           fetchPriority="high"
           decoding="async"
-          className="mt-8 aspect-square w-full rounded-[24px] bg-[#24140f] object-cover"
+          className="mt-8 aspect-square w-full rounded-[24px] bg-surface-panel object-cover"
         />
 
         <div className="mt-8 flex flex-col gap-5">
@@ -88,7 +88,7 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
         </div>
 
         <footer className="mt-10 flex items-center justify-between gap-4 border-t border-border pt-6">
-          <p className="type-c-13 text-[#8d847c]">Diário da Cunhagem · Kurio</p>
+          <p className="type-c-13 text-copy-muted">Diário da Cunhagem · Kurio</p>
           <Link
             to="/"
             hash="journal"

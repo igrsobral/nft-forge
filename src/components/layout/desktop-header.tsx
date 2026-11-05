@@ -147,7 +147,7 @@ export function DesktopHeader({
           )}
         </div>
       </div>
-      <div aria-hidden className="hidden border-t border-[#6a4332] lg:block" />
+      <div aria-hidden className="hidden border-t border-line-strong lg:block" />
       {user ? (
         <nav
           aria-label="Conta"

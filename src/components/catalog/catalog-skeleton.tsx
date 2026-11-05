@@ -24,7 +24,7 @@ export function CatalogSkeleton({ compact = false }: { compact?: boolean }) {
           <div
             // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton layout, list is never reordered
             key={index}
-            className="rounded-xl bg-[#24140f] p-3"
+            className="rounded-xl bg-surface-panel p-3"
           >
             <Skeleton className="aspect-square w-full rounded-xl" />
             <Skeleton className="mt-3 h-4 w-3/4" />

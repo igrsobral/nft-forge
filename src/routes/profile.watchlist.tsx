@@ -20,7 +20,7 @@ function WatchlistPage() {
     <section>
       <h2 className="type-b-16-bold mb-4 text-foreground">Lista de interesse</h2>
       {favorites.data && favorites.data.length === 0 ? (
-        <p className="text-sm text-[#c9a27a]">Você ainda não favoritou nenhuma edição.</p>
+        <p className="text-sm text-secondary-muted">Você ainda não favoritou nenhuma edição.</p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {items.map((nft) => (
@@ -28,7 +28,7 @@ function WatchlistPage() {
               <Link
                 to="/nfts/$nftId"
                 params={{ nftId: nft.id }}
-                className="flex items-center gap-3 rounded-xl bg-[#24140f] p-3 hover:text-primary"
+                className="flex items-center gap-3 rounded-xl bg-surface-panel p-3 hover:text-primary"
               >
                 <img
                   src={nft.imageUrl}

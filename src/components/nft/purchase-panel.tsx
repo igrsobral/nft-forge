@@ -133,7 +133,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           })}
         </fieldset>
       </div>
-      <div className="flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:border-t max-lg:border-[#6a4332] max-lg:bg-[#24140f] max-lg:px-3 max-lg:py-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
+      <div className="flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:border-t max-lg:border-line-strong max-lg:bg-surface-panel max-lg:px-3 max-lg:py-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
         <div className="flex w-full items-center gap-2 lg:w-auto">
           <button
             type="button"
@@ -156,7 +156,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           >
             +
           </button>
-          <span className="type-c-12 sr-only text-[#c9a27a]">
+          <span className="type-c-12 sr-only text-secondary-muted">
             {maxQuantity === 0
               ? 'Edição esgotada.'
               : `${edition?.remaining ?? 0} de ${edition?.supply ?? 0} disponíveis.`}
@@ -184,14 +184,14 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           <Link
             to="/cart"
             aria-label="Abrir carrinho"
-            className="flex size-11 items-center justify-center rounded-xl border border-[#6a4332] text-foreground lg:hidden"
+            className="flex size-11 items-center justify-center rounded-xl border border-line-strong text-foreground lg:hidden"
           >
             <ShoppingCart className="size-5" />
           </Link>
           <Button
             type="button"
             variant="outline"
-            className="hidden h-11 gap-2 rounded-lg border-[#8d847c]/80 bg-transparent px-5 text-foreground lg:inline-flex"
+            className="hidden h-11 gap-2 rounded-lg border-copy-muted/80 bg-transparent px-5 text-foreground lg:inline-flex"
             aria-pressed={saved}
             onClick={() => {
               if (!userId) {
@@ -209,7 +209,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
       <Button
         type="button"
         variant="outline"
-        className="h-11 gap-2 self-start rounded-lg border-[#8d847c]/80 bg-transparent px-5 text-foreground lg:hidden"
+        className="h-11 gap-2 self-start rounded-lg border-copy-muted/80 bg-transparent px-5 text-foreground lg:hidden"
         aria-pressed={saved}
         onClick={() => {
           if (!userId) {

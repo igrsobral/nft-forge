@@ -26,6 +26,21 @@
   --border: #3f2319;
   --input: #3f2319;
   --ring: #e89b55;
+  --surface-panel: #24140f;
+  --surface-inset: #1a100c;
+  --surface-pagination: #2a1c16;
+  --surface-hover: #3a2820;
+  --surface-footer: #3a261c;
+  --surface-row-alt: #20130f;
+  --text-secondary-muted: #c9a27a;
+  --text-copy-muted: #8d847c;
+  --line-strong: #6a4332;
+  --brand-google-blue: #4285f4;
+  --brand-google-green: #34a853;
+  --brand-google-yellow: #fbbc05;
+  --brand-google-red: #ea4335;
+  --brand-facebook-blue: #1877f2;
+  --brand-facebook-white: #ffffff;
   --radius: 0.625rem;
   color-scheme: dark;
   --chart-1: oklch(0.87 0 0);
@@ -45,11 +60,26 @@
 
 @theme inline {
   --font-sans: "Roboto Mono", ui-monospace, "Courier New", monospace;
-  --color-ink: #140d0a;
-  --color-surface-card: #241612;
-  --color-surface-raised: #2f1d15;
-  --color-text-secondary: #cfb28c;
-  --color-line: #3f2319;
+  --color-ink: var(--background);
+  --color-surface-card: var(--card);
+  --color-surface-raised: var(--muted);
+  --color-text-secondary: var(--secondary);
+  --color-line: var(--border);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-pagination: var(--surface-pagination);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-footer: var(--surface-footer);
+  --color-surface-row-alt: var(--surface-row-alt);
+  --color-secondary-muted: var(--text-secondary-muted);
+  --color-copy-muted: var(--text-copy-muted);
+  --color-line-strong: var(--line-strong);
+  --color-brand-google-blue: var(--brand-google-blue);
+  --color-brand-google-green: var(--brand-google-green);
+  --color-brand-google-yellow: var(--brand-google-yellow);
+  --color-brand-google-red: var(--brand-google-red);
+  --color-brand-facebook-blue: var(--brand-facebook-blue);
+  --color-brand-facebook-white: var(--brand-facebook-white);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -119,24 +149,47 @@
 }
 
 @utility bg-gradient-tile {
-  background-image: linear-gradient(139.5deg, #241612 12%, #2f1d15 106.6%);
+  background-image: linear-gradient(139.5deg, var(--card) 12%, var(--muted) 106.6%);
 }
 @utility bg-gradient-hero {
-  background-color: #241612;
+  background-color: var(--card);
   background-image:
     radial-gradient(
       105% 85% at 0% 100%,
-      rgba(210, 138, 76, 0.42) 0%,
-      rgba(210, 138, 76, 0.13) 42%,
-      rgba(210, 138, 76, 0) 64%
+      color-mix(in srgb, var(--primary) 42%, transparent) 0%,
+      color-mix(in srgb, var(--primary) 13%, transparent) 42%,
+      transparent 64%
     ),
-    linear-gradient(160deg, #241612 0%, #1e120c 55%, #150c08 100%);
+    linear-gradient(160deg, var(--card) 0%, var(--background) 55%, var(--background) 100%);
 }
 @utility bg-gradient-cta {
-  background-image: linear-gradient(108.9deg, #d28a4c 4%, rgba(210, 138, 76, 0.8) 122%);
+  background-image: linear-gradient(
+    108.9deg,
+    var(--primary) 4%,
+    color-mix(in srgb, var(--primary) 80%, transparent) 122%
+  );
 }
 @utility bg-gradient-filter-btn {
-  background-image: linear-gradient(137deg, rgba(210, 138, 76, 0.45) 24.6%, #d28a4c 100%);
+  background-image: linear-gradient(
+    137deg,
+    color-mix(in srgb, var(--primary) 45%, transparent) 24.6%,
+    var(--primary) 100%
+  );
+}
+@utility bg-gradient-orbit {
+  background-image: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--primary) 30%, transparent) 36%,
+    transparent 74%
+  );
+}
+@utility shadow-tab-float {
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--background) 55%, transparent),
+    0 10px 20px color-mix(in srgb, var(--background) 40%, transparent);
+}
+@utility shadow-artwork {
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--background) 35%, transparent);
 }
 @utility type-wordmark {
   font-size: 14px;
@@ -191,8 +244,13 @@
 }
 
 .skeleton-shimmer {
-  background-color: #2f1d15;
-  background-image: linear-gradient(90deg, transparent, rgba(245, 241, 235, 0.08), transparent);
+  background-color: var(--muted);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--foreground) 8%, transparent),
+    transparent
+  );
   background-size: 200% 100%;
   background-repeat: no-repeat;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -213,8 +271,8 @@
   width: 18px;
   margin-top: -7px;
   border-radius: 999px;
-  background: #d28a4c;
-  border: 2px solid #140d0a;
+  background: var(--primary);
+  border: 2px solid var(--background);
   cursor: pointer;
 }
 .price-range::-moz-range-thumb {
@@ -222,16 +280,16 @@
   height: 18px;
   width: 18px;
   border-radius: 999px;
-  background: #d28a4c;
-  border: 2px solid #140d0a;
+  background: var(--primary);
+  border: 2px solid var(--background);
   cursor: pointer;
 }
 .price-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #f5f1eb;
+  outline: 2px solid var(--foreground);
   outline-offset: 2px;
 }
 .price-range:focus-visible::-moz-range-thumb {
-  outline: 2px solid #f5f1eb;
+  outline: 2px solid var(--foreground);
   outline-offset: 2px;
 }
 

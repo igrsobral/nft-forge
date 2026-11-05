@@ -23,15 +23,15 @@ export function EditionCarousel({
     <section className="mt-12" aria-label={title}>
       <div className="mb-5 flex items-center gap-4">
         <h2 className="type-b-16-bold shrink-0 text-primary">{title}</h2>
-        <span aria-hidden className="h-px flex-1 bg-[#6a4332]" />
+        <span aria-hidden className="h-px flex-1 bg-line-strong" />
       </div>
       {slice.length === 0 ? (
-        <p className="text-[#c9a27a]">{emptyLabel ?? 'Nenhuma edição para mostrar.'}</p>
+        <p className="text-secondary-muted">{emptyLabel ?? 'Nenhuma edição para mostrar.'}</p>
       ) : (
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {slice.map((item) => (
             <li key={item.id} className="min-w-0">
-              <article className="relative flex h-full flex-col rounded-xl bg-[#24140f] p-3">
+              <article className="relative flex h-full flex-col rounded-xl bg-surface-panel p-3">
                 <img
                   src={item.imageUrl}
                   alt=""
@@ -74,7 +74,7 @@ export function EditionCarousel({
               className={
                 index === current
                   ? 'size-2.5 rounded-full bg-primary'
-                  : 'size-2 rounded-full bg-[#6a4332]'
+                  : 'size-2 rounded-full bg-line-strong'
               }
             />
           ))}

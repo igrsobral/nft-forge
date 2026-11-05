@@ -5,7 +5,7 @@ export const Route = createFileRoute('/profile/offers')({
   component: () => (
     <section>
       <h2 className="type-b-16-bold mb-3 text-foreground">Ofertas</h2>
-      <p className="text-sm text-[#c9a27a]">
+      <p className="text-sm text-secondary-muted">
         Nenhuma oferta recebida. Quando alguém ofertar por uma edição sua, ela aparece aqui.
       </p>
     </section>

@@ -36,14 +36,14 @@ export function MobileSearchBar({
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] items-center gap-2 px-4 pt-4 lg:hidden">
-      <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-[#6a4332] bg-[#24140f] px-3">
-        <Search className="size-4 shrink-0 text-[#c9a27a]" />
+      <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-line-strong bg-surface-panel px-3">
+        <Search className="size-4 shrink-0 text-secondary-muted" />
         <span className="sr-only">Explorar coleções</span>
         <input
           value={draft}
           placeholder="Explorar coleções"
           onChange={(event) => setDraft(event.target.value)}
-          className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#c9a27a]"
+          className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-secondary-muted"
         />
       </label>
       <MobileFiltersButton search={search} facets={facets} onChange={onChange} />
@@ -72,7 +72,7 @@ function MobileFiltersButton({
           type="button"
           aria-label="Filtros"
           variant="outline"
-          className="size-11 shrink-0 rounded-xl border-[#3f2319] bg-[#24140f] p-0 text-primary hover:bg-[#2f1d15]"
+          className="size-11 shrink-0 rounded-xl border-border bg-surface-panel p-0 text-primary hover:bg-muted"
         >
           <SlidersHorizontal className="size-5" />
         </Button>

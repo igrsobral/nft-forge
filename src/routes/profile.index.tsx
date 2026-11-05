@@ -120,7 +120,7 @@ function ProfileDetailsPage() {
           </ProfileField>
           <ProfileField label="Nome ENS" error={field(profileError, 'ensName')}>
             <span className="flex">
-              <span className="flex h-11 items-center rounded-l-md border border-r-0 border-[#6a4332] bg-[#1a100c] px-3 text-sm text-[#c9a27a]">
+              <span className="flex h-11 items-center rounded-l-md border border-r-0 border-line-strong bg-surface-inset px-3 text-sm text-secondary-muted">
                 .eth
               </span>
               <input
@@ -149,7 +149,7 @@ function ProfileDetailsPage() {
                 className="size-16 rounded-full object-cover"
               />
             ) : (
-              <span className="flex size-16 items-center justify-center rounded-full border border-[#6a4332] text-xs text-[#c9a27a]">
+              <span className="flex size-16 items-center justify-center rounded-full border border-line-strong text-xs text-secondary-muted">
                 Avatar
               </span>
             )}
@@ -174,7 +174,7 @@ function ProfileDetailsPage() {
             </Button>
             <button
               type="button"
-              className="text-sm text-[#c9a27a] hover:text-primary"
+              className="text-sm text-secondary-muted hover:text-primary"
               onClick={() => avatar.mutate(null)}
             >
               Remover
@@ -259,7 +259,7 @@ function PasswordField({
         <button
           type="button"
           aria-label={shown ? `Ocultar ${label}` : `Mostrar ${label}`}
-          className="absolute top-1/2 right-3 -translate-y-1/2 text-[#c9a27a]"
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-secondary-muted"
           onClick={() => setShown((current) => !current)}
         >
           {shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

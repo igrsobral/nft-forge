@@ -28,12 +28,12 @@ export function ProfileShell({ children }: { children: ReactNode }) {
 
   return (
     <main className="mx-auto grid w-full max-w-[1440px] min-w-0 gap-6 px-4 py-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-10 lg:py-8">
-      <aside className="rounded-xl bg-[#24140f] p-4">
+      <aside className="rounded-xl bg-surface-panel p-4">
         <h1 className="type-b-16-bold mb-4 text-foreground">Meu perfil</h1>
         <label className="mb-3 block lg:hidden">
           <span className="sr-only">Seção do perfil</span>
           <select
-            className="h-11 w-full rounded-md border border-[#6a4332] bg-[#140d0a] px-3"
+            className="h-11 w-full rounded-md border border-line-strong bg-background px-3"
             value={items.some((item) => item.to === pathname) ? pathname : '/profile'}
             onChange={(event) => {
               if (event.target.value === 'sair') {
@@ -63,7 +63,7 @@ export function ProfileShell({ children }: { children: ReactNode }) {
           ))}
           <button
             type="button"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-[#1a100c]"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-surface-inset"
             onClick={() => {
               void logout().finally(() => window.location.assign('/'))
             }}
@@ -106,7 +106,7 @@ function ProfileLink({
 }
 
 export const profileInputClass =
-  'h-11 w-full rounded-md border border-[#6a4332] bg-[#140d0a] px-3 text-sm text-foreground outline-none placeholder:text-[#c9a27a]/70 focus:border-primary focus:ring-1 focus:ring-primary'
+  'h-11 w-full rounded-md border border-line-strong bg-background px-3 text-sm text-foreground outline-none placeholder:text-secondary-muted/70 focus:border-primary focus:ring-1 focus:ring-primary'
 
 export function RequiredLabel({ children }: { children: string }) {
   return (

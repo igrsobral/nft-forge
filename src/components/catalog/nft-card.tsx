@@ -8,7 +8,7 @@ export function NftCard({ nft }: { nft: NftSummary }) {
     <article
       data-testid="nft-card"
       data-category={nft.category}
-      className="group relative flex h-full min-w-0 flex-col rounded-xl bg-[#24140f] p-3"
+      className="group relative flex h-full min-w-0 flex-col rounded-xl bg-surface-panel p-3"
     >
       <div className="relative min-w-0">
         <img
@@ -40,7 +40,7 @@ export function NftCard({ nft }: { nft: NftSummary }) {
           {formatEth(nft.priceEth)}
         </span>
         {nft.previousPriceEth ? (
-          <span className="type-c-13 text-[#8d847c] line-through">
+          <span className="type-c-13 text-copy-muted line-through">
             {formatEth(nft.previousPriceEth)}
           </span>
         ) : null}

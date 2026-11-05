@@ -82,8 +82,8 @@ export function Footer() {
 
   return (
     <footer className="px-4 pt-8 pb-10 lg:px-10">
-      <div className="mx-auto w-full max-w-[1440px] bg-[#24140f]">
-        <div className="grid gap-8 px-5 py-8 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.15fr] xl:divide-x xl:divide-[#d28a4c]/50">
+      <div className="mx-auto w-full max-w-[1440px] bg-surface-panel">
+        <div className="grid gap-8 px-5 py-8 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.15fr] xl:divide-x xl:divide-primary/50">
           {features.map((feature) => (
             <section
               key={feature.mark}
@@ -94,7 +94,7 @@ export function Footer() {
               </span>
               <div>
                 <h2 className="type-b-14-bold text-foreground">{feature.title}</h2>
-                <p className="type-c-13 mt-1 text-[#c9a27a]">{feature.body}</p>
+                <p className="type-c-13 mt-1 text-secondary-muted">{feature.body}</p>
               </div>
             </section>
           ))}
@@ -119,7 +119,7 @@ export function Footer() {
                   autoComplete="email"
                   aria-invalid={fieldError ? true : undefined}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="type-c-13 h-9 w-full rounded-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70 sm:h-6 sm:px-2"
+                  className="type-c-13 h-9 w-full rounded-md border border-line-strong bg-surface-inset px-3 text-foreground placeholder:text-secondary-muted/70 sm:h-6 sm:px-2"
                 />
               </label>
               <button
@@ -135,7 +135,7 @@ export function Footer() {
                 {fieldError}
               </p>
             ) : (
-              <p className="type-c-13 mt-2 text-[#c9a27a]">
+              <p className="type-c-13 mt-2 text-secondary-muted">
                 Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
               </p>
             )}
@@ -157,7 +157,7 @@ export function Footer() {
             <ul className="flex flex-col gap-1.5 sm:gap-1">
               {profileLinks.map((item) => (
                 <li key={item.label}>
-                  <Link to={item.to} className="type-c-13 text-[#c9a27a] hover:text-primary">
+                  <Link to={item.to} className="type-c-13 text-secondary-muted hover:text-primary">
                     {item.label}
                   </Link>
                 </li>
@@ -170,25 +170,28 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:contato@email.com?subject=Ajuda"
-                  className="type-c-13 text-[#c9a27a] hover:text-primary"
+                  className="type-c-13 text-secondary-muted hover:text-primary"
                 >
                   Central de ajuda
                 </a>
               </li>
               <li>
-                <Link to="/" className="type-c-13 text-[#c9a27a] hover:text-primary">
+                <Link to="/" className="type-c-13 text-secondary-muted hover:text-primary">
                   Como comprar NFTs
                 </Link>
               </li>
               <li>
-                <Link to="/profile/wallets" className="type-c-13 text-[#c9a27a] hover:text-primary">
+                <Link
+                  to="/profile/wallets"
+                  className="type-c-13 text-secondary-muted hover:text-primary"
+                >
                   Carteira e segurança
                 </Link>
               </li>
               <li>
                 <a
                   href="mailto:contato@email.com?subject=Política%20do%20mercado"
-                  className="type-c-13 text-[#c9a27a] hover:text-primary"
+                  className="type-c-13 text-secondary-muted hover:text-primary"
                 >
                   Política do mercado
                 </a>
@@ -196,7 +199,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:contato@email.com?subject=Denúncia"
-                  className="type-c-13 text-[#c9a27a] hover:text-primary"
+                  className="type-c-13 text-secondary-muted hover:text-primary"
                 >
                   Denunciar item
                 </a>
@@ -211,7 +214,7 @@ export function Footer() {
                   <Link
                     to="/"
                     search={{ category }}
-                    className="type-c-13 text-[#c9a27a] hover:text-primary"
+                    className="type-c-13 text-secondary-muted hover:text-primary"
                   >
                     {category}
                   </Link>
@@ -247,7 +250,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <p className="type-c-12 mx-auto mt-2 w-full max-w-[1440px] text-center text-[#c9a27a]">
+      <p className="type-c-12 mx-auto mt-2 w-full max-w-[1440px] text-center text-secondary-muted">
         © 2026 Kurio. Propriedade digital para todos.
       </p>
     </footer>

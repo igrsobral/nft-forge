@@ -19,13 +19,13 @@ function ActivityPage() {
     <section>
       <h2 className="type-b-16-bold mb-4 text-foreground">Atividade</h2>
       {items.length === 0 ? (
-        <p className="text-sm text-[#c9a27a]">
+        <p className="text-sm text-secondary-muted">
           Nenhum pedido ainda. Uma compra confirmada aparece aqui.
         </p>
       ) : (
         <ul className="grid gap-3">
           {items.map((order) => (
-            <li key={order.id} className="rounded-xl bg-[#24140f] p-4">
+            <li key={order.id} className="rounded-xl bg-surface-panel p-4">
               <Link
                 to="/orders/$orderId"
                 params={{ orderId: order.id }}
@@ -33,7 +33,7 @@ function ActivityPage() {
               >
                 Pedido {order.id.slice(0, 8)}
               </Link>
-              <p className="mt-1 text-sm text-[#c9a27a]">
+              <p className="mt-1 text-sm text-secondary-muted">
                 {order.status} · {formatEth(order.receipt.totalEth)}
               </p>
             </li>
