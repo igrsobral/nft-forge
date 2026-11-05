@@ -71,6 +71,29 @@ O lint, o estilo e a organização de imports ficam no [Biome](biome.json). O ho
 git commit -m 'feat: new checkout flow'
 ```
 
+## Observabilidade (OpenTelemetry)
+
+Traces no navegador com o SDK web do OpenTelemetry, em [`src/lib/telemetry.ts`](src/lib/telemetry.ts). A coleta é opt-in: sem `VITE_OTEL_EXPORTER_OTLP_ENDPOINT`, nada é enviado e o chunk da telemetria nem entra no carregamento inicial.
+
+O que cada carga captura:
+
+| Fonte                  | Spans gerados                                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Carregamento da página | `documentFetch`, `documentLoad` e timings de recursos (via `DocumentLoadInstrumentation`)                                |
+| REST e Socket.IO       | `XMLHttpRequest.send` com método, URL e status — cobre axios e o polling do socket (via `XMLHttpRequestInstrumentation`) |
+| Erros da janela        | `window.error` e `window.unhandledrejection` com o evento `exception`                                                    |
+
+Propagação W3C (`traceparent`/`baggage`) segue de ponta a ponta: requests same-origin já propagam e o endpoint do coletor é ignorado para não criar spans em loop. Os spans saem pós-batch (5 s), são descartados com fila cheia (200) e recebem flush quando a aba é escondida ou fecha. Quem recebê-los pode ser Jaeger, Grafana Tempo, Datadog ou qualquer backend OTLP.
+
+```bash
+# coletor local com Jaeger all-in-one
+docker run --rm -p 4318:4318 -p 16686:16686 jaegertracing/all-in-one:latest
+echo 'VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318/v1/traces' >> .env
+pnpm dev
+```
+
+Variáveis em [`.env.example`](.env.example): `VITE_OTEL_ENABLED` (kill switch), `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` (OTLP/HTTP), `VITE_OTEL_SERVICE_NAME`, `VITE_OTEL_SAMPLE_RATIO` (amostragem pais-filhos) e `VITE_OTEL_ENVIRONMENT`. Para spans manuais, use `withSpan` de `@/lib/telemetry` (via import dinâmico); o resto da aplicação não precisa mudar.
+
 ## Contas e cupons
 
 As senhas do seed são PBKDF2-SHA256 (10 000 iterações), não texto puro. A implementação está em [`src/mocks/password.ts`](src/mocks/password.ts).
