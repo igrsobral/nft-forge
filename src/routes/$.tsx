@@ -4,6 +4,6 @@ import { NotFoundPage } from '@/components/route-error'
 export const Route = createFileRoute('/$')({
   component: NotFoundPage,
   head: () => ({
-    meta: [{ title: 'Page not found · Atelier Market' }],
+    meta: [{ title: 'Página não encontrada · Kurio' }],
   }),
 })

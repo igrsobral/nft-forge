@@ -4,17 +4,52 @@ Os testes unitários e de integração rodam no Vitest. Os fluxos de ponta a pon
 
 ## Como rodar
 
-| Comando              | Descrição                                                               |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pnpm test:unit`     | Executa a suíte Vitest sem coleta de cobertura                          |
+| Comando              | Descrição                                                                     |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `pnpm test:unit`     | Executa a suíte Vitest sem coleta de cobertura                                |
 | `pnpm test:coverage` | Executa Vitest com o provedor v8; gera relatório no terminal e em `coverage/` |
-| `pnpm test:e2e`      | Instala o Chromium, se necessário, e executa os projetos desktop e mobile |
-| `pnpm typecheck`     | Verifica os projetos TypeScript com `tsc -b`                            |
-| `pnpm lint`          | Verifica o código com Biome                                              |
+| `pnpm test:e2e`      | Instala o Chromium, se necessário, e executa os projetos desktop e mobile; dependências de sistema são detalhadas em [Setup dos testes E2E](#setup-dos-testes-e2e) |
+| `pnpm typecheck`     | Verifica os projetos TypeScript com `tsc -b`                                  |
+| `pnpm lint`          | Verifica o código com Biome                                                   |
 
 A cobertura exige, nos módulos de lógica listados em [`vitest.config.ts`](../vitest.config.ts), pelo menos 85% de statements, 75% de branches, 85% de functions e 85% de lines. Entram `src/lib` (dinheiro, carrinho, carteira, busca, sessão e Axios), `src/contracts`, `src/realtime/apply-events.ts`, `src/realtime/dedupe.ts` e `src/mocks/pricing.ts`. Componentes visuais, rotas e o restante do mock HTTP ficam fora desses limiares.
 
 O login repetido dos testes E2E está em [`e2e/support.ts`](../e2e/support.ts). Não há `waitForTimeout`. As esperas usam asserções web-first.
+
+## Setup dos testes E2E
+
+Os testes E2E usam o Playwright com Chromium em dois projetos: `chromium-desktop` (viewport 1440 × 900) e `chromium-mobile` (dispositivo Pixel 5).
+
+### Instalação
+
+1. Instale as dependências da node_modules (`pnpm install`). O pacote `@playwright/test` é fixado por versão em [`package.json`](../package.json); o binário do navegador tem de ser da mesma versão.
+2. O navegador em si não precisa de ação manual: o script `pnpm test:e2e` roda `playwright install chromium` antes da suíte. Se atualizar o Playwright, rode o comando de novo para baixar o binário correspondente.
+3. **Dependências de sistema.** Abrir o Chromium em Linux (Debian/Ubuntu) exige bibliotecas do SO que `playwright install` não traz. O sintoma clássico é o teste falhar antes de qualquer navegação, com `browserType.launch: error while loading shared libraries: libnspr4.so ...`. Resolva com uma destas:
+
+   ```bash
+   sudo pnpm exec playwright install-deps chromium   # ou: pnpm exec playwright install chromium --with-deps
+   ```
+
+   Em ambiente sem root (ex.: contêiner de trabalho), peça a instalação manual: `sudo apt-get install libnspr4 libnss3` no mínimo; o `install-deps` resolve a lista completa.
+
+Sem essas bibliotecas, tanto `pnpm test:e2e` quanto a execução de um spec isolado falham no launch do browser; a falha não indica problema no aplicativo.
+
+### Como a suíte sobe o aplicativo
+
+- O Playwright inicia sozinho o servidor de desenvolvimento (`pnpm dev`) em `http://127.0.0.1:4471`; não é preciso subir servidor à mão. O timeout de espera é de 120 s.
+- Fora de CI, um servidor já em execução na mesma porta é reaproveitado (`reuseExistingServer`) — útil para depurar com o devserver aberto. Em CI isso é desligado.
+- Em CI, `forbidOnly` impede `test.only` e cada teste tem 1 retry.
+
+### Execução e diagnóstico
+
+```bash
+pnpm test:e2e                                        # suíte completa (desktop + mobile)
+pnpm exec playwright test e2e/purchase.spec.ts       # um spec
+pnpm exec playwright test --project=chromium-desktop # só um projeto
+```
+
+Em falha, o relatório HTML fica em `playwright-report/` (`pnpm exec playwright show-report`) e o trace, com ação a ação, em `test-results/<nome-do-teste>/trace.zip` (`pnpm exec playwright show-trace <caminho>`). Screenshots são tirados só em falha.
+
 
 ## Matriz de comportamento
 

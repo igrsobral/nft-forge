@@ -26,11 +26,11 @@ Com o endpoint configurado, inicie a aplicação com `pnpm dev` e consulte a int
 
 ## Dados coletados
 
-| Origem | Instrumentação |
-| --- | --- |
-| Carregamento da página | `DocumentLoadInstrumentation`: fetch, load e tempos de recursos. |
-| Chamadas REST | `XMLHttpRequestInstrumentation`: método, URL e status de respostas via XHR, incluindo Axios. |
-| Erros globais | Eventos `window.error` e `window.unhandledrejection`, registrados como exceções. |
+| Origem                 | Instrumentação                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| Carregamento da página | `DocumentLoadInstrumentation`: fetch, load e tempos de recursos.                             |
+| Chamadas REST          | `XMLHttpRequestInstrumentation`: método, URL e status de respostas via XHR, incluindo Axios. |
+| Erros globais          | Eventos `window.error` e `window.unhandledrejection`, registrados como exceções.             |
 
 O cliente Socket.IO usa transporte WebSocket, que não é instrumentado pela instrumentação XHR descrita acima.
 

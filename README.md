@@ -45,38 +45,38 @@ Abra [http://127.0.0.1:4471](http://127.0.0.1:4471). Os mocks ficam ligados por 
 
 ### Verificações
 
-| Comando | Descrição |
-| --- | --- |
-| `pnpm check` | Biome e verificação de tipos TypeScript |
-| `pnpm test:unit` | Testes unitários com Vitest |
+| Comando              | Descrição                                                              |
+| -------------------- | ---------------------------------------------------------------------- |
+| `pnpm check`         | Biome e verificação de tipos TypeScript                                |
+| `pnpm test:unit`     | Testes unitários com Vitest                                            |
 | `pnpm test:coverage` | Testes unitários com relatório de cobertura v8 e limiares configurados |
-| `pnpm test:e2e` | Testes Playwright em desktop e viewport mobile |
-| `pnpm build` | Verificação de tipos e build de produção |
-| `pnpm preview` | Pré-visualização do build em `http://127.0.0.1:4472` |
-| `pnpm lighthouse` | Build e auditorias Lighthouse mobile e desktop |
+| `pnpm test:e2e`      | Testes Playwright em desktop e viewport mobile                         |
+| `pnpm build`         | Verificação de tipos e build de produção                               |
+| `pnpm preview`       | Pré-visualização do build em `http://127.0.0.1:4472`                   |
+| `pnpm lighthouse`    | Build e auditorias Lighthouse mobile e desktop                         |
 
 Mais detalhes sobre cobertura, fluxos exercitados e limitações estão em [docs/testes.md](docs/testes.md).
 
 ## Rotas principais
 
-| Página | Rota |
-| --- | --- |
-| Catálogo | `/` |
-| Detalhe de NFT | `/nfts/:nftId` |
-| Diário da Cunhagem | `/journal/:slug` |
-| Carrinho e checkout | `/cart`, `/checkout` |
-| Pedido | `/orders/:orderId` |
-| Login e cadastro | `/login`, `/signup` |
-| Perfil e carteiras | `/profile`, `/wallets` |
+| Página              | Rota                   |
+| ------------------- | ---------------------- |
+| Catálogo            | `/`                    |
+| Detalhe de NFT      | `/nfts/:nftId`         |
+| Diário da Cunhagem  | `/journal/:slug`       |
+| Carrinho e checkout | `/cart`, `/checkout`   |
+| Pedido              | `/orders/:orderId`     |
+| Login e cadastro    | `/login`, `/signup`    |
+| Perfil e carteiras  | `/profile`, `/wallets` |
 
 Checkout, perfil, carteiras e detalhes do pedido exigem uma sessão de demonstração.
 
 ## Acesso de demonstração
 
-| Colecionador | E-mail | Senha |
-| --- | --- | --- |
-| Ada Marlowe | `ada@collector.dev` | `orchid-harbor` |
-| Leo Okonkwo | `leo@collector.dev` | `marble-gallery` |
+| Colecionador | E-mail              | Senha            |
+| ------------ | ------------------- | ---------------- |
+| Ada Marlowe  | `ada@collector.dev` | `orchid-harbor`  |
+| Leo Okonkwo  | `leo@collector.dev` | `marble-gallery` |
 
 Cupons disponíveis: `WELCOME10` (10% de desconto) e `ARCHIVE5` (5%). `SPRING24` está expirado. Todos os dados podem ser reiniciados localmente com `/?reset=1`.
 
