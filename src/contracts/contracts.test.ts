@@ -3,6 +3,7 @@ import { loginBodySchema, passwordChangeSchema, registerBodySchema } from './acc
 import { nftListQuerySchema, reviewSchema } from './catalog'
 import { cartAddSchema, orderSchema } from './commerce'
 import { apiErrorEnvelopeSchema, ethAmountSchema, walletAddressSchema } from './common'
+import { editorialPostDetailSchema, editorialPostSchema, editorialPromoSchema } from './editorial'
 import { nftUpdatedEventSchema, orderUpdatedEventSchema } from './events'
 
 describe('Zod contracts', () => {
@@ -74,6 +75,58 @@ describe('Zod contracts', () => {
       }).success,
     ).toBe(true)
     expect(orderUpdatedEventSchema.safeParse({ status: 'timeout' }).success).toBe(false)
+  })
+
+  it('accepts only known editorial categories and a positive reading time', () => {
+    expect(
+      editorialPostSchema.safeParse({
+        slug: 'prova-de-trabalho',
+        title: 'Título',
+        excerpt: 'Resumo',
+        category: 'Criadores',
+        dateLabel: '12 de setembro',
+        readingMinutes: 6,
+        imageUrl: 'data:image/svg+xml;base64,AAAA',
+      }).success,
+    ).toBe(true)
+    expect(
+      editorialPostSchema.safeParse({
+        slug: 'prova-de-trabalho',
+        title: 'Título',
+        excerpt: 'Resumo',
+        category: 'Guias',
+        dateLabel: '12 de setembro',
+        readingMinutes: 6,
+        imageUrl: 'x',
+      }).success,
+    ).toBe(false)
+    expect(
+      editorialPostSchema.safeParse({
+        slug: 'prova-de-trabalho',
+        title: 'Título',
+        excerpt: 'Resumo',
+        category: 'Mercado',
+        dateLabel: '12 de setembro',
+        readingMinutes: 0,
+        imageUrl: 'x',
+      }).success,
+    ).toBe(false)
+    expect(
+      editorialPromoSchema.safeParse({ kind: 'genesis', title: 'T', excerpt: 'E', imageUrl: 'x' })
+        .success,
+    ).toBe(true)
+    expect(
+      editorialPostDetailSchema.safeParse({
+        slug: 'prova-de-trabalho',
+        title: 'Título',
+        excerpt: 'Resumo',
+        category: 'NFTs',
+        dateLabel: '12 de setembro',
+        readingMinutes: 6,
+        imageUrl: 'x',
+        body: [],
+      }).success,
+    ).toBe(false)
   })
 
   it('parses socket payloads and error envelopes', () => {

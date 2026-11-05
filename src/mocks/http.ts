@@ -35,6 +35,7 @@ import {
 } from '@/contracts/commerce'
 import type { ErrorCode, FieldError } from '@/contracts/common'
 import { catalogNetworks, categories } from '@/contracts/common'
+import { presentEditorialHome, presentEditorialPost } from './editorial'
 import { mergedLineQuantity, nextLineQuantity } from '@/lib/cart'
 import { addEth, cmpEth, mulEth } from '@/lib/money'
 import { HttpResponse, http } from 'msw'
@@ -482,6 +483,20 @@ function markAvailability(db: Database, cart: CartRecord, scenario: Scenario) {
 }
 
 export const httpHandlers = [
+  http.get('/api/editorial', async ({ request }) => {
+    const result = await gate(request)
+    if (!result.ok) return result.response
+    return HttpResponse.json(presentEditorialHome())
+  }),
+
+  http.get('/api/editorial/posts/:slug', async ({ request, params }) => {
+    const result = await gate(request)
+    if (!result.ok) return result.response
+    const post = presentEditorialPost(String(params.slug))
+    if (!post) return apiError(404, 'not_found', 'Esse artigo não existe no diário.')
+    return HttpResponse.json(post)
+  }),
+
   http.post('/api/newsletter', async ({ request }) => {
     const result = await gate(request)
     if (!result.ok) return result.response

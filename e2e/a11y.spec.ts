@@ -19,6 +19,12 @@ test('home, detail, cart, and login have no serious accessibility violations', a
   await expect(page.getByRole('heading', { level: 1, name: 'Aurora Relic' })).toBeVisible()
   await expectNoSeriousViolations(page)
 
+  await page.goto('/journal/raridade-atributos-e-procedencia')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Raridade, atributos e procedência' }),
+  ).toBeVisible()
+  await expectNoSeriousViolations(page)
+
   await page.goto('/cart')
   await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
   await expectNoSeriousViolations(page)

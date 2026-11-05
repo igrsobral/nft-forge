@@ -25,6 +25,7 @@ Telas que existem:
 | ---------------- | ---------------------- |
 | Início           | `/`                    |
 | Detalhe do NFT   | `/nfts/$nftId`         |
+| Artigo do diário | `/journal/$slug`       |
 | Carrinho         | `/cart`                |
 | Pagamento        | `/checkout`            |
 | Pedido           | `/orders/$orderId`     |
@@ -33,7 +34,7 @@ Telas que existem:
 | Carteiras        | `/wallets`             |
 | Rota inexistente | qualquer outro caminho |
 
-Checkout, perfil, carteiras e o pedido exigem sessão. O detalhe tem uma imagem por edição, não uma galeria de várias vistas. Não há regressão visual versionada nem a suíte E2E inteira do enunciado. O que falta está em [docs/testes.md](docs/testes.md).
+Checkout, perfil, carteiras e o pedido exigem sessão. O início agora traz, abaixo da paginação, os cartões de destaque e o Diário da Cunhagem, com artigos completos em `/journal/$slug`. O detalhe tem uma imagem por edição, não uma galeria de várias vistas. Não há regressão visual versionada nem a suíte E2E inteira do enunciado. O que falta está em [docs/testes.md](docs/testes.md).
 
 ## Início rápido
 

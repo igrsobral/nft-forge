@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import type { NftListQuery, NftSummary } from '@/contracts/catalog'
 import type { CatalogTab, Sort } from '@/contracts/common'
 import { CatalogFilters } from '@/components/catalog/catalog-filters'
+import { HomeEditorial } from '@/components/catalog/home-editorial'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -345,6 +346,7 @@ export function CatalogPage() {
           </div>
         </div>
       </section>
+      <HomeEditorial />
     </main>
   )
 }

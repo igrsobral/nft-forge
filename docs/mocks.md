@@ -14,6 +14,7 @@ Os handlers vivem no processo da página, não num servidor. [`src/main.tsx`](..
 
 - sessão: cadastro, login, logout, consulta
 - NFTs: lista com busca, filtros, ordenação e página; detalhe
+- editorial: `GET /api/editorial` (destaques e diário da cunhagem) e `GET /api/editorial/posts/:slug`
 - favoritos, carrinho, cotação, pedido
 - perfil, avatar, senha, carteiras e conexão simulada da carteira
 - controles: `POST /api/dev/reset`, `POST /api/dev/scenario`, `POST /api/dev/nfts/:id/tick`

@@ -15,6 +15,9 @@ export const queryKeys = {
   quote: (ownerKey: string, params: QuoteRequest) => ['quote', ownerKey, params] as const,
   orders: (userId: string | null) => ['orders', userId ?? 'anon'] as const,
   order: (userId: string | null, orderId: string) => ['order', userId ?? 'anon', orderId] as const,
+  editorial: (userId: string | null) => ['editorial', userId ?? 'anon'] as const,
+  editorialPost: (userId: string | null, slug: string) =>
+    ['editorial-post', userId ?? 'anon', slug] as const,
   profile: (userId: string | null) => ['profile', userId ?? 'anon'] as const,
   wallets: (userId: string | null) => ['wallets', userId ?? 'anon'] as const,
 }

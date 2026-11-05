@@ -3,6 +3,7 @@ import type { NftListQuery } from '@/contracts/catalog'
 import type { QuoteRequest } from '@/contracts/commerce'
 import { getSession, listWallets } from '@/lib/api/account'
 import { getNft, listNfts } from '@/lib/api/catalog'
+import { getEditorialHome, getEditorialPost } from '@/lib/api/editorial'
 import { createQuote, getCart, getOrder, listFavorites, listOrders } from '@/lib/api/commerce'
 import { queryKeys } from '@/lib/query-keys'
 
@@ -24,6 +25,20 @@ export function nftDetailQuery(userId: string | null, nftId: string) {
   return queryOptions({
     queryKey: queryKeys.nft(userId, nftId),
     queryFn: ({ signal }) => getNft(nftId, signal),
+  })
+}
+
+export function editorialHomeQuery(userId: string | null) {
+  return queryOptions({
+    queryKey: queryKeys.editorial(userId),
+    queryFn: ({ signal }) => getEditorialHome(signal),
+  })
+}
+
+export function editorialPostQuery(userId: string | null, slug: string) {
+  return queryOptions({
+    queryKey: queryKeys.editorialPost(userId, slug),
+    queryFn: ({ signal }) => getEditorialPost(slug, signal),
   })
 }
 
