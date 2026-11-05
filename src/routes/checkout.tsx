@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, MoreVertical, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Page } from '@/components/page'
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/checkout')({
     return { ...(coupon ? { coupon } : {}), ...pickAuth(search) }
   },
   beforeLoad: ({ location }) => requireSession(location.href),
-  head: () => ({ meta: [{ title: 'Checkout · Kurio' }] }),
+  head: () => ({ meta: [{ title: 'Pagamento com carteira · Kurio' }] }),
   component: CheckoutPage,
 })
 
@@ -53,25 +53,32 @@ function CheckoutPage() {
   const selected = pickWallet(wallets.data, walletId)
   const [acceptedTotal, setAcceptedTotal] = useState<string | null>(null)
   const [provider, setProvider] = useState('WalletConnect')
+  const [menuFor, setMenuFor] = useState<string | undefined>(undefined)
   const activeWalletId = selected?.id ?? ''
   const stale = Boolean(quote.data && acceptedTotal && acceptedTotal !== quote.data.totalEth)
   const blocked = !quote.data?.availabilityOk || stale || !selected?.connected
 
   const connect = useMutation({
-    mutationFn: (action: 'connect' | 'disconnect' | 'decline') =>
-      setWalletConnection(activeWalletId, action),
+    mutationFn: ({
+      walletId: target,
+      action,
+    }: {
+      walletId: string
+      action: 'connect' | 'disconnect' | 'decline'
+    }) => setWalletConnection(target, action),
     onSuccess: async () => {
+      setMenuFor(undefined)
       await queryClient.invalidateQueries({ queryKey: ['wallets'] })
     },
     onError: async (error) => {
-      toast.error(error instanceof ApiError ? error.message : 'The wallet did not connect.')
+      toast.error(error instanceof ApiError ? error.message : 'A carteira não conectou.')
       await queryClient.invalidateQueries({ queryKey: ['wallets'] })
     },
   })
 
   const place = useMutation({
     mutationFn: () => {
-      if (!quote.data || !selected) throw new Error('Review the order first')
+      if (!quote.data || !selected) throw new Error('Revise o pedido antes de pagar')
       return createOrder(
         {
           walletId: selected.id,
@@ -88,35 +95,44 @@ function CheckoutPage() {
       void navigate({ to: '/orders/$orderId', params: { orderId: order.id } })
     },
     onError: (error) => {
-      toast.error(error instanceof ApiError ? error.message : 'The order was not created.')
+      toast.error(error instanceof ApiError ? error.message : 'O pedido não foi criado.')
       void queryClient.invalidateQueries({ queryKey: ['quote'] })
       void queryClient.invalidateQueries({ queryKey: ['cart'] })
     },
   })
 
+  const pending = session.isPending || quote.isPending || wallets.isPending
+
   return (
-    <Page
-      title="Checkout"
-      titleClassName="type-t-18-bold text-foreground max-lg:sr-only lg:text-[32px] lg:leading-tight"
-      className="max-lg:pb-40"
-    >
-      <div className="lg:hidden">
-        <a href="/cart" aria-label="Voltar" className="mb-3 flex size-11 items-center">
+    <Page title="" titleClassName="sr-only" className="max-lg:pb-16">
+      <header className="relative mb-2 flex min-h-11 items-center justify-center">
+        <a
+          href="/cart"
+          aria-label="Voltar"
+          className="absolute left-0 flex size-11 items-center justify-center rounded-full border border-[#3f2319] bg-[#241612] text-foreground transition-colors hover:bg-[#2f1d15]"
+        >
           <ChevronLeft className="size-5" />
         </a>
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm text-[#c9a27a]">Carteira conectada</p>
-            <p className="font-bold">{roleLabel(selected?.role)}</p>
-            <p className="text-xs break-all text-[#c9a27a]">
-              {selected
-                ? `${shortAddress(selected.address)} · ${networkLabel(selected.network)}`
-                : 'Nenhuma carteira'}
-            </p>
-          </div>
+        <h1 className="type-b-16-bold text-foreground lg:text-[22px]">Pagamento com carteira</h1>
+      </header>
+
+      {pending ? <Skeleton className="h-40 w-full" /> : null}
+
+      {cart.data?.items.some((item) => item.changed) ? (
+        <p
+          role="status"
+          className="type-c-13 rounded-xl border border-accent px-3 py-2 text-accent"
+        >
+          O mercado andou enquanto o carrinho estava aberto. Confirme o novo total antes de pagar.
+        </p>
+      ) : null}
+
+      <section aria-label="Carteira conectada">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="type-b-14-bold text-foreground">Carteira conectada</h2>
           <a
             href="/profile/wallets"
-            className="flex min-h-11 shrink-0 items-center text-sm text-primary"
+            className="type-b-14 font-bold text-primary underline-offset-2 hover:underline"
           >
             Trocar carteira
           </a>
@@ -130,154 +146,193 @@ function CheckoutPage() {
                 key={wallet.id}
                 className={
                   checked
-                    ? 'flex min-h-11 items-start gap-3 rounded-xl border border-primary bg-[#24140f] px-3 py-3'
-                    : 'flex min-h-11 items-start gap-3 rounded-xl border border-transparent bg-[#24140f] px-3 py-3'
+                    ? 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-primary/60 bg-[#24140f] px-3 py-3'
+                    : 'relative flex min-w-0 items-center gap-3 rounded-2xl border border-[#3f2319] bg-[#24140f] px-3 py-3'
                 }
               >
                 <input
                   type="radio"
-                  name="wallet-mobile"
-                  className="mt-1 size-4 accent-primary"
+                  name="wallet"
+                  className="size-4 shrink-0 cursor-pointer accent-primary"
                   checked={checked}
                   onChange={() => setWalletId(wallet.id)}
                 />
-                <span className="min-w-0">
-                  <span className="block font-bold">{roleLabel(wallet.role)}</span>
-                  <span className="block text-xs break-all text-[#c9a27a]">
-                    {shortAddress(wallet.address)} · {networkLabel(wallet.network)}
+                <span className="min-w-0 flex-1">
+                  <span className="type-b-14-bold block truncate text-foreground">
+                    {roleLabel(wallet.role)}
+                  </span>
+                  <span className="type-b-14 block truncate text-foreground">
+                    {shortAddress(wallet.address)}
+                  </span>
+                  <span className="type-c-12 block text-[#8d847c]">
+                    {redeLabel(wallet.network)}
                   </span>
                 </span>
+                <button
+                  type="button"
+                  aria-label={`Ações da carteira ${roleLabel(wallet.role)}`}
+                  aria-haspopup="menu"
+                  onClick={() =>
+                    setMenuFor((current) => (current === wallet.id ? undefined : wallet.id))
+                  }
+                  className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#c9a27a] transition-colors hover:text-foreground"
+                >
+                  <MoreVertical className="size-4" />
+                </button>
+                {menuFor === wallet.id ? (
+                  <div
+                    role="menu"
+                    aria-label={`Carteira ${roleLabel(wallet.role)}`}
+                    className="absolute right-2 bottom-2 z-20 flex flex-col rounded-xl border border-[#3f2319] bg-[#2f1d15] p-1 shadow-lg"
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-foreground hover:bg-[#1a100c]"
+                      onClick={() =>
+                        connect.mutate({
+                          walletId: wallet.id,
+                          action: wallet.connected ? 'disconnect' : 'connect',
+                        })
+                      }
+                    >
+                      {wallet.connected ? 'Desconectar' : 'Conectar'}
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="type-b-14 cursor-pointer rounded-lg px-3 py-2 text-left whitespace-nowrap text-[#c9a27a] hover:bg-[#1a100c]"
+                      onClick={() => connect.mutate({ walletId: wallet.id, action: 'decline' })}
+                    >
+                      Simular recusa
+                    </button>
+                  </div>
+                ) : null}
               </label>
             )
           })}
         </fieldset>
-        <fieldset className="mt-5 grid gap-2">
-          <legend className="mb-2 text-sm text-foreground">Carteira e rede</legend>
+        {wallets.data && wallets.data.length === 0 ? (
+          <p className="type-c-13 text-[#c9a27a]">
+            Adicione uma carteira em{' '}
+            <a className="text-primary underline-offset-2 hover:underline" href="/profile/wallets">
+              Minhas carteiras
+            </a>{' '}
+            antes de pagar.
+          </p>
+        ) : null}
+      </section>
+
+      <section aria-label="Carteira e rede" className="mt-6">
+        <h2 className="type-b-14-bold mb-3 text-foreground">Carteira e rede</h2>
+        <fieldset className="grid gap-2">
+          <legend className="sr-only">Provedor de carteira</legend>
           {(['WalletConnect', 'MetaMask', 'Coinbase Wallet'] as const).map((name) => (
             <label
               key={name}
-              className="flex min-h-11 items-center justify-between gap-3 rounded-xl bg-[#24140f] px-3"
+              className="flex min-h-11 items-center gap-3 rounded-2xl border border-[#3f2319] bg-[#24140f] px-3 py-2.5"
             >
-              <span>{name}</span>
+              <span
+                aria-hidden
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#6a4332] bg-[#1a100c] text-[13px] font-bold text-primary"
+              >
+                {name === 'Coinbase Wallet' ? <Wallet className="size-4" /> : name.charAt(0)}
+              </span>
+              <span className="type-b-14 min-w-0 flex-1 truncate text-foreground">{name}</span>
               <input
                 type="radio"
                 name="provider"
-                className="size-4 accent-primary"
+                className="size-4 shrink-0 cursor-pointer accent-primary"
                 checked={provider === name}
                 disabled={!selected}
                 onChange={() => {
                   setProvider(name)
-                  if (selected && !selected.connected) connect.mutate('connect')
+                  if (selected && !selected.connected) {
+                    connect.mutate({ walletId: activeWalletId, action: 'connect' })
+                  }
                 }}
               />
             </label>
           ))}
         </fieldset>
-      </div>
-      {session.isPending || quote.isPending || wallets.isPending ? (
-        <Skeleton className="h-40 w-full" />
-      ) : null}
-      <p className="type-b-14 hidden text-text-secondary lg:block">
-        Collector {session.data?.user?.displayName} · {session.data?.user?.email}
+      </section>
+
+      <p className="type-c-13 mt-6 hidden text-[#c9a27a] lg:block">
+        Colecionador {session.data?.user?.displayName} · {session.data?.user?.email}
       </p>
-      {cart.data?.items.some((item) => item.changed) ? (
-        <p role="status" className="rounded-[10px] border border-accent px-3 py-2 text-accent">
-          The market moved while this cart was open. Confirm the new total before paying.
+
+      <div className="mt-7 flex items-baseline justify-end gap-3">
+        <span className="type-b-16-bold text-foreground">Total:</span>
+        {quote.data ? (
+          <span className="type-b-16-bold text-foreground" data-testid="checkout-total">
+            {formatEth(quote.data.totalEth)}
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-28" />
+        )}
+      </div>
+
+      {quote.data && !quote.data.availabilityOk ? (
+        <p role="alert" className="type-c-13 mt-3 text-destructive">
+          {quote.data.issues.map((issue) => issue.message).join(' ')}
         </p>
       ) : null}
-      <fieldset className="hidden gap-2 lg:grid">
-        <legend className="type-b-14 text-text-secondary">Wallet and network</legend>
-        {wallets.data?.map((wallet) => (
-          <label
-            key={wallet.id}
-            className="flex items-start gap-2 rounded-[10px] border border-line p-3"
-          >
-            <input
-              type="radio"
-              name="wallet"
-              checked={(selected?.id ?? '') === wallet.id}
-              onChange={() => setWalletId(wallet.id)}
-            />
-            <span>
-              <span className="type-b-14-bold block">{wallet.label}</span>
-              <span className="type-c-12 block text-text-secondary">
-                {wallet.role} · {wallet.network} · {wallet.connected ? 'connected' : 'disconnected'}
-              </span>
-              <span className="type-c-12 block break-all">{wallet.address}</span>
-            </span>
-          </label>
-        ))}
-      </fieldset>
-      {selected ? (
-        <div className="hidden flex-col gap-2 sm:flex-row lg:flex">
-          <Button type="button" variant="outline" onClick={() => connect.mutate('connect')}>
-            Connect
-          </Button>
-          <Button type="button" variant="outline" onClick={() => connect.mutate('disconnect')}>
-            Disconnect
-          </Button>
-          <Button type="button" variant="outline" onClick={() => connect.mutate('decline')}>
-            Simulate refusal
-          </Button>
-        </div>
-      ) : (
-        <p className="hidden text-text-secondary lg:block">
-          Add a wallet before paying.{' '}
-          <a className="text-accent" href="/profile/wallets">
-            Wallets
-          </a>
+      {stale ? (
+        <p role="status" className="type-c-13 mt-3 text-accent">
+          A cotação mudou. Confirme o novo total.
         </p>
-      )}
-      <p className="type-b-14 hidden lg:block">Network {selected?.network ?? '—'}</p>
+      ) : null}
       {quote.data ? (
-        <div className="grid gap-2">
-          {!quote.data.availabilityOk ? (
-            <p role="alert" className="text-destructive">
-              {quote.data.issues.map((issue) => issue.message).join(' ')}
-            </p>
-          ) : null}
-          <p className="type-b-16-bold text-accent" data-testid="checkout-total">
-            Total {formatEth(quote.data.totalEth)}
-          </p>
-          <label className="flex items-start gap-2">
-            <input
-              type="checkbox"
-              checked={acceptedTotal === quote.data.totalEth}
-              onChange={(event) =>
-                setAcceptedTotal(event.target.checked ? (quote.data?.totalEth ?? null) : null)
-              }
-            />
-            <span className="type-b-14">I confirm this total, fee, and availability.</span>
-          </label>
-          {stale ? (
-            <p role="status" className="text-accent">
-              The quote changed. Confirm the new total.
-            </p>
-          ) : null}
-        </div>
+        <label className="mt-3 flex cursor-pointer items-start gap-2">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 cursor-pointer accent-primary"
+            checked={acceptedTotal === quote.data.totalEth}
+            onChange={(event) =>
+              setAcceptedTotal(event.target.checked ? (quote.data?.totalEth ?? null) : null)
+            }
+          />
+          <span className="type-c-13 text-[#c9a27a]">
+            Confirmo este total, a taxa e a disponibilidade.
+          </span>
+        </label>
       ) : null}
-      <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:bg-[#140d0a] max-lg:p-3">
+
+      <Button
+        type="button"
+        className="mt-8 h-14 w-full rounded-full text-[15px] font-bold"
+        disabled={blocked || acceptedTotal !== quote.data?.totalEth || place.isPending || !selected}
+        onClick={() => place.mutate()}
+      >
+        {place.isPending ? 'Enviando…' : 'Confirmar compra'}
+      </Button>
+
+      <div className="hidden justify-center gap-2 lg:flex">
         <Button
           type="button"
-          className="h-11 w-full sm:w-auto"
-          disabled={
-            blocked || acceptedTotal !== quote.data?.totalEth || place.isPending || !selected
-          }
-          onClick={() => place.mutate()}
+          variant="outline"
+          onClick={() => connect.mutate({ walletId: activeWalletId, action: 'connect' })}
         >
-          {place.isPending ? (
-            'Sending…'
-          ) : (
-            <>
-              <span className="lg:hidden">Confirmar compra</span>
-              <span className="hidden lg:inline">Confirm purchase</span>
-            </>
-          )}
+          Conectar
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => connect.mutate({ walletId: activeWalletId, action: 'disconnect' })}
+        >
+          Desconectar
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => connect.mutate({ walletId: activeWalletId, action: 'decline' })}
+        >
+          Simular recusa
         </Button>
       </div>
-      <p className="type-c-12 hidden text-text-secondary lg:block">
-        Network on the wallet is {selected ? (selected.network as Network) : 'not selected'}. A
-        repeated click reuses the same idempotency key.
+      <p className="type-c-12 hidden text-[#c9a27a] lg:block">
+        Rede da carteira: {selected ? (selected.network as Network) : 'não selecionada'}. Um clique
+        repetido reutiliza a mesma chave de idempotência.
       </p>
     </Page>
   )
@@ -294,6 +349,11 @@ function networkLabel(network: string): string {
   if (network === 'polygon') return 'Polygon'
   if (network === 'base') return 'Base'
   return network
+}
+
+function redeLabel(network: string): string {
+  if (network === 'ethereum') return 'Rede principal Ethereum'
+  return `Rede ${networkLabel(network)}`
 }
 
 function shortAddress(address: string): string {

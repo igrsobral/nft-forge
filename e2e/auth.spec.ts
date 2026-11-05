@@ -105,7 +105,7 @@ test('resumes checkout after the login modal', async ({ page }) => {
   await page.getByRole('dialog').getByLabel('E-mail').fill('ada@collector.dev')
   await page.getByRole('dialog').getByLabel('Senha', { exact: true }).fill('orchid-harbor')
   await page.getByRole('dialog').locator('form').getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible()
 })
 
 test('closes the modal with escape', async ({ page }) => {

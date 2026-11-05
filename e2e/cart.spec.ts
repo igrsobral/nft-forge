@@ -46,7 +46,7 @@ test('changes quantity, validates coupons, opens checkout, and removes the item'
   await expect(page.getByTestId('quote-discount')).not.toHaveText('(-) 0 ETH')
 
   await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
-  await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible()
 
   await page.goBack()
   await page.getByRole('button', { name: 'Remover Aurora Relic' }).click()
