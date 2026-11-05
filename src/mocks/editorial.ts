@@ -4,7 +4,7 @@ import {
   editorialHomeSchema,
   editorialPostDetailSchema,
 } from '@/contracts/editorial'
-import { nftImageUrl } from './images'
+import { artUrlAt } from './images'
 
 export type EditorialPromoRecord = {
   kind: EditorialPromoKind
@@ -109,29 +109,31 @@ export const editorialPosts: EditorialPostRecord[] = [
   },
 ]
 
-function imageFor(title: string, hue: number, frame: number): string {
-  return nftImageUrl(title, 'Kurio Editorial', hue, frame)
+function imageAt(index: number): string {
+  return artUrlAt(index)
 }
 
 export function presentEditorialHome() {
   return editorialHomeSchema.parse({
-    promos: editorialPromos.map((promo) => ({
+    promos: editorialPromos.map((promo, index) => ({
       kind: promo.kind,
       title: promo.title,
       excerpt: promo.excerpt,
-      imageUrl: imageFor(promo.title, promo.hue, promo.frame),
+      imageUrl: imageAt(index),
     })),
     journal: editorialPosts
       .map(({ body: _body, ...post }) => post)
-      .map((post) => ({ ...post, imageUrl: imageFor(post.title, post.hue, post.frame) })),
+      .map((post, index) => ({ ...post, imageUrl: imageAt(index + editorialPromos.length) })),
   })
 }
 
 export function presentEditorialPost(slug: string) {
-  const post = editorialPosts.find((item) => item.slug === slug)
+  const postIndex = editorialPosts.findIndex((item) => item.slug === slug)
+  if (postIndex < 0) return null
+  const post = editorialPosts[postIndex]
   if (!post) return null
   return editorialPostDetailSchema.parse({
     ...post,
-    imageUrl: imageFor(post.title, post.hue, post.frame),
+    imageUrl: imageAt(postIndex + editorialPromos.length),
   })
 }

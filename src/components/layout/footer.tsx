@@ -82,25 +82,28 @@ export function Footer() {
 
   return (
     <footer className="px-4 pt-8 pb-10 lg:px-10">
-      <div className="mx-auto max-w-[1440px] bg-[#24140f]">
+      <div className="mx-auto w-full max-w-[1440px] bg-[#24140f]">
         <div className="grid gap-8 px-5 py-8 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.15fr] xl:divide-x xl:divide-[#d28a4c]/50">
           {features.map((feature) => (
-            <section key={feature.mark} className="flex gap-4 xl:px-5 xl:first:pl-0">
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+            <section
+              key={feature.mark}
+              className="flex flex-col items-start gap-2 sm:px-3 sm:first:pl-0"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">
                 {feature.mark}
               </span>
               <div>
                 <h2 className="type-b-14-bold text-foreground">{feature.title}</h2>
-                <p className="type-c-13 mt-2 text-[#c9a27a]">{feature.body}</p>
+                <p className="type-c-13 mt-1 text-[#c9a27a]">{feature.body}</p>
               </div>
             </section>
           ))}
-          <section className="xl:pl-6">
-            <h2 className="type-b-14-bold max-w-[16ch] text-foreground">
+          <section className="sm:pl-3">
+            <h2 className="type-b-14-bold max-w-[23ch] text-foreground">
               Antecipe-se ao próximo lançamento
             </h2>
             <form
-              className="mt-3 flex flex-col gap-2 sm:flex-row"
+              className="mt-2 flex flex-col gap-2 sm:flex-row sm:gap-1"
               onSubmit={(event) => {
                 event.preventDefault()
                 subscribe.mutate()
@@ -116,13 +119,13 @@ export function Footer() {
                   autoComplete="email"
                   aria-invalid={fieldError ? true : undefined}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="type-c-13 h-10 w-full rounded-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70"
+                  className="type-c-13 h-9 w-full rounded-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70 sm:h-6 sm:px-2"
                 />
               </label>
               <button
                 type="submit"
                 disabled={subscribe.isPending}
-                className="type-b-14-bold h-10 rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-60"
+                className="type-b-14-bold h-9 rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-60 sm:h-6 sm:px-2"
               >
                 {subscribe.isPending ? 'Enviando…' : 'Enviar'}
               </button>
@@ -132,26 +135,26 @@ export function Footer() {
                 {fieldError}
               </p>
             ) : (
-              <p className="type-c-13 mt-3 text-[#c9a27a]">
+              <p className="type-c-13 mt-2 text-[#c9a27a]">
                 Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
               </p>
             )}
           </section>
         </div>
 
-        <div className="grid gap-3 bg-[#3a261c] px-5 py-4 text-sm text-foreground md:grid-cols-4 md:items-center">
+        <div className="type-c-13 grid gap-3 bg-[#3a261c] px-4 py-3 text-foreground sm:grid-cols-4 sm:items-center sm:gap-0">
           <p className="font-bold tracking-[0.18em]">KURIO</p>
           <p>Feito para colecionadores, criadores e cultura</p>
           <a href="mailto:contato@email.com" className="hover:text-primary">
             contato@email.com
           </a>
-          <p className="md:text-right">+55 11 4002 8922</p>
+          <p className="sm:text-right">+55 11 4002 8922</p>
         </div>
 
-        <div className="grid gap-8 px-5 py-8 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-6 px-4 py-4 sm:grid-cols-4 sm:gap-4">
           <nav aria-label="Meu perfil">
-            <h2 className="type-b-14-bold mb-3 text-foreground">Meu perfil</h2>
-            <ul className="flex flex-col gap-2">
+            <h2 className="type-b-14-bold mb-2 text-foreground">Meu perfil</h2>
+            <ul className="flex flex-col gap-1.5 sm:gap-1">
               {profileLinks.map((item) => (
                 <li key={item.label}>
                   <Link to={item.to} className="type-c-13 text-[#c9a27a] hover:text-primary">
@@ -162,8 +165,8 @@ export function Footer() {
             </ul>
           </nav>
           <nav aria-label="Central de ajuda">
-            <h2 className="type-b-14-bold mb-3 text-foreground">Central de ajuda</h2>
-            <ul className="flex flex-col gap-2">
+            <h2 className="type-b-14-bold mb-2 text-foreground">Central de ajuda</h2>
+            <ul className="flex flex-col gap-1.5 sm:gap-1">
               <li>
                 <a
                   href="mailto:contato@email.com?subject=Ajuda"
@@ -201,8 +204,8 @@ export function Footer() {
             </ul>
           </nav>
           <nav aria-label="Coleções do rodapé">
-            <h2 className="type-b-14-bold mb-3 text-foreground">Coleções</h2>
-            <ul className="flex flex-col gap-2">
+            <h2 className="type-b-14-bold mb-2 text-foreground">Coleções</h2>
+            <ul className="flex flex-col gap-1.5 sm:gap-1">
               {collectionLinks.map((category) => (
                 <li key={category}>
                   <Link
@@ -217,17 +220,17 @@ export function Footer() {
             </ul>
           </nav>
           <div>
-            <h2 className="type-b-14-bold mb-3 text-foreground">Redes sociais</h2>
-            <ul className="flex flex-wrap gap-2">
+            <h2 className="type-b-14-bold mb-2 text-foreground">Redes sociais</h2>
+            <ul className="flex flex-wrap gap-1.5">
               {socials.map((item) => (
                 <li key={item.label}>
                   <a
                     href={item.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex size-9 items-center justify-center rounded-md border border-primary text-primary hover:bg-primary/10"
+                    className="flex size-8 items-center justify-center rounded-md border border-primary text-primary hover:bg-primary/10 sm:size-[18px] sm:rounded-sm"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
+                    <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current sm:size-3">
                       <path d={item.path} />
                     </svg>
                     <span className="sr-only">{item.label}</span>
@@ -235,16 +238,18 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <h2 className="type-b-14-bold mt-5 mb-3 text-foreground">Carteiras compatíveis</h2>
-            <p className="type-c-12 inline-flex rounded-full border border-primary px-3 py-1 tracking-wide whitespace-nowrap text-primary">
+            <h2 className="type-b-14-bold mt-4 mb-2 text-foreground sm:mt-3">
+              Carteiras compatíveis
+            </h2>
+            <p className="type-c-12 inline-flex rounded-full border border-primary px-2 py-1 tracking-wide text-primary">
               METAMASK · WALLETCONNECT · COINBASE
             </p>
           </div>
         </div>
-        <p className="type-c-12 px-5 pb-5 text-center text-[#c9a27a]">
-          © 2026 Kurio. Propriedade digital para todos.
-        </p>
       </div>
+      <p className="type-c-12 mx-auto mt-2 w-full max-w-[1440px] text-center text-[#c9a27a]">
+        © 2026 Kurio. Propriedade digital para todos.
+      </p>
     </footer>
   )
 }

@@ -15,10 +15,14 @@ const STATIC_NFT_ART = [
   '/nft/ape-solar.png',
 ] as const
 
+export function artUrlAt(index: number): string {
+  const slot = ((index % STATIC_NFT_ART.length) + STATIC_NFT_ART.length) % STATIC_NFT_ART.length
+  return STATIC_NFT_ART[slot] ?? STATIC_NFT_ART[0]
+}
+
 export function nftArtUrl(recordId: string): string {
   const index = Number.parseInt(recordId.replace(/^nft_/, ''), 10)
-  const slot = index > 0 ? (index - 1) % STATIC_NFT_ART.length : 0
-  return STATIC_NFT_ART[slot] ?? STATIC_NFT_ART[0]
+  return artUrlAt(index - 1)
 }
 
 export function nftImageUrl(name: string, _collection: string, hue: number, frame = 0): string {

@@ -16,3 +16,19 @@ export async function addEdition(page: Page, nftId = 'nft_01') {
   await page.getByRole('button', { name: /comprar/i }).click()
   await expect(page.getByTestId('cart-item')).toBeVisible()
 }
+
+/**
+ * Sai do carrinho para o pagamento: no mobile é a etapa separada `/checkout`;
+ * no desktop o pagamento já acontece na própria página do carrinho.
+ */
+export async function goToPayment(page: Page) {
+  if ((page.viewportSize()?.width ?? 1440) < 1024) {
+    await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+    await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible()
+  } else {
+    await expect(
+      page.getByRole('button', { name: /confirm purchase|confirmar compra/i }),
+    ).toBeVisible()
+    await expect(page.getByRole('checkbox', { name: /confirmo este total/i })).toBeVisible()
+  }
+}

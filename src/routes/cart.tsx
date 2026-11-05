@@ -4,6 +4,7 @@ import { ChevronLeft, Trash2 } from 'lucide-react'
 import { useState, useSyncExternalStore } from 'react'
 import { useOpenAuth } from '@/components/auth/auth-modal'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
+import { WalletPayment } from '@/components/checkout/wallet-payment'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CartItem } from '@/contracts/commerce'
@@ -67,7 +68,7 @@ function CartPage() {
   const hasItems = (cart.data?.items.length ?? 0) > 0
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-4 pb-28 lg:px-10 lg:py-8 lg:pb-8">
+    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-4 pb-28 lg:px-10 lg:py-8 lg:pb-8 xl:px-[50px] xl:pt-6">
       <header className="relative mb-5 flex min-h-11 items-center justify-center lg:hidden">
         <a
           href="/#catalogo"
@@ -78,8 +79,8 @@ function CartPage() {
         </a>
         <h1 className="type-b-16-bold text-foreground">Carrinho de NFTs</h1>
       </header>
-      <h1 className="type-t-18-bold mb-6 hidden text-foreground lg:block">Carrinho de NFTs</h1>
-      <p className="type-c-13 mb-6 hidden text-[#c9a27a] lg:block">
+      <h1 className="hidden lg:sr-only">Carrinho de NFTs</h1>
+      <p className="type-c-13 mb-6 hidden text-[#c9a27a] lg:mb-4 lg:block">
         <Link to="/" className="hover:text-primary">
           Início
         </Link>
@@ -117,7 +118,7 @@ function CartPage() {
       ) : null}
 
       {hasItems ? (
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,2.35fr)_minmax(320px,1fr)] xl:gap-24">
           <section aria-label="Itens do carrinho" className="min-w-0">
             {changed ? (
               <p
@@ -127,7 +128,17 @@ function CartPage() {
                 O preço ou o estoque mudou. O resumo usa a cotação mais recente.
               </p>
             ) : null}
-            <ul className="flex flex-col gap-3">
+            <div
+              aria-hidden="true"
+              className="hidden grid-cols-[minmax(0,1fr)_140px_150px_140px_50px] items-center border-b border-[#6a4332] pb-2 text-[18px] font-bold text-foreground xl:grid"
+            >
+              <span>NFTs</span>
+              <span>Preço</span>
+              <span className="text-center">Edições</span>
+              <span>Total</span>
+              <span />
+            </div>
+            <ul className="flex flex-col gap-3 xl:mt-3 xl:gap-3">
               {cart.data?.items.map((item) => (
                 <CartRow
                   key={item.id}
@@ -140,10 +151,18 @@ function CartPage() {
             </ul>
           </section>
 
-          <aside className="min-w-0 rounded-2xl border border-[#3f2319] bg-[#24140f] p-4 lg:p-5">
-            <h2 className="type-b-16-bold text-foreground max-lg:sr-only">Resumo da carteira</h2>
+          <aside className="min-w-0 rounded-2xl border border-[#3f2319] bg-[#24140f] p-4 lg:p-5 xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0">
+            <h2 className="type-b-16-bold text-foreground max-lg:sr-only xl:border-b xl:border-[#6a4332] xl:pb-2 xl:text-[20px] xl:leading-7">
+              Resumo da carteira
+            </h2>
+            <label
+              htmlFor="coupon"
+              className="type-b-14-bold mt-6 mb-2 hidden text-foreground xl:block"
+            >
+              Código promocional
+            </label>
             <form
-              className="flex items-center rounded-full border border-[#6a4332] bg-[#1a100c] p-1 pr-1 lg:mt-5"
+              className="mt-5 flex items-center rounded-full border border-[#6a4332] bg-[#1a100c] p-1 pr-1 xl:mt-0 xl:rounded-md xl:p-0"
               onSubmit={(event) => {
                 event.preventDefault()
                 setApplied(coupon.trim() || undefined)
@@ -157,11 +176,11 @@ function CartPage() {
                 value={coupon}
                 onChange={(event) => setCoupon(event.target.value)}
                 placeholder="Digite o código promocional..."
-                className="type-c-13 h-10 min-w-0 flex-1 bg-transparent px-4 text-foreground outline-none placeholder:text-[#c9a27a]/70"
+                className="type-c-13 h-10 min-w-0 flex-1 bg-transparent px-4 text-foreground outline-none placeholder:text-[#c9a27a]/70 xl:px-2"
               />
               <button
                 type="submit"
-                className="type-b-14-bold h-10 shrink-0 cursor-pointer rounded-full bg-gradient-cta px-5 text-primary-foreground transition-[filter] hover:brightness-110"
+                className="type-b-14-bold h-10 shrink-0 cursor-pointer rounded-full bg-gradient-cta px-5 text-primary-foreground transition-[filter] hover:brightness-110 xl:rounded-sm"
               >
                 Aplicar
               </button>
@@ -190,42 +209,55 @@ function CartPage() {
               </p>
             ) : null}
             {quote.data ? (
-              <dl data-testid="quote-summary" className="mt-6 grid gap-4 text-foreground lg:mt-7">
-                <div className="type-b-14 flex items-baseline justify-between gap-3">
+              <dl
+                data-testid="quote-summary"
+                className="mt-6 grid gap-4 text-foreground lg:mt-7 xl:mt-6"
+              >
+                <div className="type-b-14 flex items-baseline justify-between gap-3 xl:text-[16px] xl:leading-6">
                   <dt>Subtotal</dt>
                   <dd className="type-b-14-bold">{formatEth(quote.data.subtotalEth)}</dd>
                 </div>
-                <div className="type-b-14 flex items-baseline justify-between gap-3">
+                <div className="type-b-14 flex items-baseline justify-between gap-3 xl:text-[16px] xl:leading-6">
                   <dt>Desconto do lançamento</dt>
                   <dd className="type-b-14-bold" data-testid="quote-discount">
                     (-) {formatEth(quote.data.discountEth)}
                   </dd>
                 </div>
-                <div className="type-b-14 flex items-baseline justify-between gap-3">
+                <div className="type-b-14 flex items-baseline justify-between gap-3 xl:text-[16px] xl:leading-6">
                   <dt>Taxa de rede</dt>
                   <dd className="flex flex-col items-end">
                     <span className="type-b-14-bold">{formatEth(quote.data.networkFeeEth)}</span>
                     <span className="type-c-12 text-[#c9a27a]">Taxa estimada</span>
                   </dd>
                 </div>
-                <div className="type-b-16-bold mt-1 flex items-baseline justify-between gap-3 border-t border-[#6a4332] pt-4 text-foreground">
+                <div className="type-b-16-bold mt-1 flex items-baseline justify-between gap-3 border-t border-[#6a4332] pt-4 text-foreground xl:mt-5 xl:border-0 xl:pt-0 xl:text-[18px] xl:leading-6">
                   <dt>Total</dt>
-                  <dd data-testid="quote-total">{formatEth(quote.data.totalEth)}</dd>
+                  <dd data-testid="quote-total" className="xl:text-[#e89b55]">
+                    {formatEth(quote.data.totalEth)}
+                  </dd>
                 </div>
               </dl>
             ) : (
               <Skeleton className="mt-6 h-28 w-full" />
             )}
             {signedIn ? (
-              <Button asChild className="mt-6 h-12 w-full rounded-full text-[15px] font-bold">
-                <Link to="/checkout" search={checkoutSearch}>
-                  Conectar e finalizar
-                </Link>
-              </Button>
+              <>
+                <Button
+                  asChild
+                  className="mt-6 h-12 w-full rounded-full text-[15px] font-bold lg:hidden"
+                >
+                  <Link to="/checkout" search={checkoutSearch}>
+                    Conectar e finalizar
+                  </Link>
+                </Button>
+                <div className="hidden rounded-2xl lg:block">
+                  <WalletPayment couponCode={applied} embedded />
+                </div>
+              </>
             ) : (
               <button
                 type="button"
-                className="group/button inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-[15px] font-bold whitespace-nowrap text-primary-foreground transition-all outline-none select-none hover:brightness-110 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px"
+                className="group/button mt-4 inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-[15px] font-bold whitespace-nowrap text-primary-foreground transition-all outline-none select-none hover:brightness-110 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px xl:mt-6 xl:rounded-sm"
                 onClick={() => openAuth('login', loginRedirect)}
               >
                 Conectar e finalizar
@@ -234,7 +266,7 @@ function CartPage() {
             <Link
               to="/"
               hash="catalogo"
-              className="type-c-13 mt-3 block text-center text-[#c9a27a] hover:text-primary hover:underline"
+              className="type-c-13 mt-3 block text-center text-[#c9a27a] hover:text-primary hover:underline xl:mt-4 xl:text-[16px]"
             >
               Continuar explorando
             </Link>
@@ -264,41 +296,49 @@ function CartRow({
   return (
     <li
       data-testid="cart-item"
-      className="min-w-0 flex items-center gap-2.5 rounded-2xl border border-[#3f2319] bg-[#24140f] p-3"
+      className="min-w-0 flex items-center gap-2.5 rounded-2xl border border-[#3f2319] bg-[#24140f] p-3 xl:grid xl:grid-cols-[minmax(0,1fr)_140px_150px_140px_50px] xl:gap-0 xl:rounded-none xl:border-0 xl:bg-[#241612] xl:p-0 xl:odd:bg-[#241612] xl:even:bg-[#20130f]"
     >
-      <img
-        src={item.imageUrl}
-        alt=""
-        width={56}
-        height={56}
-        className="size-14 shrink-0 rounded-xl object-cover"
-      />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] leading-tight font-bold text-foreground">
-          {item.name} {item.tokenId}
-        </p>
-        <p className="type-c-12 mt-1 text-[#c9a27a]">Edição: {item.editionName}</p>
-        <p className="type-b-16-bold mt-1.5 text-primary">
-          {formatEth(item.unitPriceEth)}
-          <span className="sr-only">
-            {' '}
-            ID do token: {item.tokenId} · edição {item.editionName}
-          </span>
-        </p>
+      <div className="flex min-w-0 flex-1 items-center gap-2.5 xl:gap-4">
+        <img
+          src={item.imageUrl}
+          alt=""
+          width={56}
+          height={56}
+          className="size-14 shrink-0 rounded-xl object-cover xl:size-20 xl:rounded-lg"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] leading-tight font-bold text-foreground xl:text-[18px]">
+            {item.name} {item.tokenId}
+          </p>
+          <p className="type-c-12 mt-1 text-[#c9a27a] xl:hidden">Edição: {item.editionName}</p>
+          <p className="type-c-12 mt-1 hidden text-[#b39463] xl:block">
+            ID do token: {item.tokenId}
+          </p>
+          <p className="type-b-16-bold mt-1.5 text-primary xl:hidden">
+            {formatEth(item.unitPriceEth)}
+            <span className="sr-only">
+              {' '}
+              ID do token: {item.tokenId} · edição {item.editionName}
+            </span>
+          </p>
+        </div>
       </div>
-      <div className="relative flex shrink-0 items-center gap-1.5">
+      <p className="hidden xl:block xl:text-[18px] xl:font-bold xl:text-[#cfb28c]">
+        {formatEth(item.unitPriceEth)}
+      </p>
+      <div className="relative flex shrink-0 items-center gap-1.5 xl:static xl:justify-self-center xl:gap-3">
         <button
           type="button"
           aria-label="Diminuir quantidade"
           disabled={pending || item.quantity <= 1}
           onClick={() => onQuantity(item.quantity - 1)}
-          className="flex size-7 cursor-pointer items-center justify-center rounded-full border border-[#6a4332] bg-[#1a100c] text-[#c9a27a] transition-colors hover:text-foreground disabled:opacity-40"
+          className="flex size-7 cursor-pointer items-center justify-center rounded-full border border-[#6a4332] bg-[#1a100c] text-[#c9a27a] transition-colors hover:text-foreground disabled:opacity-40 xl:size-8 xl:border-0 xl:bg-[#d28a4c] xl:text-[#140d0a]"
         >
           −
         </button>
         <span
           data-testid="cart-quantity"
-          className="min-w-5 text-center text-[14px] font-bold text-foreground"
+          className="min-w-5 text-center text-[14px] font-bold text-foreground xl:text-[18px]"
         >
           {item.quantity}
         </span>
@@ -307,7 +347,7 @@ function CartRow({
           aria-label="Aumentar quantidade"
           disabled={pending || item.quantity >= max}
           onClick={() => onQuantity(item.quantity + 1)}
-          className="relative flex size-7 cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-primary-foreground transition-[filter] hover:brightness-110 disabled:opacity-40"
+          className="relative flex size-7 cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-primary-foreground transition-[filter] hover:brightness-110 disabled:opacity-40 xl:size-8 xl:bg-[#d28a4c] xl:text-[#140d0a]"
         >
           +
         </button>
@@ -316,11 +356,23 @@ function CartRow({
           aria-label={`Remover ${item.name}`}
           disabled={pending}
           onClick={onRemove}
-          className="absolute bottom-0 right-0 z-10 flex size-7 translate-x-[55%] translate-y-[55%] cursor-pointer items-center justify-center rounded-full text-primary transition-colors hover:text-destructive disabled:opacity-40"
+          className="absolute bottom-0 right-0 z-10 flex size-7 translate-x-[55%] translate-y-[55%] cursor-pointer items-center justify-center rounded-full text-primary transition-colors hover:text-destructive disabled:opacity-40 xl:hidden"
         >
           <Trash2 className="size-3.5" />
         </button>
       </div>
+      <p className="hidden xl:block xl:text-[18px] xl:font-bold xl:text-[#e89b55]">
+        {formatEth(item.lineTotalEth)}
+      </p>
+      <button
+        type="button"
+        aria-label={`Remover ${item.name}`}
+        disabled={pending}
+        onClick={onRemove}
+        className="hidden size-8 cursor-pointer items-center justify-center text-[#b39463] transition-colors hover:text-destructive disabled:opacity-40 xl:flex"
+      >
+        <Trash2 className="size-5" />
+      </button>
     </li>
   )
 }

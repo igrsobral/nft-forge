@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { goToPayment } from './support'
 
 test('signs in, checks out, and shows the confirmed receipt', async ({ page }) => {
   await page.goto('/?reset=1')
@@ -12,9 +13,8 @@ test('signs in, checks out, and shows the confirmed receipt', async ({ page }) =
 
   await page.goto('/nfts/nft_01')
   await page.getByRole('button', { name: /comprar/i }).click()
-  await expect(page.getByTestId('cart-item')).toBeVisible()
-  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
-  await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible()
+  await page.getByTestId('cart-item').waitFor()
+  await goToPayment(page)
   await page.getByRole('checkbox', { name: /confirmo este total/i }).check()
   await page.getByRole('button', { name: /confirm purchase|confirmar compra/i }).click()
   const receipt = page.getByRole('dialog')

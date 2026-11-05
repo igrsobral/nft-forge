@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addEdition, signIn } from './support'
+import { addEdition, goToPayment, signIn } from './support'
 
 test('sends anonymous visitors away from protected routes and shows a 404', async ({ page }) => {
   await page.goto('/?reset=1')
@@ -35,7 +35,7 @@ test('clears an expired session and keeps the cart when payment is declined', as
   await signIn(page)
   await addEdition(page)
   await page.evaluate(() => localStorage.setItem('nft-market:scenario', 'payment_declined'))
-  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+  await goToPayment(page)
   await page.getByRole('checkbox', { name: /confirmo este total/i }).check()
   await page.getByRole('button', { name: /confirm purchase|confirmar compra/i }).click()
   await expect(page.getByRole('heading', { name: 'Pagamento recusado' })).toBeVisible()
@@ -49,7 +49,7 @@ test('retries a timed-out order with the same idempotency key', async ({ page })
   await signIn(page)
   await addEdition(page)
   await page.evaluate(() => localStorage.setItem('nft-market:scenario', 'order_timeout'))
-  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
+  await goToPayment(page)
   await page.getByRole('checkbox', { name: /confirmo este total/i }).check()
   await page.getByRole('button', { name: /confirm purchase|confirmar compra/i }).click()
   await expect(page.getByText(/timed out/)).toBeVisible({ timeout: 20_000 })

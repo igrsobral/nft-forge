@@ -7,7 +7,7 @@ describe('mock editorial', () => {
     expect(home.promos).toHaveLength(2)
     expect(home.journal).toHaveLength(4)
     for (const item of [...home.promos, ...home.journal]) {
-      expect(item.imageUrl).toMatch(/^data:image\/svg\+xml/)
+      expect(item.imageUrl).toMatch(/^\/nft\/ape-/)
     }
     expect(home.journal[0]).toMatchObject({
       slug: 'prova-de-trabalho-de-nfts',

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { goToPayment } from './support'
 
 test('changes quantity, validates coupons, opens checkout, and removes the item', async ({
   page,
@@ -45,10 +46,11 @@ test('changes quantity, validates coupons, opens checkout, and removes the item'
   await expect(page.getByTestId('coupon-error')).toHaveCount(0)
   await expect(page.getByTestId('quote-discount')).not.toHaveText('(-) 0 ETH')
 
-  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
-  await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible()
+  await goToPayment(page)
 
-  await page.goBack()
+  if ((page.viewportSize()?.width ?? 1440) < 1024) {
+    await page.goBack()
+  }
   await page.getByRole('button', { name: 'Remover Aurora Relic' }).click()
   await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
 })
