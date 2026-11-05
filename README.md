@@ -1,150 +1,95 @@
-# Kurio — marketplace de NFTs
+# Kurio — marketplace de arte digital
 
-Aplicação do desafio de frontend da Jungle Gaming. O colecionador descobre edições, filtra o catálogo pela URL, acompanha preço ao vivo, monta um carrinho, confirma uma cotação e recebe um recibo só depois que a simulação de pagamento confirma o pedido. Conta, perfil e carteiras passam pela mesma API simulada.
+Kurio é uma aplicação de demonstração para descobrir e colecionar edições digitais. Explore o catálogo, filtre resultados pela URL, acompanhe mudanças de mercado e experimente o fluxo de compra — da cotação ao recibo.
 
-Não há backend real. REST e Socket.IO são interceptados no navegador pelo MSW, inclusive no build de produção. O arquivo do Figma não foi aberto nesta entrega (o acesso exige login no app desktop). As cores e a fonte seguem os tokens publicados do desafio — tinta `#140d0a`, cobre `#d28a4c`, Roboto Mono — em [`src/index.css`](src/index.css). A composição das telas não reproduz os frames.
+> **Demonstração de frontend:** não há backend, carteira ou transação blockchain reais. A API REST e os eventos Socket.IO são simulados no navegador pelo [MSW](src/mocks). Os dados de demonstração são locais.
 
-## O que está entregue
+## Arte em destaque
 
-| Requisito                                           | No projeto                                                                         | Onde olhar                                                                                                                                         |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TanStack Router, rotas por arquivo e busca validada | Sim                                                                                | [`src/routes`](src/routes), [`vite.config.ts`](vite.config.ts), [`src/router.tsx`](src/router.tsx)                                                 |
-| TanStack Query                                      | Sim                                                                                | [`src/lib/query-client.ts`](src/lib/query-client.ts), [`src/lib/queries.ts`](src/lib/queries.ts), [`src/lib/query-keys.ts`](src/lib/query-keys.ts) |
-| Axios, uma instância                                | Sim                                                                                | [`src/lib/api/client.ts`](src/lib/api/client.ts)                                                                                                   |
-| REST com contratos                                  | Sim                                                                                | [`src/contracts`](src/contracts), [`src/mocks/http.ts`](src/mocks/http.ts)                                                                         |
-| Socket.IO no cliente                                | Sim                                                                                | [`src/realtime/socket.ts`](src/realtime/socket.ts), [`src/realtime/bridge.tsx`](src/realtime/bridge.tsx)                                           |
-| Tailwind CSS                                        | Sim                                                                                | [`src/index.css`](src/index.css)                                                                                                                   |
-| shadcn/ui                                           | Sim, primitivos usados de fato                                                     | [`src/components/ui`](src/components/ui), [`components.json`](components.json)                                                                     |
-| MSW e `@mswjs/socket.io-binding`                    | Sim                                                                                | [`src/mocks`](src/mocks), [`public/mockServiceWorker.js`](public/mockServiceWorker.js)                                                             |
-| Playwright                                          | Sim, cobertura parcial                                                             | [`e2e`](e2e), [`playwright.config.ts`](playwright.config.ts)                                                                                       |
-| Lighthouse                                          | Configurado e executado uma vez neste ambiente; relatórios locais, não versionados | [`lighthouserc.mobile.cjs`](lighthouserc.mobile.cjs), [`lighthouserc.desktop.cjs`](lighthouserc.desktop.cjs), [docs/testes.md](docs/testes.md)     |
+As imagens abaixo são parte dos assets de demonstração usados pelo catálogo — não são capturas de tela da interface.
 
-Telas que existem:
+<table>
+  <tr>
+    <td align="center"><img src="public/nft/ape-emerald.png" alt="Arte NFT Ape Emerald" width="180"><br><strong>Ape Emerald</strong></td>
+    <td align="center"><img src="public/nft/ape-sage.png" alt="Arte NFT Ape Sage" width="180"><br><strong>Ape Sage</strong></td>
+    <td align="center"><img src="public/nft/ape-solar.png" alt="Arte NFT Ape Solar" width="180"><br><strong>Ape Solar</strong></td>
+    <td align="center"><img src="public/nft/ape-neon.png" alt="Arte NFT Ape Neon" width="180"><br><strong>Ape Neon</strong></td>
+  </tr>
+</table>
 
-| Tela             | Rota                   |
-| ---------------- | ---------------------- |
-| Início           | `/`                    |
-| Detalhe do NFT   | `/nfts/$nftId`         |
-| Artigo do diário | `/journal/$slug`       |
-| Carrinho         | `/cart`                |
-| Pagamento        | `/checkout`            |
-| Pedido           | `/orders/$orderId`     |
-| Login e cadastro | `/login`, `/signup`    |
-| Perfil           | `/profile`             |
-| Carteiras        | `/wallets`             |
-| Rota inexistente | qualquer outro caminho |
+## Recursos
 
-Checkout, perfil, carteiras e o pedido exigem sessão. O início agora traz, abaixo da paginação, os cartões de destaque e o Diário da Cunhagem, com artigos completos em `/journal/$slug`. O detalhe tem uma imagem por edição, não uma galeria de várias vistas. Não há regressão visual versionada nem a suíte E2E inteira do enunciado. O que falta está em [docs/testes.md](docs/testes.md).
+- Catálogo com busca, filtros, ordenação e paginação sincronizados com a URL.
+- Página de detalhe com edições, favoritos e atualização de mercado em tempo real.
+- Carrinho, cotação, cupons e checkout com chave de idempotência.
+- Conta de demonstração, perfil, carteiras simuladas e histórico de pedidos.
+- Cenários controláveis para testar latência, indisponibilidade, conflitos e resultados de pagamento.
+- Telemetria de navegador com OpenTelemetry, ativada apenas quando configurada.
 
-## Início rápido
+O visual usa os tokens de cor e a tipografia publicados para o desafio (tinta `#140d0a`, cobre `#d28a4c` e Roboto Mono). A composição não é uma reprodução dos frames do Figma.
 
-Verificado neste ambiente: Node `v22.23.4` e pnpm `10.33.4` (`packageManager` no `package.json`). Use Node 22 ou mais novo e pnpm 10.
+## Tecnologias
+
+React 19 · TypeScript · Vite · TanStack Router e Query · Axios · Zod · Tailwind CSS · shadcn/ui · MSW · Socket.IO · Vitest · Playwright
+
+## Começar
+
+Requisitos: **Node.js 22 ou superior** e **pnpm 10** (o repositório fixa pnpm `10.33.4`).
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-O servidor de desenvolvimento sobe em [http://127.0.0.1:4471](http://127.0.0.1:4471), com os mocks ligados. Não é preciso criar `.env`: os padrões estão em [`src/lib/env.ts`](src/lib/env.ts). O modelo está em [`.env.example`](.env.example).
+Abra [http://127.0.0.1:4471](http://127.0.0.1:4471). Os mocks ficam ligados por padrão; não é necessário configurar um backend nem criar um arquivo `.env` para experimentar a aplicação. Consulte [`.env.example`](.env.example) para opções de configuração.
 
-| Comando              | O que faz                                                                        | Verificado                                                                                                                        |
-| -------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm typecheck`     | `tsc -b` em app, config do Vite e e2e                                            | Sim                                                                                                                               |
-| `pnpm lint`          | Biome (`check`) em todos os arquivos                                             | Sim                                                                                                                               |
-| `pnpm lint:fix`      | Biome com correções automáticas                                                  | Sim                                                                                                                               |
-| `pnpm check`         | `biome check .` + `pnpm typecheck`                                               | Sim                                                                                                                               |
-| `pnpm build`         | Typecheck e build de produção, com o worker do MSW                               | Sim                                                                                                                               |
-| `pnpm preview`       | Serve `dist` em [http://127.0.0.1:4472](http://127.0.0.1:4472)                   | Sim, responde 200                                                                                                                 |
-| `pnpm test:unit`     | Vitest da lógica (dinheiro, contratos, carrinho, sessão, tempo real)             | Sim, ver [docs/testes.md](docs/testes.md)                                                                                         |
-| `pnpm test:coverage` | A mesma suíte com cobertura v8 e limiares                                        | Sim                                                                                                                               |
-| `pnpm test:e2e`      | Instala o Chromium do Playwright, se faltar, e roda desktop e mobile             | Sim, ver [docs/testes.md](docs/testes.md)                                                                                         |
-| `pnpm lighthouse`    | `pnpm build` e depois três coletas mobile e três desktop de `/` e `/nfts/nft_01` | Sim, saiu com código 0. Medianas em [docs/testes.md](docs/testes.md). Os HTML/JSON ficam em `.lighthouseci/` e não vão para o git |
-| `pnpm format:check`  | Biome em modo verificação                                                        | Sim                                                                                                                               |
+### Verificações
 
-`pnpm test:unit` roda o Vitest. `pnpm test:coverage` exige os limiares de `vitest.config.ts`. O Playwright continua em `pnpm test:e2e`.
+| Comando | Descrição |
+| --- | --- |
+| `pnpm check` | Biome e verificação de tipos TypeScript |
+| `pnpm test:unit` | Testes unitários com Vitest |
+| `pnpm test:coverage` | Testes unitários com relatório de cobertura v8 e limiares configurados |
+| `pnpm test:e2e` | Testes Playwright em desktop e viewport mobile |
+| `pnpm build` | Verificação de tipos e build de produção |
+| `pnpm preview` | Pré-visualização do build em `http://127.0.0.1:4472` |
+| `pnpm lighthouse` | Build e auditorias Lighthouse mobile e desktop |
 
-### Qualidade de código (Biome, Husky, commitlint)
+Mais detalhes sobre cobertura, fluxos exercitados e limitações estão em [docs/testes.md](docs/testes.md).
 
-O lint, o estilo e a organização de imports ficam no [Biome](biome.json). O hooks do Git (`.husky/`) rodam o lint-staged no pre-commit (Biome apenas nos arquivos em stage) e o [commitlint](commitlint.config.js) no commit-msg, que exige Conventional Commits (`feat:`, `fix:`, `chore:`...).
+## Rotas principais
 
-```bash
-git commit -m 'feat: new checkout flow'
-```
+| Página | Rota |
+| --- | --- |
+| Catálogo | `/` |
+| Detalhe de NFT | `/nfts/:nftId` |
+| Diário da Cunhagem | `/journal/:slug` |
+| Carrinho e checkout | `/cart`, `/checkout` |
+| Pedido | `/orders/:orderId` |
+| Login e cadastro | `/login`, `/signup` |
+| Perfil e carteiras | `/profile`, `/wallets` |
 
-## Observabilidade (OpenTelemetry)
+Checkout, perfil, carteiras e detalhes do pedido exigem uma sessão de demonstração.
 
-Traces no navegador com o SDK web do OpenTelemetry, em [`src/lib/telemetry.ts`](src/lib/telemetry.ts). A coleta é opt-in: sem `VITE_OTEL_EXPORTER_OTLP_ENDPOINT`, nada é enviado e o chunk da telemetria nem entra no carregamento inicial.
+## Acesso de demonstração
 
-O que cada carga captura:
+| Colecionador | E-mail | Senha |
+| --- | --- | --- |
+| Ada Marlowe | `ada@collector.dev` | `orchid-harbor` |
+| Leo Okonkwo | `leo@collector.dev` | `marble-gallery` |
 
-| Fonte                  | Spans gerados                                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Carregamento da página | `documentFetch`, `documentLoad` e timings de recursos (via `DocumentLoadInstrumentation`)                                |
-| REST e Socket.IO       | `XMLHttpRequest.send` com método, URL e status — cobre axios e o polling do socket (via `XMLHttpRequestInstrumentation`) |
-| Erros da janela        | `window.error` e `window.unhandledrejection` com o evento `exception`                                                    |
+Cupons disponíveis: `WELCOME10` (10% de desconto) e `ARCHIVE5` (5%). `SPRING24` está expirado. Todos os dados podem ser reiniciados localmente com `/?reset=1`.
 
-Propagação W3C (`traceparent`/`baggage`) segue de ponta a ponta: requests same-origin já propagam e o endpoint do coletor é ignorado para não criar spans em loop. Os spans saem pós-batch (5 s), são descartados com fila cheia (200) e recebem flush quando a aba é escondida ou fecha. Quem recebê-los pode ser Jaeger, Grafana Tempo, Datadog ou qualquer backend OTLP.
+## Cenários e telemetria
 
-```bash
-# coletor local com Jaeger all-in-one
-docker run --rm -p 4318:4318 -p 16686:16686 jaegertracing/all-in-one:latest
-echo 'VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318/v1/traces' >> .env
-pnpm dev
-```
+O cenário de mock padrão é `success`. Para abrir a aplicação diretamente em outro cenário, use `/?scenario=offline` (ou `empty`, `latency`, `http_error`, `expired_session`, `price_changed`, `sold_out`, `order_timeout`, `payment_confirmed` e outros). O laboratório de mocks também fica disponível no cabeçalho em larguras a partir de 640 px. A lista completa e o comportamento de cada cenário estão em [docs/mocks.md](docs/mocks.md).
 
-Variáveis em [`.env.example`](.env.example): `VITE_OTEL_ENABLED` (kill switch), `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` (OTLP/HTTP), `VITE_OTEL_SERVICE_NAME`, `VITE_OTEL_SAMPLE_RATIO` (amostragem pais-filhos) e `VITE_OTEL_ENVIRONMENT`. Para spans manuais, use `withSpan` de `@/lib/telemetry` (via import dinâmico); o resto da aplicação não precisa mudar.
+Para enviar traces, defina `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` em `.env`; sem um endpoint configurado, a telemetria não é carregada. Consulte o guia de [observabilidade](docs/observabilidade.md) e [`.env.example`](.env.example).
 
-## Contas e cupons
+## Documentação
 
-As senhas do seed são PBKDF2-SHA256 (10 000 iterações), não texto puro. A implementação está em [`src/mocks/password.ts`](src/mocks/password.ts).
-
-| Colecionador | E-mail              | Senha            |
-| ------------ | ------------------- | ---------------- |
-| Ada Marlowe  | `ada@collector.dev` | `orchid-harbor`  |
-| Leo Okonkwo  | `leo@collector.dev` | `marble-gallery` |
-
-A Ada já tem carteira principal na Ethereum (conectada) e secundária na Base. O Leo tem carteira principal na Polygon.
-
-| Cupom                 | Efeito               |
-| --------------------- | -------------------- |
-| `WELCOME10`           | 10% sobre o subtotal |
-| `ARCHIVE5`            | 5% sobre o subtotal  |
-| `SPRING24`            | Expirado             |
-| Qualquer outro código | Inválido             |
-
-A taxa de rede é `0.0015` ETH quando o carrinho tem itens. Valores em ETH são strings decimais.
-
-## Cenários de mock
-
-Prioridade: `?scenario=` na carga da página grava `localStorage`, e essa chave ganha do ambiente. Sem chave gravada, vale `VITE_MOCK_SCENARIO`. Sem os dois, o cenário é `success`.
-
-`?reset=1` apaga o banco, o token e o id do usuário e recria o seed. Não apaga o cenário escolhido.
-
-O laboratório no cabeçalho (a partir de 640 px) chama `POST /api/dev/scenario` e `POST /api/dev/reset`. Esses dois caminhos não passam pelo bloqueio de `offline` e `http_error`.
-
-| Cenário             | Como ver o efeito                                                                                                    |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `success`           | Catálogo normal. O pedido nasce `pending` e o socket confirma em seguida.                                            |
-| `empty`             | A listagem volta vazia. `/nfts/nft_01` continua abrindo.                                                             |
-| `latency`           | Cada URL espera um atraso determinístico (350–1649 ms), então uma busca mais nova pode terminar antes.               |
-| `offline`           | As chamadas `/api` falham como queda de rede.                                                                        |
-| `http_error`        | As chamadas `/api` respondem 503 `transient`.                                                                        |
-| `expired_session`   | Qualquer request com `Authorization` recebe 401. O login sem token ainda cria sessão, mas ela já nasce expirada.     |
-| `unauthorized`      | Com sessão válida, rotas privadas respondem 403. O catálogo público segue.                                           |
-| `signup_conflict`   | Todo cadastro responde 409, mesmo com e-mail novo.                                                                   |
-| `invalid_coupon`    | Todo cupom é inválido.                                                                                               |
-| `expired_coupon`    | Todo cupom está expirado.                                                                                            |
-| `price_changed`     | O `POST /api/orders` sobe o preço, emite `nft.updated` e responde 409.                                               |
-| `sold_out`          | O `POST /api/orders` zera o estoque das edições do carrinho, emite `nft.updated` e responde 409.                     |
-| `order_timeout`     | O pedido é gravado e a resposta HTTP espera 60 s. O Axios corta em 10 s. O mesmo `Idempotency-Key` devolve o pedido. |
-| `payment_confirmed` | A resposta de criação já vem `confirmed`, e o socket também emite.                                                   |
-| `payment_declined`  | O pedido fica `pending` e o socket marca `declined`. O carrinho é mantido.                                           |
-
-Na página da edição, **Simulate market move** chama `POST /api/dev/nfts/:id/tick`. O preço na tela só muda quando chega `nft.updated`. O corpo do POST não é escrito no cache.
-
-Detalhe do mock, do binding e do build de demonstração: [docs/mocks.md](docs/mocks.md).
-
-## Onde continuar
-
-- Arquitetura, fluxo de dados, tempo real e dinheiro: [ARCHITECTURE.md](ARCHITECTURE.md)
-- Testes, limitações e deploy: [docs/testes.md](docs/testes.md)
+- [Arquitetura e fluxo de dados](ARCHITECTURE.md)
+- [Camada de mocks e cenários](docs/mocks.md)
+- [Observabilidade com OpenTelemetry](docs/observabilidade.md)
+- [Testes, cobertura e limitações](docs/testes.md)
+- [Visão geral dos contratos](src/contracts)

@@ -1,18 +1,18 @@
-# Testes
+# Testes e qualidade
 
-Os testes de lógica rodam no Vitest. Os fluxos de ponta a ponta rodam no Playwright, em desktop 1440×900 e no Pixel 5. Cada teste E2E começa em `/?reset=1`, que zera o banco, o token e o id do usuário daquele contexto. Os dois projetos não compartilham `localStorage`.
+Os testes unitários e de integração rodam no Vitest. Os fluxos de ponta a ponta rodam no Playwright em desktop (1440 × 900) e no perfil Pixel 5. Cada teste E2E começa em `/?reset=1`, que reinicia os dados e a sessão daquele contexto. Os projetos desktop e mobile não compartilham `localStorage`.
 
 ## Como rodar
 
-| Comando              | O que faz                                                      |
-| -------------------- | -------------------------------------------------------------- |
-| `pnpm test:unit`     | Vitest, sem cobertura                                          |
-| `pnpm test:coverage` | Vitest com c8/v8. O relatório sai no terminal e em `coverage/` |
-| `pnpm test:e2e`      | Instala o Chromium, se faltar, e roda os dois projetos         |
-| `pnpm typecheck`     | `tsc -b`                                                       |
-| `pnpm lint`          | ESLint                                                         |
+| Comando              | Descrição                                                               |
+| -------------------- | ----------------------------------------------------------------------- |
+| `pnpm test:unit`     | Executa a suíte Vitest sem coleta de cobertura                          |
+| `pnpm test:coverage` | Executa Vitest com o provedor v8; gera relatório no terminal e em `coverage/` |
+| `pnpm test:e2e`      | Instala o Chromium, se necessário, e executa os projetos desktop e mobile |
+| `pnpm typecheck`     | Verifica os projetos TypeScript com `tsc -b`                            |
+| `pnpm lint`          | Verifica o código com Biome                                              |
 
-A cobertura exige, nos módulos de lógica listados em [`vitest.config.ts`](../vitest.config.ts), pelo menos 85% de statements, 75% de branches, 85% de functions e 85% de lines. Entram `src/lib` (dinheiro, carrinho, carteira, busca, sessão, Axios), `src/contracts`, `src/realtime/apply-events.ts`, `src/realtime/dedupe.ts` e `src/mocks/pricing.ts`. Ficam de fora componentes visuais, rotas e o restante do mock HTTP.
+A cobertura exige, nos módulos de lógica listados em [`vitest.config.ts`](../vitest.config.ts), pelo menos 85% de statements, 75% de branches, 85% de functions e 85% de lines. Entram `src/lib` (dinheiro, carrinho, carteira, busca, sessão e Axios), `src/contracts`, `src/realtime/apply-events.ts`, `src/realtime/dedupe.ts` e `src/mocks/pricing.ts`. Componentes visuais, rotas e o restante do mock HTTP ficam fora desses limiares.
 
 O login repetido dos testes E2E está em [`e2e/support.ts`](../e2e/support.ts). Não há `waitForTimeout`. As esperas usam asserções web-first.
 
@@ -46,10 +46,10 @@ O login repetido dos testes E2E está em [`e2e/support.ts`](../e2e/support.ts). 
 
 - Regressão visual com baseline.
 - Projeto Playwright em 768 px.
-- Lighthouse no mesmo comando dos testes. O histórico de uma coleta continua abaixo.
+- Lighthouse integrado ao mesmo comando dos testes.
 - O worker do Socket.IO em si. A suíte cobre a função que aplica o evento no cache e a que descarta duplicata, e o preço ao vivo pela UI.
 - Cada ramo do `src/mocks/http.ts`. O arquivo é o servidor simulado; os fluxos críticos passam pelo Playwright e as regras de quantidade, cupom e timeout estão extraídas ou exercitadas por ele.
 
 ## Lighthouse
 
-`pnpm lighthouse` faz o build e roda três coletas mobile e três desktop de `/` e `/nfts/nft_01`. Uma execução nesta máquina, em 3 de novembro de 2026, saiu com código 0. As medianas estão no histórico do repositório anterior a esta auditoria: performance mobile 94, desktop 99–100, acessibilidade 100. Rode o comando de novo para repetir. Os HTML ficam em `.lighthouseci/` e não vão para o git.
+`pnpm lighthouse` faz o build e executa três coletas mobile e três desktop nas rotas `/` e `/nfts/nft_01`. Uma execução em 3 de novembro de 2026 terminou com sucesso; as medianas registradas foram 94 em performance mobile, 99–100 em desktop e 100 em acessibilidade. Esses números são uma referência histórica, não uma garantia: rode o comando novamente para medir o ambiente atual. Os relatórios HTML ficam em `.lighthouseci/` e não são versionados.
