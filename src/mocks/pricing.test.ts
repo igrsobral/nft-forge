@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { NftRecord } from './seed'
 import { NETWORK_FEE_ETH, quoteCart, totalsMatch } from './pricing'
+import type { NftRecord } from './seed'
 
 function nft(remaining = 10): NftRecord {
   return {
@@ -16,6 +16,7 @@ function nft(remaining = 10): NftRecord {
     imageHue: 20,
     priceEth: '0.80',
     previousPriceEth: null,
+    rarity: 'comum',
     editions: [
       {
         id: 'ed_open',

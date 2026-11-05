@@ -1,8 +1,8 @@
 import {
-  editorialHomeSchema,
-  editorialPostDetailSchema,
   type EditorialCategory,
   type EditorialPromoKind,
+  editorialHomeSchema,
+  editorialPostDetailSchema,
 } from '@/contracts/editorial'
 import { nftImageUrl } from './images'
 

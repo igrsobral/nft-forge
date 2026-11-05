@@ -24,18 +24,19 @@ test('lists editions, keeps a filter in the url, and opens the detail', async ({
   }
 
   const name = (
-    await page.getByTestId('nft-card').first().getByTestId('nft-name').innerText()
+    (await page.getByTestId('nft-card').first().getByTestId('nft-name').textContent()) ?? ''
   ).trim()
+
   await page.getByTestId('nft-card').first().click()
   await expect(page.getByRole('heading', { level: 1, name })).toBeVisible()
   await expect(page).toHaveURL(/\/nfts\/nft_/)
 
   await expect(page.getByTestId('socket-status')).toHaveText('Live', { timeout: 15_000 })
   const price = page.getByTestId('nft-price')
-  const before = (await price.innerText()).trim()
+  const before = ((await price.textContent()) ?? '').trim()
   await page.getByRole('button', { name: 'Simulate market move' }).click()
   await expect(price).not.toHaveText(before, { timeout: 10_000 })
-  const after = (await price.innerText()).trim()
+  const after = ((await price.textContent()) ?? '').trim()
 
   await page.goBack()
   await expect(page).toHaveURL(/category=Fotografia/)
@@ -48,7 +49,7 @@ test('keeps tab, sort, pagination, network, and price in the query string', asyn
   await page.goto('/?reset=1')
   await expect(page.getByTestId('nft-card')).toHaveCount(9)
 
-  const firstName = (await page.getByTestId('nft-name').first().innerText()).trim()
+  const firstName = ((await page.getByTestId('nft-name').first().textContent()) ?? '').trim()
   await page.getByRole('button', { name: '2', exact: true }).click()
   await expect(page).toHaveURL(/page=2/)
   await expect(page.getByRole('button', { name: '2', exact: true })).toHaveAttribute(
@@ -81,7 +82,7 @@ test('keeps tab, sort, pagination, network, and price in the query string', asyn
 
   const priceFilters = await openFilters()
   const priceLabel = priceFilters.getByText(/^Preço:/)
-  const beforePrice = (await priceLabel.innerText()).trim()
+  const beforePrice = ((await priceLabel.textContent()) ?? '').trim()
   await priceFilters.getByLabel('Preço mínimo').focus()
   await page.keyboard.press('ArrowRight')
   await expect(priceLabel).not.toHaveText(beforePrice)

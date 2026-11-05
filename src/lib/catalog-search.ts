@@ -1,4 +1,4 @@
-import { nftListQuerySchema, type NftListQuery } from '@/contracts/catalog'
+import { type NftListQuery, nftListQuerySchema } from '@/contracts/catalog'
 import { pickAuth } from '@/lib/auth-search'
 
 export function toListQuery(search: unknown): NftListQuery {

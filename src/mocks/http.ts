@@ -1,5 +1,5 @@
-import type { NftListQuery } from '@/contracts/catalog'
-import { nftDetailSchema, nftListQuerySchema, nftListResponseSchema } from '@/contracts/catalog'
+import { HttpResponse, http } from 'msw'
+import type { z } from 'zod'
 import {
   authResponseSchema,
   avatarUpdateSchema,
@@ -7,16 +7,18 @@ import {
   forgotPasswordSchema,
   loginBodySchema,
   passwordChangeSchema,
-  registerBodySchema,
   profileUpdateSchema,
   publicUserSchema,
+  registerBodySchema,
   sessionResponseSchema,
   signupBodySchema,
-  walletListSchema,
   walletConnectionSchema,
+  walletListSchema,
   walletSchema,
   walletWriteSchema,
 } from '@/contracts/account'
+import type { NftListQuery } from '@/contracts/catalog'
+import { nftDetailSchema, nftListQuerySchema, nftListResponseSchema } from '@/contracts/catalog'
 import {
   cartAddSchema,
   cartSchema,
@@ -29,28 +31,26 @@ import {
   orderListSchema,
   orderSchema,
   quoteRequestSchema,
+  quoteSchema,
   supportRequestSchema,
   supportResponseSchema,
-  quoteSchema,
 } from '@/contracts/commerce'
 import type { ErrorCode, FieldError } from '@/contracts/common'
 import { catalogNetworks, categories } from '@/contracts/common'
-import { presentEditorialHome, presentEditorialPost } from './editorial'
 import { mergedLineQuantity, nextLineQuantity } from '@/lib/cart'
 import { addEth, cmpEth, mulEth } from '@/lib/money'
-import { HttpResponse, http } from 'msw'
-import type { z } from 'zod'
 import { getDb, persist, resetDb } from './db'
 import { delay, pause } from './delay'
+import { presentEditorialHome, presentEditorialPost } from './editorial'
 import { canonicalJson, sha256 } from './hash'
 import { hashPassword, randomSalt, verifyPassword } from './password'
 import { findEdition, findNft, quoteCart, totalsMatch } from './pricing'
-import { getScenario, isScenario, setScenario, type Scenario } from './scenario'
+import { getScenario, isScenario, type Scenario, setScenario } from './scenario'
 import {
-  galleryFor,
-  imageFor,
   type CartRecord,
   type Database,
+  galleryFor,
+  imageFor,
   type NftRecord,
   type OrderRecord,
   type UserRecord,
@@ -173,6 +173,7 @@ function presentSummary(nft: NftRecord) {
     previousPriceEth: nft.previousPriceEth,
     imageUrl: imageFor(nft),
     available: nft.editions.some((edition) => edition.remaining > 0),
+    rarity: nft.rarity,
     version: nft.version,
     updatedAt: nft.updatedAt,
   }
@@ -436,7 +437,7 @@ function scheduleResolution(orderId: string, scenario: Scenario) {
   window.setTimeout(() => {
     const db = getDb()
     const order = db.orders.find((item) => item.id === orderId)
-    if (!order || order.status !== 'pending') return
+    if (order?.status !== 'pending') return
     if (scenario === 'payment_declined') {
       order.status = 'declined'
     } else if (confirmOrder(db, order)) {

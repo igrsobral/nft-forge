@@ -1,8 +1,8 @@
 import {
-  editorialHomeSchema,
-  editorialPostDetailSchema,
   type EditorialHome,
   type EditorialPostDetail,
+  editorialHomeSchema,
+  editorialPostDetailSchema,
 } from '@/contracts/editorial'
 import { api } from './client'
 

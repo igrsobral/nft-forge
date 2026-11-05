@@ -3,8 +3,8 @@ import type { NftListQuery } from '@/contracts/catalog'
 import type { QuoteRequest } from '@/contracts/commerce'
 import { getSession, listWallets } from '@/lib/api/account'
 import { getNft, listNfts } from '@/lib/api/catalog'
-import { getEditorialHome, getEditorialPost } from '@/lib/api/editorial'
 import { createQuote, getCart, getOrder, listFavorites, listOrders } from '@/lib/api/commerce'
+import { getEditorialHome, getEditorialPost } from '@/lib/api/editorial'
 import { queryKeys } from '@/lib/query-keys'
 
 export function sessionQuery(userId: string | null) {

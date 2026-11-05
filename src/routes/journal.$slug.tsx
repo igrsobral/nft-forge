@@ -5,8 +5,8 @@ import {
   JournalPostSkeleton,
 } from '@/components/journal/journal-post-page'
 import { RouteError } from '@/components/route-error'
-import { ApiError } from '@/lib/api/errors'
 import { getEditorialPost } from '@/lib/api/editorial'
+import { ApiError } from '@/lib/api/errors'
 import { queryKeys } from '@/lib/query-keys'
 import { getStoredUserId } from '@/lib/storage'
 

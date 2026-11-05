@@ -1,4 +1,4 @@
-import { useQuery, useQueries } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { formatEth } from '@/lib/money'
 import { favoritesQuery, nftDetailQuery } from '@/lib/queries'

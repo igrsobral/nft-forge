@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { api } from '@/lib/api/client'
 import { clearStoredSession } from '@/lib/storage'
-import { getScenario, scenarioDescriptions, scenarios, type Scenario } from '@/mocks/scenario'
+import { getScenario, type Scenario, scenarioDescriptions, scenarios } from '@/mocks/scenario'
 
 export function MockLab() {
   const [open, setOpen] = useState(false)

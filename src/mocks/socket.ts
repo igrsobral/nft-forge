@@ -1,10 +1,10 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
 import { ws } from 'msw'
 import {
-  nftUpdatedEventSchema,
-  orderUpdatedEventSchema,
   type NftUpdatedEvent,
+  nftUpdatedEventSchema,
   type OrderUpdatedEvent,
+  orderUpdatedEventSchema,
 } from '@/contracts/events'
 import type { NftRecord, OrderRecord } from './seed'
 

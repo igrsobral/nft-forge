@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { profileInputClass, ProfileField } from '@/components/profile/profile-shell'
+import { ProfileField, profileInputClass } from '@/components/profile/profile-shell'
 import { Button } from '@/components/ui/button'
-import type { Network, WalletRole } from '@/contracts/common'
 import type { Wallet } from '@/contracts/account'
+import type { Network, WalletRole } from '@/contracts/common'
 import { createWallet, updateWallet } from '@/lib/api/account'
 import { ApiError } from '@/lib/api/errors'
 import { sessionQuery, walletsQuery } from '@/lib/queries'
@@ -59,7 +59,7 @@ function WalletsPage() {
         <WalletForm
           key={primary?.id ?? 'new-primary'}
           wallet={primary}
-          role="primary"
+          walletRole="primary"
           defaults={{
             displayName: primary?.displayName || user?.displayName || '',
             label: primary?.label || user?.walletNickname || '',
@@ -81,7 +81,7 @@ function WalletsPage() {
             <WalletForm
               key={secondary.id}
               wallet={secondary}
-              role="secondary"
+              walletRole="secondary"
               defaults={{
                 displayName: secondary.displayName,
                 label: secondary.label,
@@ -121,7 +121,7 @@ function WalletsPage() {
             {adding ? (
               <div className="mt-4">
                 <WalletForm
-                  role="secondary"
+                  walletRole="secondary"
                   defaults={
                     sameAsPrimary && primary
                       ? {
@@ -151,13 +151,13 @@ function WalletsPage() {
 
 function WalletForm({
   wallet,
-  role,
+  walletRole,
   defaults,
   submitLabel,
   onDone,
 }: {
   wallet?: Wallet
-  role: WalletRole
+  walletRole: WalletRole
   defaults: typeof empty
   submitLabel: string
   onDone?: () => void
@@ -175,7 +175,7 @@ function WalletForm({
         label: values.label,
         address: values.address,
         network: values.network,
-        role,
+        role: walletRole,
         displayName: values.displayName,
         profileName: values.profileName,
         ensName: values.ensName,
@@ -243,7 +243,7 @@ function WalletForm({
         <input className={profileInputClass} value={values.ensName} onChange={set('ensName')} />
       </ProfileField>
       <ProfileField label="Tipo de carteira" error={field('role')}>
-        <select className={profileInputClass} value={role} disabled>
+        <select className={profileInputClass} value={walletRole} disabled>
           <option value="primary">Principal</option>
           <option value="secondary">Secundária</option>
         </select>

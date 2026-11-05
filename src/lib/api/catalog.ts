@@ -1,10 +1,10 @@
 import {
-  nftDetailSchema,
-  nftListQuerySchema,
-  nftListResponseSchema,
   type NftDetail,
   type NftListQuery,
   type NftListResponse,
+  nftDetailSchema,
+  nftListQuerySchema,
+  nftListResponseSchema,
 } from '@/contracts/catalog'
 import { api } from './client'
 

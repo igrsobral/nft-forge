@@ -11,6 +11,6 @@ export function requireSession(href: string): void {
 }
 
 export function safeRedirect(value: string | undefined): string {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/'
+  if (!value?.startsWith('/') || value.startsWith('//')) return '/'
   return value
 }

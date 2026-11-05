@@ -1,12 +1,12 @@
 import axios from 'axios'
 import { afterEach, describe, expect, it } from 'vitest'
-import { api } from './client'
 import {
   clearStoredSession,
   getStoredToken,
   onSessionExpired,
   setStoredSession,
 } from '@/lib/storage'
+import { api } from './client'
 
 afterEach(() => {
   api.defaults.adapter = undefined

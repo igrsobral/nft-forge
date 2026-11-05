@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { CatalogPage, CatalogSkeleton } from '@/components/catalog/catalog-page'
+import { CatalogPage } from '@/components/catalog/catalog-page'
+import { CatalogSkeleton } from '@/components/catalog/catalog-skeleton'
 import { RouteError } from '@/components/route-error'
 import { listNfts } from '@/lib/api/catalog'
 import { toListQuery, toRouteSearch } from '@/lib/catalog-search'

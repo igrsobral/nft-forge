@@ -1,14 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { Eye, EyeOff, X } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { login, register, requestPasswordReset } from '@/lib/api/account'
 import { addFavorite } from '@/lib/api/commerce'
 import { ApiError } from '@/lib/api/errors'
 import { safeRedirect } from '@/lib/auth'
-import { hrefWithAuth, pickAuth, type AuthMode } from '@/lib/auth-search'
+import { type AuthMode, hrefWithAuth, pickAuth } from '@/lib/auth-search'
 
 const resumeFavoriteKey = 'nft-market:resume-favorite'
 

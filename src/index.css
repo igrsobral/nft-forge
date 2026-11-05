@@ -1,9 +1,9 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@fontsource/roboto-mono/400.css';
-@import '@fontsource/roboto-mono/500.css';
-@import '@fontsource/roboto-mono/700.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource/roboto-mono/400.css";
+@import "@fontsource/roboto-mono/500.css";
+@import "@fontsource/roboto-mono/700.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -17,7 +17,7 @@
   --popover-foreground: #f5f1eb;
   --primary: #d28a4c;
   --primary-foreground: #140d0a;
-  --secondary: #b39463;
+  --secondary: #cfb28c;
   --secondary-foreground: #f5f1eb;
   --muted: #2f1d15;
   --muted-foreground: #b39463;
@@ -45,7 +45,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Roboto Mono', ui-monospace, 'Courier New', monospace;
+  --font-sans: "Roboto Mono", ui-monospace, "Courier New", monospace;
   --color-ink: #140d0a;
   --color-surface-card: #241612;
   --color-surface-raised: #2f1d15;
@@ -121,6 +121,17 @@
 
 @utility bg-gradient-tile {
   background-image: linear-gradient(139.5deg, #241612 12%, #2f1d15 106.6%);
+}
+@utility bg-gradient-hero {
+  background-color: #241612;
+  background-image:
+    radial-gradient(
+      105% 85% at 0% 100%,
+      rgba(210, 138, 76, 0.42) 0%,
+      rgba(210, 138, 76, 0.13) 42%,
+      rgba(210, 138, 76, 0) 64%
+    ),
+    linear-gradient(160deg, #241612 0%, #1e120c 55%, #150c08 100%);
 }
 @utility bg-gradient-cta {
   background-image: linear-gradient(108.9deg, #d28a4c 4%, rgba(210, 138, 76, 0.8) 122%);
@@ -241,7 +252,7 @@
   --popover-foreground: #f5f1eb;
   --primary: #d28a4c;
   --primary-foreground: #140d0a;
-  --secondary: #b39463;
+  --secondary: #cfb28c;
   --secondary-foreground: #f5f1eb;
   --muted: #2f1d15;
   --muted-foreground: #b39463;

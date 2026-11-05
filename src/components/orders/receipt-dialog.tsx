@@ -1,9 +1,9 @@
 import { useNavigate } from '@tanstack/react-router'
 import { X } from 'lucide-react'
-import type { Order } from '@/contracts/commerce'
-import { confirmationNote, etherscanTxUrl, formatReceiptDate, shortTxHash } from '@/lib/receipt'
-import { formatEth } from '@/lib/money'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import type { Order } from '@/contracts/commerce'
+import { formatEth } from '@/lib/money'
+import { confirmationNote, etherscanTxUrl, formatReceiptDate, shortTxHash } from '@/lib/receipt'
 
 export function ReceiptDialog({ order }: { order: Order }) {
   const navigate = useNavigate()

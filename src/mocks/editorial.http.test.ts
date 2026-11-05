@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { ApiError } from '@/lib/api/errors'
 import { getEditorialHome, getEditorialPost } from '@/lib/api/editorial'
+import type { ApiError } from '@/lib/api/errors'
 import { httpHandlers } from './http'
 
 const server = setupServer(...httpHandlers)

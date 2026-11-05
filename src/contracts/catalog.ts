@@ -24,6 +24,8 @@ export const reviewSchema = z.object({
   createdAt: z.string(),
 })
 
+export const raritySchema = z.enum(['comum', 'raro'])
+
 export const nftSummarySchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -37,6 +39,7 @@ export const nftSummarySchema = z.object({
   previousPriceEth: ethAmountSchema.nullable(),
   imageUrl: z.string().min(1),
   available: z.boolean(),
+  rarity: raritySchema.optional(),
   version: z.number().int().nonnegative(),
   updatedAt: z.string(),
 })

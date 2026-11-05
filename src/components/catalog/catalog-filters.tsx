@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { NftListQuery, NftListResponse } from '@/contracts/catalog'
 import type { CatalogNetwork, Category } from '@/contracts/common'
-import { categories, catalogNetworks } from '@/contracts/common'
+import { catalogNetworks, categories } from '@/contracts/common'
 import { toEth } from '@/lib/money'
 import { stepByKey } from '@/lib/price-step'
 
@@ -17,7 +17,7 @@ function stepEth(step: number): string {
 
 function commaFixed(value: string): string {
   const [whole, fraction = ''] = toEth(value).split('.')
-  return `${whole ?? '0'},${(fraction + '00').slice(0, 2)}`
+  return `${whole ?? '0'},${(`${fraction}00`).slice(0, 2)}`
 }
 
 export function CatalogFilters({

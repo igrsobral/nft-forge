@@ -33,6 +33,7 @@ export type NftRecord = {
   imageHue: number
   priceEth: string
   previousPriceEth: string | null
+  rarity: 'comum' | 'raro'
   editions: EditionRecord[]
   tokenId: string
   attributes: string[]
@@ -409,6 +410,7 @@ function createNfts(): NftRecord[] {
       imageHue: (index * 37) % 360,
       priceEth,
       previousPriceEth: index % 4 === 2 ? mulEth(priceEth, '1.15') : null,
+      rarity: index % 4 === 2 ? 'raro' : 'comum',
       editions,
       tokenId: `#${String(index + 1).padStart(4, '0')}`,
       attributes: [...(attributeSets[index % attributeSets.length] ?? attributeSets[0])],

@@ -1,12 +1,12 @@
+import type { QueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   useRouterState,
 } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
-import type { QueryClient } from '@tanstack/react-query'
 import { AuthModal } from '@/components/auth/auth-modal'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'

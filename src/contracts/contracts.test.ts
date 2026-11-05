@@ -50,7 +50,7 @@ describe('Zod contracts', () => {
   })
 
   it('requires an EVM address and a known order status', () => {
-    expect(walletAddressSchema.safeParse('0x' + 'a'.repeat(40)).success).toBe(true)
+    expect(walletAddressSchema.safeParse(`0x${'a'.repeat(40)}`).success).toBe(true)
     expect(walletAddressSchema.safeParse('not-an-address').success).toBe(false)
     expect(
       orderSchema.safeParse({

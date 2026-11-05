@@ -1,6 +1,6 @@
+import Decimal from 'decimal.js'
 import type { Quote } from '@/contracts/commerce'
 import { eqEth, mulEth, toEth } from '@/lib/money'
-import Decimal from 'decimal.js'
 import type { Scenario } from './scenario'
 import type { CartRecord, NftRecord, ReceiptLineRecord } from './seed'
 

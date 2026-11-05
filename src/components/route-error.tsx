@@ -1,7 +1,7 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
-import { ApiError } from '@/lib/api/errors'
 import { Button } from '@/components/ui/button'
+import { ApiError } from '@/lib/api/errors'
 
 export function RouteError({ error, reset }: ErrorComponentProps) {
   const message =

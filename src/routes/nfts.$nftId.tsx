@@ -1,10 +1,10 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { DetailSkeleton, NftDetailPage, NftMissing } from '@/components/nft/detail-page'
 import { RouteError } from '@/components/route-error'
-import { ApiError } from '@/lib/api/errors'
 import { getNft } from '@/lib/api/catalog'
-import { queryKeys } from '@/lib/query-keys'
+import { ApiError } from '@/lib/api/errors'
 import { pickAuth } from '@/lib/auth-search'
+import { queryKeys } from '@/lib/query-keys'
 import { getStoredUserId } from '@/lib/storage'
 
 export const Route = createFileRoute('/nfts/$nftId')({
