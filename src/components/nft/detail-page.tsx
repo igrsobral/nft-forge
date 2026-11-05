@@ -107,7 +107,15 @@ export function NftDetailPage() {
                     : 'size-16 shrink-0 overflow-hidden rounded-lg border border-transparent opacity-80 sm:size-[84px]'
                 }
               >
-                <img src={src} alt="" className="size-full object-cover" />
+                <img
+                  src={src}
+                  alt=""
+                  width={84}
+                  height={84}
+                  loading="lazy"
+                  decoding="async"
+                  className="size-full object-cover"
+                />
               </button>
             ))}
           </fieldset>
@@ -124,6 +132,9 @@ export function NftDetailPage() {
               alt={`${nft.name} por ${nft.creator}`}
               width={800}
               height={800}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               className="aspect-square w-full min-w-0 rounded-[18px] object-cover max-lg:h-[300px] max-lg:aspect-auto"
             />
             <Dialog>
@@ -140,7 +151,15 @@ export function NftDetailPage() {
                 <DialogHeader>
                   <DialogTitle>{nft.name}</DialogTitle>
                 </DialogHeader>
-                <img src={image} alt="" className="w-full rounded-xl object-cover" />
+                <img
+                  src={image}
+                  alt=""
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full rounded-xl object-cover"
+                />
               </DialogContent>
             </Dialog>
           </div>

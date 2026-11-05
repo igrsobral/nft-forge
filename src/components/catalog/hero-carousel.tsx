@@ -97,6 +97,9 @@ export function HomeHeroDesktop() {
             alt={`${activeSlide.name} por ${activeSlide.creator}`}
             width={460}
             height={460}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="aspect-square w-full min-w-0 object-cover"
           />
         </Link>
@@ -144,6 +147,11 @@ export function HomeHeroMobile() {
               <img
                 src={activeSlide.imageUrl}
                 alt=""
+                width={128}
+                height={128}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="size-32 rounded-[18px] object-cover shadow-[0_12px_32px_rgba(0,0,0,0.35)]"
               />
             </Link>

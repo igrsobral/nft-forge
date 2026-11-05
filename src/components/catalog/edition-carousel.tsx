@@ -35,6 +35,10 @@ export function EditionCarousel({
                 <img
                   src={item.imageUrl}
                   alt=""
+                  width={250}
+                  height={250}
+                  loading="lazy"
+                  decoding="async"
                   className="aspect-square w-full min-w-0 rounded-xl object-cover"
                 />
                 <h3 className="type-c-13 mt-3 truncate text-foreground">

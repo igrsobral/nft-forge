@@ -8,6 +8,8 @@ if (otelEnabled && otelEndpoint) {
 captureMockControlFromLocation()
 
 async function start() {
+  const bootstrap = import('@/bootstrap')
+  void bootstrap.catch(() => {})
   if (mocksEnabled) {
     const { worker } = await import('@/mocks/browser')
     await worker.start({
@@ -16,7 +18,8 @@ async function start() {
       quiet: true,
     })
   }
-  await import('@/bootstrap')
+  const { mountApp } = await bootstrap
+  mountApp()
 }
 
 void start().catch((error: unknown) => {

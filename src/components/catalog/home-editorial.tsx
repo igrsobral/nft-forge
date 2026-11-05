@@ -43,6 +43,8 @@ function EditorialSections({
               alt=""
               width={200}
               height={200}
+              loading="lazy"
+              decoding="async"
               className="aspect-square w-full shrink-0 rounded-2xl object-cover sm:size-[200px]"
             />
             <div className="flex min-w-0 flex-1 flex-col">
@@ -82,6 +84,8 @@ function EditorialSections({
                   alt=""
                   width={250}
                   height={250}
+                  loading="lazy"
+                  decoding="async"
                   className="aspect-square w-full min-w-0 rounded-lg object-cover"
                 />
                 <p className="type-c-12 mt-3 text-[#8d847c]">

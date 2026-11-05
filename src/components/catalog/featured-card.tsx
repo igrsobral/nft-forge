@@ -21,6 +21,8 @@ export function FeaturedCard({ nft }: { nft: NftSummary | null }) {
           alt={`${nft.name}, oferta limitada`}
           width={260}
           height={320}
+          loading="lazy"
+          decoding="async"
           className="aspect-[4/5] w-full object-cover"
         />
       </Link>

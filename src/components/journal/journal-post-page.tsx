@@ -69,6 +69,9 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
           alt=""
           width={768}
           height={768}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="mt-8 aspect-square w-full rounded-[24px] bg-[#24140f] object-cover"
         />
 

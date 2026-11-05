@@ -139,7 +139,15 @@ function ProfileDetailsPage() {
           </ProfileField>
           <div className="flex items-center gap-3">
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" className="size-16 rounded-full object-cover" />
+              <img
+                src={user.avatarUrl}
+                alt=""
+                width={64}
+                height={64}
+                loading="lazy"
+                decoding="async"
+                className="size-16 rounded-full object-cover"
+              />
             ) : (
               <span className="flex size-16 items-center justify-center rounded-full border border-[#6a4332] text-xs text-[#c9a27a]">
                 Avatar

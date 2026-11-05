@@ -74,6 +74,8 @@ export function ReceiptDialog({ order }: { order: Order }) {
                           alt=""
                           width={64}
                           height={64}
+                          loading="lazy"
+                          decoding="async"
                           className="size-16 shrink-0 rounded-lg object-cover"
                         />
                       ) : (

@@ -304,6 +304,8 @@ function CartRow({
           alt=""
           width={56}
           height={56}
+          loading="lazy"
+          decoding="async"
           className="size-14 shrink-0 rounded-xl object-cover xl:size-20 xl:rounded-lg"
         />
         <div className="min-w-0 flex-1">

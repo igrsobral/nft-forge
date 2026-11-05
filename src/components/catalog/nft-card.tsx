@@ -16,6 +16,8 @@ export function NftCard({ nft }: { nft: NftSummary }) {
           alt={`${nft.name} por ${nft.creator}`}
           width={250}
           height={250}
+          loading="lazy"
+          decoding="async"
           className="aspect-square w-full min-w-0 rounded-xl object-cover"
         />
         {nft.rarity === 'raro' ? <RarityBadge /> : null}

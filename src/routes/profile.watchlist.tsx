@@ -30,7 +30,15 @@ function WatchlistPage() {
                 params={{ nftId: nft.id }}
                 className="flex items-center gap-3 rounded-xl bg-[#24140f] p-3 hover:text-primary"
               >
-                <img src={nft.imageUrl} alt="" className="size-14 rounded-lg object-cover" />
+                <img
+                  src={nft.imageUrl}
+                  alt=""
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  decoding="async"
+                  className="size-14 rounded-lg object-cover"
+                />
                 <span>
                   <span className="block font-bold">{nft.name}</span>
                   <span className="text-sm text-primary">{formatEth(nft.priceEth)}</span>
