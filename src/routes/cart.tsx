@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Trash2 } from 'lucide-react'
+import { ChevronLeft, Trash2 } from 'lucide-react'
 import { useState, useSyncExternalStore } from 'react'
 import { useOpenAuth } from '@/components/auth/auth-modal'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
@@ -67,17 +67,18 @@ function CartPage() {
   const hasItems = (cart.data?.items.length ?? 0) > 0
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-4 pb-28 max-lg:min-h-[calc(100dvh-4.25rem)] lg:px-10 lg:py-8 lg:pb-8">
-      <div className="mb-4 flex items-center gap-2 lg:hidden">
+    <main className="mx-auto w-full max-w-[1440px] min-w-0 overflow-x-clip px-4 py-4 pb-28 lg:px-10 lg:py-8 lg:pb-8">
+      <header className="relative mb-5 flex min-h-11 items-center justify-center lg:hidden">
         <a
           href="/#catalogo"
           aria-label="Voltar"
-          className="flex size-11 items-center justify-center rounded-full text-foreground"
+          className="absolute left-0 flex size-11 items-center justify-center rounded-full border border-[#3f2319] bg-[#241612] text-foreground transition-colors hover:bg-[#2f1d15]"
         >
-          ←
+          <ChevronLeft className="size-5" />
         </a>
-        <h1 className="text-lg font-bold">Carrinho de NFTs</h1>
-      </div>
+        <h1 className="type-b-16-bold text-foreground">Carrinho de NFTs</h1>
+      </header>
+      <h1 className="type-t-18-bold mb-6 hidden text-foreground lg:block">Carrinho de NFTs</h1>
       <p className="type-c-13 mb-6 hidden text-[#c9a27a] lg:block">
         <Link to="/" className="hover:text-primary">
           Início
@@ -90,7 +91,7 @@ function CartPage() {
         <span>Carrinho</span>
       </p>
 
-      {cart.isPending ? <Skeleton className="h-48 w-full rounded-xl" /> : null}
+      {cart.isPending ? <Skeleton className="h-48 w-full rounded-2xl" /> : null}
       {cart.isError ? (
         <p role="alert" className="text-destructive">
           {cart.error instanceof ApiError
@@ -100,9 +101,11 @@ function CartPage() {
       ) : null}
 
       {cart.data && !hasItems ? (
-        <div className="rounded-xl bg-[#24140f] px-6 py-14 text-center">
-          <h1 className="text-xl font-bold text-foreground">Seu carrinho está vazio</h1>
-          <p className="mt-2 text-[#c9a27a]">Escolha uma edição no mercado para começar.</p>
+        <div className="rounded-2xl border border-[#3f2319] bg-[#24140f] px-6 py-14 text-center">
+          <h1 className="type-b-16-bold text-foreground">Seu carrinho está vazio</h1>
+          <p className="type-c-13 mt-2 text-[#c9a27a]">
+            Escolha uma edição no mercado para começar.
+          </p>
           <Link
             to="/"
             hash="catalogo"
@@ -114,23 +117,16 @@ function CartPage() {
       ) : null}
 
       {hasItems ? (
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <section aria-label="Itens do carrinho">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <section aria-label="Itens do carrinho" className="min-w-0">
             {changed ? (
               <p
                 role="status"
-                className="mb-3 rounded-lg border border-primary/60 px-3 py-2 text-sm text-primary"
+                className="type-c-13 mb-3 rounded-xl border border-primary/60 px-3 py-2 text-primary"
               >
                 O preço ou o estoque mudou. O resumo usa a cotação mais recente.
               </p>
             ) : null}
-            <div className="type-c-13 mb-2 hidden grid-cols-[minmax(0,1.7fr)_0.7fr_0.9fr_0.7fr_2.5rem] gap-3 px-4 text-[#c9a27a] lg:grid">
-              <span>NFTs</span>
-              <span>Preço</span>
-              <span>Edições</span>
-              <span>Total</span>
-              <span className="sr-only">Remover</span>
-            </div>
             <ul className="flex flex-col gap-3">
               {cart.data?.items.map((item) => (
                 <CartRow
@@ -144,48 +140,44 @@ function CartPage() {
             </ul>
           </section>
 
-          <aside className="rounded-xl bg-[#24140f] p-5">
-            <h2 className="type-b-16-bold border-b border-[#6a4332] pb-3 text-foreground max-lg:sr-only">
-              Resumo da carteira
-            </h2>
+          <aside className="min-w-0 rounded-2xl border border-[#3f2319] bg-[#24140f] p-4 lg:p-5">
+            <h2 className="type-b-16-bold text-foreground max-lg:sr-only">Resumo da carteira</h2>
             <form
-              className="mt-4"
+              className="flex items-center rounded-full border border-[#6a4332] bg-[#1a100c] p-1 pr-1 lg:mt-5"
               onSubmit={(event) => {
                 event.preventDefault()
                 setApplied(coupon.trim() || undefined)
               }}
             >
-              <label htmlFor="coupon" className="type-c-13 text-[#c9a27a]">
+              <label htmlFor="coupon" className="sr-only">
                 Código promocional
               </label>
-              <div className="mt-2 flex">
-                <input
-                  id="coupon"
-                  value={coupon}
-                  onChange={(event) => setCoupon(event.target.value)}
-                  placeholder="Digite o código"
-                  className="type-c-13 h-11 min-w-0 flex-1 rounded-l-md border border-[#6a4332] bg-[#1a100c] px-3 text-foreground placeholder:text-[#c9a27a]/70"
-                />
-                <button
-                  type="submit"
-                  className="type-b-14-bold h-11 rounded-r-md bg-primary px-4 text-primary-foreground"
-                >
-                  Aplicar
-                </button>
-              </div>
-              {applied ? (
-                <button
-                  type="button"
-                  className="type-c-12 mt-2 text-[#c9a27a] underline-offset-2 hover:underline"
-                  onClick={() => {
-                    setCoupon('')
-                    setApplied(undefined)
-                  }}
-                >
-                  Remover código
-                </button>
-              ) : null}
+              <input
+                id="coupon"
+                value={coupon}
+                onChange={(event) => setCoupon(event.target.value)}
+                placeholder="Digite o código promocional..."
+                className="type-c-13 h-10 min-w-0 flex-1 bg-transparent px-4 text-foreground outline-none placeholder:text-[#c9a27a]/70"
+              />
+              <button
+                type="submit"
+                className="type-b-14-bold h-10 shrink-0 cursor-pointer rounded-full bg-gradient-cta px-5 text-primary-foreground transition-[filter] hover:brightness-110"
+              >
+                Aplicar
+              </button>
             </form>
+            {applied ? (
+              <button
+                type="button"
+                className="type-c-12 mt-2 px-1 text-[#c9a27a] underline-offset-2 hover:underline"
+                onClick={() => {
+                  setCoupon('')
+                  setApplied(undefined)
+                }}
+              >
+                Remover código
+              </button>
+            ) : null}
             {quote.data?.coupon && !quote.data.coupon.valid ? (
               <p
                 role="alert"
@@ -198,51 +190,51 @@ function CartPage() {
               </p>
             ) : null}
             {quote.data ? (
-              <dl data-testid="quote-summary" className="type-b-14 mt-5 grid gap-3 text-foreground">
-                <div className="flex items-baseline justify-between gap-3">
+              <dl data-testid="quote-summary" className="mt-6 grid gap-4 text-foreground lg:mt-7">
+                <div className="type-b-14 flex items-baseline justify-between gap-3">
                   <dt>Subtotal</dt>
-                  <dd>{formatEth(quote.data.subtotalEth)}</dd>
+                  <dd className="type-b-14-bold">{formatEth(quote.data.subtotalEth)}</dd>
                 </div>
-                <div className="flex items-baseline justify-between gap-3">
+                <div className="type-b-14 flex items-baseline justify-between gap-3">
                   <dt>Desconto do lançamento</dt>
-                  <dd data-testid="quote-discount">(-) {formatEth(quote.data.discountEth)}</dd>
+                  <dd className="type-b-14-bold" data-testid="quote-discount">
+                    (-) {formatEth(quote.data.discountEth)}
+                  </dd>
                 </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt>
-                    Taxa de rede
-                    <span className="type-c-12 mt-1 block text-[#8d847c]">Taxa estimada</span>
-                  </dt>
-                  <dd>{formatEth(quote.data.networkFeeEth)}</dd>
+                <div className="type-b-14 flex items-baseline justify-between gap-3">
+                  <dt>Taxa de rede</dt>
+                  <dd className="flex flex-col items-end">
+                    <span className="type-b-14-bold">{formatEth(quote.data.networkFeeEth)}</span>
+                    <span className="type-c-12 text-[#c9a27a]">Taxa estimada</span>
+                  </dd>
                 </div>
-                <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-[#6a4332] pt-3 font-bold text-primary">
+                <div className="type-b-16-bold mt-1 flex items-baseline justify-between gap-3 border-t border-[#6a4332] pt-4 text-foreground">
                   <dt>Total</dt>
                   <dd data-testid="quote-total">{formatEth(quote.data.totalEth)}</dd>
                 </div>
               </dl>
             ) : (
-              <Skeleton className="mt-5 h-28 w-full" />
+              <Skeleton className="mt-6 h-28 w-full" />
             )}
-            <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:bg-[#140d0a] max-lg:p-3">
-              {signedIn ? (
-                <Button asChild className="mt-5 h-11 w-full rounded-md max-lg:mt-0">
-                  <Link to="/checkout" search={checkoutSearch}>
-                    Conectar e finalizar
-                  </Link>
-                </Button>
-              ) : (
-                <button
-                  type="button"
-                  className="mt-5 h-11 w-full rounded-md bg-primary font-bold text-primary-foreground max-lg:mt-0"
-                  onClick={() => openAuth('login', loginRedirect)}
-                >
+            {signedIn ? (
+              <Button asChild className="mt-6 h-12 w-full rounded-full text-[15px] font-bold">
+                <Link to="/checkout" search={checkoutSearch}>
                   Conectar e finalizar
-                </button>
-              )}
-            </div>
+                </Link>
+              </Button>
+            ) : (
+              <button
+                type="button"
+                className="group/button inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-[15px] font-bold whitespace-nowrap text-primary-foreground transition-all outline-none select-none hover:brightness-110 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px"
+                onClick={() => openAuth('login', loginRedirect)}
+              >
+                Conectar e finalizar
+              </button>
+            )}
             <Link
               to="/"
               hash="catalogo"
-              className="type-c-13 mt-3 block text-center text-primary hover:underline"
+              className="type-c-13 mt-3 block text-center text-[#c9a27a] hover:text-primary hover:underline"
             >
               Continuar explorando
             </Link>
@@ -250,7 +242,7 @@ function CartPage() {
         </div>
       ) : null}
 
-      <div className="hidden lg:block">
+      <div className="mt-10 hidden lg:block">
         <EditionCarousel title="Colecionadores também viram" items={suggestions} />
       </div>
     </main>
@@ -272,35 +264,42 @@ function CartRow({
   return (
     <li
       data-testid="cart-item"
-      className="flex items-center gap-2 rounded-xl bg-[#24140f] p-2 lg:grid lg:grid-cols-[minmax(0,1.7fr)_0.7fr_0.9fr_0.7fr_2.5rem] lg:items-center lg:gap-3 lg:px-4 lg:py-3"
+      className="min-w-0 flex items-center gap-2.5 rounded-2xl border border-[#3f2319] bg-[#24140f] p-3"
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
-        <img
-          src={item.imageUrl}
-          alt=""
-          width={64}
-          height={64}
-          className="size-12 shrink-0 rounded-lg object-cover lg:size-16"
-        />
-        <div className="min-w-0">
-          <p className="type-b-14-bold truncate text-foreground">{item.name}</p>
-          <p className="type-c-12 hidden text-[#c9a27a] lg:block">ID do token: {item.tokenId}</p>
-          <p className="type-c-12 text-[#8d847c]">Edição {item.editionName}</p>
-          <p className="type-b-14-bold text-primary lg:hidden">{formatEth(item.unitPriceEth)}</p>
-        </div>
+      <img
+        src={item.imageUrl}
+        alt=""
+        width={56}
+        height={56}
+        className="size-14 shrink-0 rounded-xl object-cover"
+      />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[15px] leading-tight font-bold text-foreground">
+          {item.name} {item.tokenId}
+        </p>
+        <p className="type-c-12 mt-1 text-[#c9a27a]">Edição: {item.editionName}</p>
+        <p className="type-b-16-bold mt-1.5 text-primary">
+          {formatEth(item.unitPriceEth)}
+          <span className="sr-only">
+            {' '}
+            ID do token: {item.tokenId} · edição {item.editionName}
+          </span>
+        </p>
       </div>
-      <p className="type-b-14 hidden text-foreground lg:block">{formatEth(item.unitPriceEth)}</p>
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="relative flex shrink-0 items-center gap-1.5">
         <button
           type="button"
           aria-label="Diminuir quantidade"
           disabled={pending || item.quantity <= 1}
           onClick={() => onQuantity(item.quantity - 1)}
-          className="flex size-11 items-center justify-center rounded-md border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40 lg:size-7 lg:rounded-none"
+          className="flex size-7 cursor-pointer items-center justify-center rounded-full border border-[#6a4332] bg-[#1a100c] text-[#c9a27a] transition-colors hover:text-foreground disabled:opacity-40"
         >
           −
         </button>
-        <span data-testid="cart-quantity" className="type-b-14 min-w-4 text-center">
+        <span
+          data-testid="cart-quantity"
+          className="min-w-5 text-center text-[14px] font-bold text-foreground"
+        >
           {item.quantity}
         </span>
         <button
@@ -308,21 +307,20 @@ function CartRow({
           aria-label="Aumentar quantidade"
           disabled={pending || item.quantity >= max}
           onClick={() => onQuantity(item.quantity + 1)}
-          className="flex size-11 items-center justify-center rounded-md border border-[#6a4332] bg-[#1a100c] text-foreground disabled:opacity-40 lg:size-7 lg:rounded-none"
+          className="relative flex size-7 cursor-pointer items-center justify-center rounded-full bg-gradient-cta text-primary-foreground transition-[filter] hover:brightness-110 disabled:opacity-40"
         >
           +
         </button>
+        <button
+          type="button"
+          aria-label={`Remover ${item.name}`}
+          disabled={pending}
+          onClick={onRemove}
+          className="absolute bottom-0 right-0 z-10 flex size-7 translate-x-[55%] translate-y-[55%] cursor-pointer items-center justify-center rounded-full text-primary transition-colors hover:text-destructive disabled:opacity-40"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
       </div>
-      <p className="type-b-14-bold hidden text-primary lg:block">{formatEth(item.lineTotalEth)}</p>
-      <button
-        type="button"
-        aria-label={`Remover ${item.name}`}
-        disabled={pending}
-        onClick={onRemove}
-        className="flex size-11 shrink-0 items-center justify-center text-[#c9a27a] hover:text-primary disabled:opacity-40 lg:size-auto lg:justify-self-end"
-      >
-        <Trash2 className="size-4" />
-      </button>
     </li>
   )
 }
