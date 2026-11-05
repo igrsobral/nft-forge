@@ -88,10 +88,10 @@ export function NftDetailPage() {
         </a>
       </p>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:gap-10">
-        <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-9">
+        <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:gap-4">
           <fieldset
-            className="relative hidden border-0 gap-2 p-0 lg:flex lg:flex-col"
+            className="relative hidden border-0 gap-3 p-0 lg:flex lg:flex-col"
             aria-label="Miniaturas"
           >
             {gallery.map((src, index) => (
@@ -103,15 +103,15 @@ export function NftDetailPage() {
                 onClick={() => setFrame(index)}
                 className={
                   index === Math.min(frame, gallery.length - 1)
-                    ? 'size-16 shrink-0 overflow-hidden rounded-lg border border-primary sm:size-[72px]'
-                    : 'size-16 shrink-0 overflow-hidden rounded-lg border border-transparent opacity-80 sm:size-[72px]'
+                    ? 'size-16 shrink-0 overflow-hidden rounded-lg border border-primary sm:size-[84px]'
+                    : 'size-16 shrink-0 overflow-hidden rounded-lg border border-transparent opacity-80 sm:size-[84px]'
                 }
               >
                 <img src={src} alt="" className="size-full object-cover" />
               </button>
             ))}
           </fieldset>
-          <div className="relative min-w-0 flex-1 rounded-[24px] bg-[#24140f] p-3">
+          <div className="relative min-w-0 flex-1 rounded-[24px] border border-[#6a4332]/70 bg-[#24140f] p-3">
             <a
               href="/#catalogo"
               aria-label="Voltar"
@@ -131,9 +131,9 @@ export function NftDetailPage() {
                 <button
                   type="button"
                   aria-label="Ampliar imagem"
-                  className="absolute top-5 right-5 flex size-9 items-center justify-center rounded-full bg-[#140d0a]/80 text-foreground"
+                  className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-full border border-[#6a4332]/60 bg-[#140d0a]/85 text-foreground"
                 >
-                  <ZoomIn className="size-4" />
+                  <ZoomIn className="size-[18px]" />
                 </button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl">
@@ -146,17 +146,17 @@ export function NftDetailPage() {
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-6">
           <div className="flex items-start justify-between gap-3">
-            <h1 className="text-[28px] leading-tight font-bold text-foreground lg:text-[34px]">
+            <h1 className="text-[28px] leading-tight font-bold text-foreground lg:text-[30px]">
               {nft.name}
             </h1>
             <p className="mt-1 shrink-0 rounded-full bg-[#24140f] px-2.5 py-1 text-sm font-bold text-primary lg:hidden">
               {nft.rating.toFixed(1)}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3 max-lg:sr-only">
-            <p data-testid="nft-price" className="text-2xl font-bold text-primary">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 max-lg:sr-only">
+            <p data-testid="nft-price" className="text-[26px] leading-none font-bold text-primary">
               {formatEth(nft.priceEth)}
             </p>
             <p className="flex items-center gap-2 text-[#c9a27a]">
@@ -183,7 +183,7 @@ export function NftDetailPage() {
             </p>
           </div>
           <PurchasePanel nft={nft} />
-          <ul className="type-c-13 grid gap-1 text-[#c9a27a]">
+          <ul className="type-c-13 grid gap-2 text-[#c9a27a]">
             <li>ID do token: {nft.tokenId}</li>
             <li>Coleção: {nft.collectionName}</li>
             <li>Atributos: {nft.attributes.join(', ')}</li>

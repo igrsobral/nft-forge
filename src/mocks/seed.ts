@@ -1,7 +1,7 @@
 import type { CatalogNetwork, Category, Network, WalletRole } from '@/contracts/common'
 import { categories } from '@/contracts/common'
 import { mulEth } from '@/lib/money'
-import { nftImageUrl } from './images'
+import { nftArtUrl } from './images'
 
 export type EditionRecord = {
   id: string
@@ -524,9 +524,10 @@ export function createSeed(): Database {
 }
 
 export function imageFor(nft: NftRecord): string {
-  return nftImageUrl(nft.name, nft.collectionName, nft.imageHue)
+  return nftArtUrl(nft.id)
 }
 
 export function galleryFor(nft: NftRecord): string[] {
-  return [0, 1, 2, 3].map((frame) => nftImageUrl(nft.name, nft.collectionName, nft.imageHue, frame))
+  const art = nftArtUrl(nft.id)
+  return [0, 1, 2, 3].map(() => art)
 }
