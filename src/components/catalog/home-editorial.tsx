@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
-import type { EditorialPost, EditorialPromo, EditorialPromoKind } from '@/contracts/editorial'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { EditorialPost, EditorialPromo, EditorialPromoKind } from '@/contracts/editorial'
 import { editorialHomeQuery } from '@/lib/queries'
 import { getStoredUserId } from '@/lib/storage'
 
@@ -119,6 +119,7 @@ function EditorialSkeleton() {
       <div className="grid gap-4 pt-2 lg:grid-cols-2 lg:gap-5 lg:pt-4">
         {Array.from({ length: 2 }, (_, index) => (
           <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton layout, list is never reordered
             key={index}
             className="flex flex-col gap-4 rounded-[20px] bg-[#24140f] p-4 sm:flex-row"
           >
@@ -137,6 +138,7 @@ function EditorialSkeleton() {
         <Skeleton className="mx-auto mt-3 h-4 w-full max-w-md" />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {Array.from({ length: 4 }, (_, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton layout, list is never reordered
             <div key={index} className="rounded-xl bg-[#24140f] p-3">
               <Skeleton className="aspect-square w-full rounded-lg" />
               <Skeleton className="mt-3 h-4 w-2/3" />

@@ -3,8 +3,8 @@ import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import type { Category } from '@/contracts/common'
-import { ApiError } from '@/lib/api/errors'
 import { subscribeNewsletter } from '@/lib/api/commerce'
+import { ApiError } from '@/lib/api/errors'
 
 const features = [
   {
@@ -225,12 +225,12 @@ export function Footer() {
                     href={item.href}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label={item.label}
                     className="flex size-9 items-center justify-center rounded-md border border-primary text-primary hover:bg-primary/10"
                   >
                     <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
                       <path d={item.path} />
                     </svg>
+                    <span className="sr-only">{item.label}</span>
                   </a>
                 </li>
               ))}

@@ -1,19 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Heart, ShoppingCart } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { rememberFavorite, takeFavoriteResume, useOpenAuth } from '@/components/auth/auth-modal'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { toast } from 'sonner'
-import type { NftDetail } from '@/contracts/catalog'
+import { rememberFavorite, takeFavoriteResume, useOpenAuth } from '@/components/auth/auth-modal'
 import { Button } from '@/components/ui/button'
+import type { NftDetail } from '@/contracts/catalog'
+import { addCartItem, addFavorite, removeFavorite } from '@/lib/api/commerce'
 import { ApiError } from '@/lib/api/errors'
-import { addFavorite, addCartItem, removeFavorite } from '@/lib/api/commerce'
-import { favoritesQuery } from '@/lib/queries'
-import { queryKeys } from '@/lib/query-keys'
 import { CART_QUANTITY_CAP } from '@/lib/cart'
 import { formatEth } from '@/lib/money'
+import { favoritesQuery } from '@/lib/queries'
+import { queryKeys } from '@/lib/query-keys'
 import { getSessionEpoch, getStoredUserId, subscribeSession } from '@/lib/storage'
-import { useSyncExternalStore } from 'react'
 
 const pillOrder = ['1/1', '1/10', '1/50', 'ABERTA']
 
@@ -98,7 +97,10 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
     <div className="flex flex-col gap-4">
       <div>
         <p className="type-b-14 text-foreground">Edição:</p>
-        <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Edição">
+        <fieldset
+          className="mt-2 flex flex-wrap items-center gap-2 border-0 p-0"
+          aria-label="Edição"
+        >
           {pills.map((item) => {
             const selected = item.id === edition?.id
             return (
@@ -121,7 +123,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
               </button>
             )
           })}
-        </div>
+        </fieldset>
       </div>
       <div className="flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-lg:z-30 max-lg:border-t max-lg:border-[#6a4332] max-lg:bg-[#24140f] max-lg:px-3 max-lg:py-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
         <div className="flex w-full items-center gap-2">

@@ -5,10 +5,10 @@ import {
   Heart,
   LifeBuoy,
   LogOut,
+  type LucideIcon,
   Tag,
   UserRound,
   Wallet,
-  type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { logout } from '@/lib/api/account'
@@ -127,6 +127,7 @@ export function ProfileField({
   children: ReactNode
 }) {
   return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: the input is passed via `children` from the call site
     <label className="grid gap-1.5">
       <RequiredLabel>{label}</RequiredLabel>
       {children}

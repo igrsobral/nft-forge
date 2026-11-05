@@ -60,6 +60,7 @@ export function EditionCarousel({
         >
           {Array.from({ length: pageCount }, (_, index) => (
             <button
+              // biome-ignore lint/suspicious/noArrayIndexKey: fixed page-dot list, mirrors pageCount order and never shifts
               key={index}
               type="button"
               role="tab"

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import type { EditorialPostDetail } from '@/contracts/editorial'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { EditorialPostDetail } from '@/contracts/editorial'
 import { ApiError } from '@/lib/api/errors'
 import { editorialPostQuery } from '@/lib/queries'
 import { getStoredUserId } from '@/lib/storage'
@@ -74,7 +74,11 @@ function JournalPost({ post }: { post: EditorialPostDetail }) {
 
         <div className="mt-8 flex flex-col gap-5">
           {post.body.map((paragraph, index) => (
-            <p key={index} className="type-b-15 text-foreground/90">
+            <p
+              // biome-ignore lint/suspicious/noArrayIndexKey: static article body, paragraphs are fixed
+              key={index}
+              className="type-b-15 text-foreground/90"
+            >
               {paragraph}
             </p>
           ))}

@@ -3,12 +3,6 @@ import { Link } from '@tanstack/react-router'
 import { ChevronLeft, Mail, Star, ZoomIn } from 'lucide-react'
 import { useState } from 'react'
 import { EditionCarousel } from '@/components/catalog/edition-carousel'
-import { tickNftPrice } from '@/lib/api/catalog'
-import { ApiError } from '@/lib/api/errors'
-import { toListQuery } from '@/lib/catalog-search'
-import { formatEth } from '@/lib/money'
-import { nftDetailQuery, nftListQuery } from '@/lib/queries'
-import { getStoredUserId } from '@/lib/storage'
 import { PurchasePanel } from '@/components/nft/purchase-panel'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +13,12 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { tickNftPrice } from '@/lib/api/catalog'
+import { ApiError } from '@/lib/api/errors'
+import { toListQuery } from '@/lib/catalog-search'
+import { formatEth } from '@/lib/money'
+import { nftDetailQuery, nftListQuery } from '@/lib/queries'
+import { getStoredUserId } from '@/lib/storage'
 import { Route } from '@/routes/nfts.$nftId'
 
 const networkLabels = { ethereum: 'Ethereum', polygon: 'Polygon', solana: 'Solana' } as const
@@ -90,9 +90,8 @@ export function NftDetailPage() {
 
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:gap-10">
         <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
-          <div
-            className="relative hidden gap-2 lg:flex lg:flex-col"
-            role="group"
+          <fieldset
+            className="relative hidden border-0 gap-2 p-0 lg:flex lg:flex-col"
             aria-label="Miniaturas"
           >
             {gallery.map((src, index) => (
@@ -111,7 +110,7 @@ export function NftDetailPage() {
                 <img src={src} alt="" className="size-full object-cover" />
               </button>
             ))}
-          </div>
+          </fieldset>
           <div className="relative min-w-0 flex-1 rounded-[24px] bg-[#24140f] p-3">
             <a
               href="/#catalogo"
@@ -164,6 +163,7 @@ export function NftDetailPage() {
               <span className="inline-flex" role="img" aria-label={`${nft.rating} de 5`}>
                 {Array.from({ length: 5 }, (_, index) => (
                   <Star
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed 5 decorative stars, order never changes
                     key={index}
                     className={
                       index < filledStars
@@ -194,30 +194,30 @@ export function NftDetailPage() {
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
               target="_blank"
               rel="noreferrer"
-              aria-label="Compartilhar no LinkedIn"
               className="text-primary"
             >
               <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
                 <path d="M6.5 9H4V20h2.5zM5.2 4A1.6 1.6 0 1 0 5.2 7.2 1.6 1.6 0 0 0 5.2 4zM20 20h-2.5v-5.6c0-1.6-.6-2.6-2-2.6a2.2 2.2 0 0 0-2 1.5 2 2 0 0 0-.1.9V20H11V9h2.4v1.5a3.4 3.4 0 0 1 3-1.7c2.2 0 3.6 1.4 3.6 4.5z" />
               </svg>
+              <span className="sr-only">Compartilhar no LinkedIn</span>
             </a>
             <a
               href={`mailto:?subject=${encodeURIComponent(nft.name)}&body=${encodeURIComponent(shareUrl)}`}
-              aria-label="Compartilhar por e-mail"
               className="text-primary"
             >
               <Mail className="size-4" />
+              <span className="sr-only">Compartilhar por e-mail</span>
             </a>
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(nft.name)}&url=${encodeURIComponent(shareUrl)}`}
               target="_blank"
               rel="noreferrer"
-              aria-label="Compartilhar no Twitter"
               className="text-primary"
             >
               <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
                 <path d="M19 7.3c-.6.3-1.2.4-1.9.5a3.1 3.1 0 0 0 1.4-1.7 6.2 6.2 0 0 1-2 .8 3.1 3.1 0 0 0-5.3 2.8A8.8 8.8 0 0 1 5 6.6a3.1 3.1 0 0 0 1 4.1 3 3 0 0 1-1.4-.4v.1a3.1 3.1 0 0 0 2.5 3 3.1 3.1 0 0 1-1.4.1 3.1 3.1 0 0 0 2.9 2.2A6.3 6.3 0 0 1 5 17.5 8.8 8.8 0 0 0 9.8 19c5.8 0 9-4.8 9-9v-.4A6.4 6.4 0 0 0 20 7.7a6 6 0 0 1-1 .6z" />
               </svg>
+              <span className="sr-only">Compartilhar no Twitter</span>
             </a>
           </p>
           <button

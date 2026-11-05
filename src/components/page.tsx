@@ -37,6 +37,7 @@ export function Field({
   children: ReactNode
 }) {
   return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: the input is passed via `children` from the call site
     <label className="grid gap-1">
       <span className="type-b-14 text-text-secondary">{label}</span>
       {children}
