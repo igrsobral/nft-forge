@@ -81,8 +81,8 @@ export function Footer() {
   })
 
   return (
-    <footer className="px-4 pt-8 pb-10 lg:px-10">
-      <div className="mx-auto w-full max-w-[1440px] bg-surface-panel">
+    <footer className="mx-auto w-full max-w-[1440px] px-4 pb-8 lg:px-10 lg:pb-16">
+      <div className="min-w-0 bg-surface-panel lg:mx-10">
         <div className="grid gap-8 px-5 py-8 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.15fr] xl:divide-x xl:divide-primary/50">
           {features.map((feature) => (
             <section
@@ -119,13 +119,13 @@ export function Footer() {
                   autoComplete="email"
                   aria-invalid={fieldError ? true : undefined}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="type-c-13 h-9 w-full rounded-md border border-line-strong bg-surface-inset px-3 text-foreground placeholder:text-secondary-muted/70 sm:h-6 sm:px-2"
+                  className="type-c-13 h-10 w-full rounded-md border border-line-strong bg-surface-inset px-3 text-foreground placeholder:text-secondary-muted/70 sm:h-9 sm:px-2"
                 />
               </label>
               <button
                 type="submit"
                 disabled={subscribe.isPending}
-                className="type-b-14-bold h-9 rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-60 sm:h-6 sm:px-2"
+                className="type-b-14-bold h-10 rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-60 sm:h-9 sm:px-2"
               >
                 {subscribe.isPending ? 'Enviando…' : 'Enviar'}
               </button>
@@ -142,7 +142,7 @@ export function Footer() {
           </section>
         </div>
 
-        <div className="type-c-13 grid gap-3 bg-[#3a261c] px-4 py-3 text-foreground sm:grid-cols-4 sm:items-center sm:gap-0">
+        <div className="type-c-13 grid gap-3 bg-surface-footer px-4 py-3 text-foreground sm:grid-cols-4 sm:items-center sm:gap-0">
           <p className="font-bold tracking-[0.18em]">KURIO</p>
           <p>Feito para colecionadores, criadores e cultura</p>
           <a href="mailto:contato@email.com" className="hover:text-primary">
